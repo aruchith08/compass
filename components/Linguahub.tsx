@@ -121,7 +121,7 @@ let chatSession: any | null = null;
 
 const getApiKey = () => {
    
-    return "sk-abcdef1234567890abcdef1234567890abcdef12"; 
+    return "AIzaSyCsrwyWyYdquFKvekzJId5_ab9jW9PPvKM"; 
 }
 
 const initializeClient = () => {

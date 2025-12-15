@@ -120,12 +120,8 @@ let client: GoogleGenAI | null = null;
 let chatSession: any | null = null;
 
 const getApiKey = () => {
-    try {
-        return process.env.API_KEY;
-    } catch (e) {
-        console.warn("process.env.API_KEY is not accessible");
-        return "";
-    }
+   
+    return "AIzaSyCsrwyWyYdquFKvekzJId5_ab9jW9PPvKM"; 
 }
 
 const initializeClient = () => {

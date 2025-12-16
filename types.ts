@@ -58,8 +58,4 @@ export interface RoadmapContextType {
   toggleHomeworkTask: (id: string) => void;
   addHomeworkTask: (text: string) => void;
   deleteHomeworkTask: (id: string) => void;
-  
-  // Notifications
-  notificationPermission: NotificationPermission;
-  requestNotificationPermission: () => Promise<void>;
 }

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { ArrowRight, Target, Trophy, AlertCircle, Quote, Flame, Filter, ListTodo, BookOpen, Plus, Trash2, Bell, CheckCircle } from 'lucide-react';
+import { ArrowRight, Target, Trophy, AlertCircle, Quote, Flame, Filter, ListTodo, BookOpen, Plus, Trash2, CheckCircle } from 'lucide-react';
 import { Role } from '../types';
 
 const Dashboard: React.FC = () => {
@@ -11,7 +11,6 @@ const Dashboard: React.FC = () => {
     dailyTasks, homeworkTasks, 
     toggleDailyTask, addDailyTask, deleteDailyTask,
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
-    notificationPermission, requestNotificationPermission
   } = useRoadmap();
   
   const [selectedRole, setSelectedRole] = useState<Role | "All Roles">("All Roles");
@@ -79,17 +78,6 @@ const Dashboard: React.FC = () => {
         
         {/* Dashboard Controls */}
         <div className="flex flex-col sm:flex-row gap-4">
-           {/* Notification Enable Button (Mobile Support) */}
-           {notificationPermission === 'default' && (
-             <button 
-               onClick={requestNotificationPermission}
-               className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm shadow-indigo-500/20"
-             >
-               <Bell size={16} />
-               <span>Enable Reminders</span>
-             </button>
-           )}
-
            {/* Role Filter */}
            <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
              <Filter size={16} className="text-slate-500 ml-2" />

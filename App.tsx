@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -40,10 +40,8 @@ const App: React.FC = () => {
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   
-  // Notification State
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
-    'Notification' in window ? Notification.permission : 'default'
-  );
+  // Track date for midnight reset
+  const dateRef = useRef(new Date().toDateString());
   
   // Theme State - Default to dark
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -132,45 +130,25 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
-  // Notification Timer Logic (22:00 IST)
+  // Midnight Check Logic: Ensure tasks reset at midnight if app is open
   useEffect(() => {
-    const checkTimeAndNotify = () => {
-      const now = new Date();
-      // Convert to IST (UTC + 5:30)
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const ist = new Date(utc + (3600000 * 5.5));
+    const intervalId = setInterval(() => {
+      const nowStr = new Date().toDateString();
       
-      const hour = ist.getHours();
-      const minute = ist.getMinutes();
-
-      if (hour === 22 && minute === 0) {
-        const incompleteDaily = dailyTasks.some(t => !t.completed);
-        const incompleteHomework = homeworkTasks.some(t => !t.completed);
-
-        if ((incompleteDaily || incompleteHomework) && notificationPermission === 'granted') {
-           new Notification("Roadmap Reminder", {
-             body: "You have incomplete tasks! Check your Daily Routine and Homework.",
-             icon: "/vite.svg"
-           });
-        }
+      // Check if day has changed while app is running
+      if (nowStr !== dateRef.current) {
+         dateRef.current = nowStr;
+         
+         // Uncheck all daily tasks (keep structure)
+         setDailyTasks(prev => prev.map(t => ({ ...t, completed: false })));
+         
+         // Clear homework tasks
+         setHomeworkTasks([]);
       }
-    };
+    }, 10000); // Check every 10 seconds
 
-    const interval = setInterval(checkTimeAndNotify, 60000); 
-    return () => clearInterval(interval);
-  }, [dailyTasks, homeworkTasks, notificationPermission]);
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-      if (permission === 'granted') {
-        new Notification("Notifications Enabled", {
-          body: "You're all set! We'll remind you at 10 PM IST if you have pending tasks.",
-        });
-      }
-    }
-  };
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleLogin = async (username: string) => {
     setIsLoading(true);
@@ -278,9 +256,7 @@ const App: React.FC = () => {
     toggleHomeworkTask,
     addHomeworkTask,
     deleteHomeworkTask,
-    notificationPermission,
-    requestNotificationPermission
-  }), [items, user, theme, dailyTasks, homeworkTasks, notificationPermission]);
+  }), [items, user, theme, dailyTasks, homeworkTasks]);
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },

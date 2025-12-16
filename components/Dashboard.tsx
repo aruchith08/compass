@@ -38,14 +38,34 @@ const Dashboard: React.FC = () => {
   const handlePerplexityClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const userAgent = navigator.userAgent.toLowerCase();
-    const isMobile = /iphone|ipad|ipod|android/.test(userAgent);
+    const isAndroid = /android/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
-    if (isMobile) {
-      // On mobile, navigating directly allows Universal Links / App Links to trigger the app.
-      // Opening in a new tab often forces the browser to handle it, bypassing the app.
-      window.location.href = "https://www.perplexity.ai/";
+    if (isAndroid) {
+      // Android: Use Intent URL to force open app or fallback to browser
+      // Package ID for Perplexity: ai.perplexity.app.android
+      const intentUrl = "intent://www.perplexity.ai/#Intent;scheme=https;package=ai.perplexity.app.android;S.browser_fallback_url=https://www.perplexity.ai;end";
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // iOS: Try custom URL scheme with fallback
+      // This attempts to open 'perplexity://'. If it fails (user remains on page), we redirect to web.
+      const appScheme = "perplexity://";
+      const webUrl = "https://www.perplexity.ai/";
+      
+      const start = Date.now();
+      
+      // Attempt to open app
+      window.location.href = appScheme;
+
+      // Fallback check
+      setTimeout(() => {
+        // If the user is still here after 500ms, the app likely didn't open.
+        if (Date.now() - start < 1000) {
+           window.location.href = webUrl;
+        }
+      }, 500);
     } else {
-      // On desktop, open in a new tab to keep the dashboard active.
+      // Desktop: Open in new tab
       window.open("https://www.perplexity.ai/", "_blank");
     }
   };

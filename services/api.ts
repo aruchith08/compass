@@ -30,8 +30,29 @@ export const api = {
     const normalizedUser = username.toLowerCase().trim();
 
     if (db.users[normalizedUser]) {
-      // User exists, return their data
-      return db.users[normalizedUser].items;
+      // User exists
+      const userItems = db.users[normalizedUser].items;
+      
+      // SYNC LOGIC: Check if there are new items in the source code (ROADMAP_DATA) 
+      // that are missing from the user's local storage data.
+      // This ensures that when we add new tasks (like Behavioral/HR), existing users receive them.
+      const userItemIds = new Set(userItems.map(i => i.id));
+      const newItems = ROADMAP_DATA.filter(defaultItem => !userItemIds.has(defaultItem.id));
+      
+      if (newItems.length > 0) {
+        console.log(`Syncing ${newItems.length} new items to user profile...`);
+        // Append new items to the user's existing list
+        const updatedItems = [...userItems, ...newItems];
+        
+        // Update DB
+        db.users[normalizedUser].items = updatedItems;
+        db.users[normalizedUser].lastActive = new Date().toISOString();
+        saveCloudData(db);
+        
+        return updatedItems;
+      }
+
+      return userItems;
     } else {
       // New user, initialize with default data
       db.users[normalizedUser] = {

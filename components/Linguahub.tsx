@@ -579,13 +579,25 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
             // Load Daily Challenges
             const savedSession = localStorage.getItem(sessionKey);
+            let sessionLoaded = false;
+
             if (savedSession) {
-                const session = JSON.parse(savedSession);
-                setTodayTasks(session.tasks);
-                setCurrentTaskIndex(session.currentIndex);
-                setIsSessionComplete(session.isComplete);
-                setIsLoadingTasks(false);
-            } else {
+                try {
+                    const session = JSON.parse(savedSession);
+                    // Check if tasks exist and are not empty
+                    if (session.tasks && Array.isArray(session.tasks) && session.tasks.length > 0) {
+                        setTodayTasks(session.tasks);
+                        setCurrentTaskIndex(session.currentIndex);
+                        setIsSessionComplete(session.isComplete);
+                        setIsLoadingTasks(false);
+                        sessionLoaded = true;
+                    }
+                } catch (e) {
+                    console.error("Error parsing saved session", e);
+                }
+            }
+            
+            if (!sessionLoaded) {
                 setIsLoadingTasks(true);
                 const newTasks = await generateDailyChallenges();
                 if (newTasks && newTasks.length > 0) {
@@ -775,7 +787,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <Star className="text-amber-500 fill-amber-500" size={20} />
                     <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Daily IELTS Challenges</h2>
                 </div>
-                {!isLoadingTasks && !isSessionComplete && (
+                {!isLoadingTasks && !isSessionComplete && todayTasks.length > 0 && (
                     <div className="text-sm font-medium px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300">
                     Question {currentTaskIndex + 1} of {todayTasks.length}
                     </div>
@@ -800,6 +812,18 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                 Great job completing your daily IELTS challenges. Come back tomorrow for a new set of tasks.
                             </p>
                         </div>
+                    </div>
+                ) : todayTasks.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
+                        <AlertCircle size={48} className="mb-4 text-red-400" />
+                        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Unable to generate tasks</h3>
+                        <p className="mb-6 max-w-xs mx-auto">There was an issue connecting to the AI tutor. Please check your connection.</p>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-900/20"
+                        >
+                            Retry Connection
+                        </button>
                     </div>
                 ) : (
                     <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 w-full">

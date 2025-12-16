@@ -41,12 +41,8 @@ const Dashboard: React.FC = () => {
     const isMobile = /iphone|ipad|ipod|android/.test(userAgent);
 
     if (isMobile) {
-      // Use the provided Smart Deep Link. 
-      // This link type (sng.link) automatically detects the OS and tries to open the app via Universal Links/App Schemes.
-      // If the app is not installed, it falls back to the web or store based on its internal configuration.
       window.location.href = "https://perplexity.sng.link/A6awk/ppas?_smtype=3&pvid=83882534-5238-4282-8b29-06f008299556&_ios_dl=perplexity-app%3A%2F%2F&_android_dl=perplexity-app%3A%2F%2F&_web_params=utm_source%3Demail%26utm_campaign%3DGA_launch&_dl=perplexity-app%3A%2F%2F&_p=origin%3Dmobile-header%26pvid%3D83882534-5238-4282-8b29-06f008299556%26pathname%3D%252F&_ddl=perplexity-app%3A%2F%2F";
     } else {
-      // Desktop: Open in new tab
       window.open("https://www.perplexity.ai/", "_blank");
     }
   };
@@ -82,7 +78,7 @@ const Dashboard: React.FC = () => {
   }).length;
   
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-8 animate-fade-in pb-12 w-full max-w-full overflow-hidden">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -94,9 +90,30 @@ const Dashboard: React.FC = () => {
         </div>
         
         {/* Dashboard Controls */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+           {/* External Tools Icons */}
+           <div className="flex gap-2">
+              <a 
+                 href="https://gamma.app/create" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm"
+                 title="PPT Maker (Gamma)"
+              >
+                 <Presentation size={20} />
+              </a>
+              <a 
+                 href="https://www.perplexity.ai/" 
+                 onClick={handlePerplexityClick}
+                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors shadow-sm"
+                 title="Perplexity AI"
+              >
+                 <Search size={20} />
+              </a>
+           </div>
+
            {/* Role Filter */}
-           <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+           <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
              <Filter size={16} className="text-slate-500 ml-2" />
              <select 
                value={selectedRole}
@@ -113,10 +130,10 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* === DAILY FOCUS SECTION === */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         
         {/* Daily Routine */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
               <ListTodo className="mr-2 text-indigo-500" size={20} /> Daily Routine
@@ -124,7 +141,7 @@ const Dashboard: React.FC = () => {
             <span className="text-xs text-slate-400">Resets Daily</span>
           </div>
           
-          <div className="flex-1 space-y-2 mb-4">
+          <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[200px] custom-scrollbar">
              {dailyTasks.map(task => (
                <div key={task.id} className="flex items-start group">
                  <button 
@@ -135,7 +152,7 @@ const Dashboard: React.FC = () => {
                  >
                    {task.completed && <CheckCircle size={14} />}
                  </button>
-                 <span className={`text-sm flex-1 ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
+                 <span className={`text-sm flex-1 break-words ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
                  </span>
                  {!task.isFixed && (
@@ -150,7 +167,7 @@ const Dashboard: React.FC = () => {
              ))}
           </div>
           
-          <form onSubmit={handleAddDaily} className="relative mt-auto">
+          <form onSubmit={handleAddDaily} className="relative mt-auto pt-2">
              <input 
                type="text" 
                value={newDaily}
@@ -158,14 +175,14 @@ const Dashboard: React.FC = () => {
                placeholder="Add routine task..."
                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-indigo-500 transition-colors dark:text-white"
              />
-             <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors">
+             <button type="submit" className="absolute right-2 top-1/2 -translate-y-0 p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors">
                <Plus size={14} />
              </button>
           </form>
         </div>
 
         {/* Today's Homework */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
               <BookOpen className="mr-2 text-rose-500" size={20} /> Today's Homework
@@ -173,7 +190,7 @@ const Dashboard: React.FC = () => {
             <span className="text-xs text-slate-400">Clears Tomorrow</span>
           </div>
 
-          <div className="flex-1 space-y-2 mb-4">
+          <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[200px] custom-scrollbar">
              {homeworkTasks.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-slate-400 text-sm min-h-[100px]">
                    <p>No homework added yet.</p>
@@ -189,7 +206,7 @@ const Dashboard: React.FC = () => {
                  >
                    {task.completed && <CheckCircle size={14} />}
                  </button>
-                 <span className={`text-sm flex-1 ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
+                 <span className={`text-sm flex-1 break-words ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
                  </span>
                  <button 
@@ -202,7 +219,7 @@ const Dashboard: React.FC = () => {
              ))}
           </div>
 
-          <form onSubmit={handleAddHomework} className="relative mt-auto">
+          <form onSubmit={handleAddHomework} className="relative mt-auto pt-2">
              <input 
                type="text" 
                value={newHomework}
@@ -210,22 +227,22 @@ const Dashboard: React.FC = () => {
                placeholder="Add homework assignment..."
                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-rose-500 transition-colors dark:text-white"
              />
-             <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md transition-colors">
+             <button type="submit" className="absolute right-2 top-1/2 -translate-y-0 p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md transition-colors">
                <Plus size={14} />
              </button>
           </form>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         {/* Overall Progress Chart */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-sm transition-colors duration-300">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-sm transition-colors duration-300 min-w-0">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
             <Target className="mr-2 text-cyan-500" size={20} /> 
             {selectedRole === "All Roles" ? "Total Progress" : `${selectedRole} Progress`}
           </h3>
-          <div className="h-64 relative z-10">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full relative z-10 flex items-center justify-center" style={{ height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="99%" height="100%">
               <PieChart>
                 <Pie
                   data={overallData}
@@ -243,83 +260,109 @@ const Dashboard: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }}
-                  itemStyle={{ color: '#f8fafc' }}
+                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#f8fafc' }}
+                   itemStyle={{ color: '#f8fafc' }}
                 />
               </PieChart>
             </ResponsiveContainer>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">{totalProgress}%</span>
+            {/* Centered Percentage */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-4xl font-bold text-slate-900 dark:text-white">{totalProgress}%</span>
+              <span className="text-xs text-slate-500 uppercase tracking-wider">Complete</span>
             </div>
           </div>
         </div>
 
-        {/* Role Readiness Chart */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 lg:col-span-2 shadow-sm transition-colors duration-300">
+        {/* Role Readiness Bar Chart */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm min-w-0">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-            <Trophy className="mr-2 text-purple-500" size={20} /> Role Readiness Comparison
+            <Trophy className="mr-2 text-amber-500" size={20} /> Role Readiness
           </h3>
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={roleData} layout="vertical" margin={{ left: 40, right: 20 }}>
-                <XAxis type="number" domain={[0, 100]} hide />
-                <YAxis dataKey="name" type="category" width={100} stroke="#94a3b8" fontSize={12} tick={{ fill: '#64748b' }} />
-                <Tooltip 
-                   cursor={{fill: '#f1f5f9'}}
-                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }}
+          <div className="w-full" style={{ height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="99%" height="100%">
+              <BarChart data={roleData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <XAxis 
+                   dataKey="name" 
+                   axisLine={false} 
+                   tickLine={false} 
+                   tick={{ fill: '#64748b', fontSize: 10 }} 
+                   interval={0}
                 />
-                <Bar dataKey="score" barSize={20} radius={[0, 4, 4, 0]}>
+                <YAxis hide domain={[0, 100]} />
+                <Tooltip 
+                   cursor={{ fill: 'transparent' }}
+                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#f8fafc' }}
+                />
+                <Bar dataKey="score" radius={[4, 4, 0, 0]}>
                   {roleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.score > 70 ? '#22c55e' : entry.score > 40 ? '#06b6d4' : '#3b82f6'} />
+                    <Cell key={`cell-${index}`} fill={entry.score >= 80 ? '#10b981' : entry.score >= 50 ? '#06b6d4' : '#64748b'} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
 
-      {/* Next Focus Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center">
-            <AlertCircle className="mr-2 text-amber-500" size={20} /> 
-            {selectedRole === "All Roles" ? "Immediate Focus" : `Focus: ${selectedRole}`}
+        {/* Next Focus Actions */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col min-w-0">
+           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+            <Flame className="mr-2 text-rose-500" size={20} /> Next Priorities
           </h3>
-          <div className="space-y-4">
-            {nextFocusItems.length > 0 ? nextFocusItems.map(item => (
-              <div key={item.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl flex justify-between items-center group hover:border-cyan-500/50 transition-colors">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400">Year {item.year > 0 ? item.year : "Gen"}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">{item.category}</span>
-                  </div>
-                  <h4 className="font-medium text-slate-700 dark:text-slate-200">{item.name}</h4>
-                </div>
-                <ArrowRight size={18} className="text-slate-400 group-hover:text-cyan-500 transition-colors" />
-              </div>
-            )) : (
-              <div className="p-4 text-slate-400 text-center">No high priority items pending for this role! Great job.</div>
-            )}
+          
+          <div className="flex-1 space-y-3 overflow-y-auto max-h-[220px] custom-scrollbar">
+             {nextFocusItems.length > 0 ? (
+               nextFocusItems.map(item => (
+                 <div key={item.id} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-cyan-500/30 transition-colors">
+                    <div className="flex justify-between items-start mb-1">
+                       <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider bg-cyan-50 dark:bg-cyan-900/20 px-1.5 py-0.5 rounded">
+                         Year {item.year}
+                       </span>
+                       <span className="text-[10px] text-slate-400">{item.category}</span>
+                    </div>
+                    <h4 className="font-medium text-slate-800 dark:text-slate-200 text-sm line-clamp-2">{item.name}</h4>
+                 </div>
+               ))
+             ) : (
+               <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center py-6">
+                 <p className="text-sm">You're all caught up on high priority tasks!</p>
+               </div>
+             )}
+          </div>
+          
+          <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-sm">
+             <span className="text-slate-500">Total Completed</span>
+             <span className="font-bold text-slate-900 dark:text-white">{completedCount} Tasks</span>
           </div>
         </div>
-
-        <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-center items-center text-center relative overflow-hidden shadow-lg">
-           <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Trophy size={100} className="text-white" />
+      </div>
+      
+      {/* Motivation Quote */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg">
+        <div className="absolute top-0 right-0 p-12 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+           <div className="flex-1">
+              <Quote className="text-white/30 mb-2" size={32} />
+              <p className="text-lg md:text-xl font-medium italic opacity-95">
+                "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."
+              </p>
+              <p className="mt-2 text-sm text-indigo-200 font-bold tracking-wide uppercase">— Brian Herbert</p>
            </div>
-           <h3 className="text-xl font-bold text-white mb-2">Milestones ({selectedRole === "All Roles" ? "Total" : "Role"})</h3>
-           <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 my-4">
-             {completedCount}
+           
+           <div className="hidden md:flex gap-4">
+              <button 
+                onClick={handlePerplexityClick}
+                className="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors shadow-lg flex items-center gap-2 group"
+              >
+                <Search size={18} />
+                <span>Deep Search Topic</span>
+                <ExternalLink size={14} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+              </button>
            </div>
-           <p className="text-slate-400 max-w-xs">
-             Tasks, projects, and skills mastered on your journey.
-           </p>
         </div>
       </div>
 
       {/* Real Advice & Verdict Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm transition-colors duration-300">
             <div className="flex items-center space-x-2 mb-4">
                <Quote className="text-cyan-600 dark:text-cyan-500" size={20} />
@@ -352,40 +395,6 @@ const Dashboard: React.FC = () => {
                <p className="mt-4 text-xs text-slate-500 italic">"If you do this seriously for 3-4 years, you will be ahead of 90% of students."</p>
             </div>
          </div>
-      </div>
-
-      {/* Quick Tools / External Apps */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-         <a 
-           href="https://gamma.app/create" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm hover:border-indigo-500 hover:shadow-md transition-all group flex items-center space-x-4 cursor-pointer"
-         >
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl group-hover:scale-110 transition-transform">
-               <Presentation size={24} />
-            </div>
-            <div className="flex-1">
-               <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">PPT Maker</h3>
-               <p className="text-xs text-slate-500 dark:text-slate-400">Generate slides with Gamma AI</p>
-            </div>
-            <ExternalLink size={18} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
-         </a>
-
-         <a 
-           href="https://www.perplexity.ai/" 
-           onClick={handlePerplexityClick}
-           className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm hover:border-teal-500 hover:shadow-md transition-all group flex items-center space-x-4 cursor-pointer"
-         >
-            <div className="p-3 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 rounded-xl group-hover:scale-110 transition-transform">
-               <Search size={24} />
-            </div>
-            <div className="flex-1">
-               <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">Perplexity AI</h3>
-               <p className="text-xs text-slate-500 dark:text-slate-400">Smart search & research</p>
-            </div>
-            <ExternalLink size={18} className="text-slate-300 group-hover:text-teal-500 transition-colors" />
-         </a>
       </div>
     </div>
   );

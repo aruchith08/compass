@@ -34,6 +34,22 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Smart Link Handler for Perplexity
+  const handlePerplexityClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android/.test(userAgent);
+
+    if (isMobile) {
+      // On mobile, navigating directly allows Universal Links / App Links to trigger the app.
+      // Opening in a new tab often forces the browser to handle it, bypassing the app.
+      window.location.href = "https://www.perplexity.ai/";
+    } else {
+      // On desktop, open in a new tab to keep the dashboard active.
+      window.open("https://www.perplexity.ai/", "_blank");
+    }
+  };
+
   // Role Readiness Data
   const roles: Role[] = ["AI/ML Engineer", "Data Scientist", "Data Analyst", "AI Security Officer", "Full Stack Developer"];
   const roleData = roles.map(role => ({
@@ -357,8 +373,7 @@ const Dashboard: React.FC = () => {
 
          <a 
            href="https://www.perplexity.ai/" 
-           target="_blank" 
-           rel="noopener noreferrer"
+           onClick={handlePerplexityClick}
            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm hover:border-teal-500 hover:shadow-md transition-all group flex items-center space-x-4 cursor-pointer"
          >
             <div className="p-3 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 rounded-xl group-hover:scale-110 transition-transform">

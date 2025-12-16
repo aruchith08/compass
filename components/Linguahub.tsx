@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User } from '../types';
+import { runGenAI } from '../services/ai';
 
 // --- TYPES ---
 
@@ -122,139 +123,99 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
     { name: 'Cambridge English Prep', url: 'https://www.cambridgeenglish.org/learning-english/exam-preparation/' },
 ];
 
-// --- GEMINI SERVICE ---
+// --- GEMINI SERVICE INTEGRATION ---
 
-let client: GoogleGenAI | null = null;
-let chatSession: any | null = null;
+const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
+    return runGenAI(async (ai) => {
+        // Map history to GenAI format
+        const chatHistory = history.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.text }]
+        }));
 
-const getApiKey = () => {
-    return "AIzaSyCsrwyWyYdquFKvekzJId5_ab9jW9PPvKM"; 
-}
-
-const initializeClient = () => {
-    const key = getApiKey();
-    if (!client && key) {
-        client = new GoogleGenAI({ apiKey: key });
-    }
-    return client;
-};
-
-const startChat = () => {
-    const ai = initializeClient();
-    if (!ai) return null;
-
-    if (!chatSession) {
-        chatSession = ai.chats.create({
+        const chat = ai.chats.create({
             model: 'gemini-2.5-flash',
+            history: chatHistory,
             config: {
-            systemInstruction: 'You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria (Lexical Resource, Grammatical Range, Coherence, Fluency).',
+                systemInstruction: 'You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria (Lexical Resource, Grammatical Range, Coherence, Fluency).',
             },
         });
-    }
-    return chatSession;
-};
 
-const sendMessageToGemini = async (message: string): Promise<string> => {
-    const key = getApiKey();
-    if (!key) {
-        return "API configuration missing. Please ensure API_KEY is set.";
-    }
-
-    const session = startChat();
-    if (!session) {
-         return "Failed to initialize AI.";
-    }
-
-    try {
-        const result = await session.sendMessage({ message });
+        const result = await chat.sendMessage(message);
         return result.text || "I'm sorry, I couldn't generate a response.";
-    } catch (error) {
-        console.error("Gemini API Error:", error);
-        return "Failed to communicate with AI.";
-    }
+    });
 };
 
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string): Promise<{text: string, score: number}> => {
-    const ai = initializeClient();
-    if (!ai) {
-        return { text: "API Key missing.", score: 0 };
-    }
+    return runGenAI(async (ai) => {
+        const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
 
-    const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
+        const prompt = `You are a certified IELTS Examiner.
+        
+        Task: Evaluate the candidate's response to the following IELTS practice task.
+        
+        Task Type: "${challenge}"${contextStr}
+        Candidate Response: "${userAnswer}"
+        
+        Requirements:
+        1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria.
+        2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response.
+        3. For Listening/Reading: Check factual accuracy against the context.
+        4. Provide specific corrections and tips to improve the band score.
+        
+        Output Format (Strictly follow this):
+        Score: [Band Score]/9
+        Feedback: [Detailed feedback]`;
 
-    const prompt = `You are a certified IELTS Examiner.
-    
-    Task: Evaluate the candidate's response to the following IELTS practice task.
-    
-    Task Type: "${challenge}"${contextStr}
-    Candidate Response: "${userAnswer}"
-    
-    Requirements:
-    1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria.
-    2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response.
-    3. For Listening/Reading: Check factual accuracy against the context.
-    4. Provide specific corrections and tips to improve the band score.
-    
-    Output Format (Strictly follow this):
-    Score: [Band Score]/9
-    Feedback: [Detailed feedback]`;
-
-    try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt
         });
         
         const responseText = response.text || "No response generated.";
-        
-        // Parse score (Band 0-9)
         const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
         const score = scoreMatch ? parseFloat(scoreMatch[1]) : 0;
         
         return { text: responseText, score };
-    } catch (error) {
-        console.error("Evaluation Error:", error);
-        return { text: "Unable to verify answer at the moment.", score: 0 };
-    }
+    });
 };
 
 const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
-    const ai = initializeClient();
-    if (!ai) return null;
-
-    const schema = {
-        type: Type.OBJECT,
-        properties: {
-            word: { type: Type.STRING },
-            phonetic: { type: Type.STRING },
-            partOfSpeech: { type: Type.STRING },
-            definition: { type: Type.STRING },
-            example: { type: Type.STRING },
-        },
-        required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
-    };
-
-    const prompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9.
-    Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'.
-    
-    Return a JSON object with:
-    - word: The word itself.
-    - phonetic: IPA pronunciation guide.
-    - partOfSpeech: e.g., Adjective, Noun, Verb.
-    - definition: Clear, academic definition.
-    - example: A sentence demonstrating its usage in a high-level context.`;
-
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                responseMimeType: 'application/json',
-                responseSchema: schema,
-                temperature: 1.2
-            }
+        return await runGenAI(async (ai) => {
+            const schema = {
+                type: Type.OBJECT,
+                properties: {
+                    word: { type: Type.STRING },
+                    phonetic: { type: Type.STRING },
+                    partOfSpeech: { type: Type.STRING },
+                    definition: { type: Type.STRING },
+                    example: { type: Type.STRING },
+                },
+                required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
+            };
+
+            const prompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9.
+            Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'.
+            
+            Return a JSON object with:
+            - word: The word itself.
+            - phonetic: IPA pronunciation guide.
+            - partOfSpeech: e.g., Adjective, Noun, Verb.
+            - definition: Clear, academic definition.
+            - example: A sentence demonstrating its usage in a high-level context.`;
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: prompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: schema,
+                    temperature: 1.2
+                }
+            });
+            return JSON.parse(response.text || "{}");
         });
-        return JSON.parse(response.text || "{}");
     } catch (error) {
         console.error("Vocab generation failed:", error);
         return null;
@@ -262,74 +223,67 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 };
 
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
-    const ai = initializeClient();
-    if (!ai) return "Unable to check.";
-    
-    const prompt = `Evaluate the usage of the word "${word}" in the following sentence:
-    "${sentence}"
-    
-    Is it used correctly grammatically and contextually?
-    Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
-    
     try {
-        const response = await ai.models.generateContent({
-             model: 'gemini-2.5-flash',
-             contents: prompt
+        return await runGenAI(async (ai) => {
+            const prompt = `Evaluate the usage of the word "${word}" in the following sentence:
+            "${sentence}"
+            
+            Is it used correctly grammatically and contextually?
+            Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
+            
+            const response = await ai.models.generateContent({
+                 model: 'gemini-2.5-flash',
+                 contents: prompt
+            });
+            return response.text || "No feedback generated.";
         });
-        return response.text || "No feedback generated.";
     } catch (e) {
         return "Error checking sentence.";
     }
 };
 
 const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
-    const ai = initializeClient();
-    if (!ai) {
-         console.error("API Key missing");
-         return [];
-    }
-
-    // Schema for tasks
-    const schema = {
-        type: Type.ARRAY,
-        items: {
-        type: Type.OBJECT,
-        properties: {
-            id: { type: Type.STRING },
-            category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
-            type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
-            content: { type: Type.STRING, description: 'The question or task instruction' },
-            requiresInput: { type: Type.BOOLEAN },
-            hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
-        },
-        required: ['id', 'category', 'type', 'content', 'requiresInput'],
-        }
-    };
-
-    const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges.
-    
-    Strictly generate one task for each of these categories: 
-    1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) about a university conversation or news report in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script (e.g. "What time does the library close?").
-    2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a "True/False/Not Given" question or a specific detail question based on the text.
-    3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'.
-    4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'.
-    5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'.
-
-    Ensure the difficulty matches IELTS Band 7.0-8.0.`;
-
     try {
-        const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: schema
-        }
-        });
+        return await runGenAI(async (ai) => {
+            const schema = {
+                type: Type.ARRAY,
+                items: {
+                type: Type.OBJECT,
+                properties: {
+                    id: { type: Type.STRING },
+                    category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
+                    type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
+                    content: { type: Type.STRING, description: 'The question or task instruction' },
+                    requiresInput: { type: Type.BOOLEAN },
+                    hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
+                },
+                required: ['id', 'category', 'type', 'content', 'requiresInput'],
+                }
+            };
 
-        const jsonText = response.text || "[]";
-        const tasks = JSON.parse(jsonText);
-        return tasks;
+            const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges.
+            
+            Strictly generate one task for each of these categories: 
+            1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) about a university conversation or news report in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script (e.g. "What time does the library close?").
+            2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a "True/False/Not Given" question or a specific detail question based on the text.
+            3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'.
+            4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'.
+            5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'.
+
+            Ensure the difficulty matches IELTS Band 7.0-8.0.`;
+
+            const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: schema
+            }
+            });
+
+            const jsonText = response.text || "[]";
+            return JSON.parse(jsonText);
+        });
     } catch (error) {
         console.error("Failed to generate daily tasks:", error);
         return [];
@@ -436,20 +390,25 @@ const ChatWidget = () => {
 
         const userMsg = input.trim();
         setInput('');
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        
+        // Add user message to state
+        const newHistory: ChatMessage[] = [...messages, { role: 'user', text: userMsg }];
+        setMessages(newHistory);
         setIsLoading(true);
 
         try {
-        const response = await sendMessageToGemini(userMsg);
-        setMessages(prev => [...prev, { role: 'model', text: response }]);
+            // Pass the FULL history to the key-rotated service
+            // This ensures that even if the key rotates, the new client receives the context
+            const response = await sendMessageToGemini(userMsg, newHistory.filter(m => !m.isError));
+            setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
-        setMessages(prev => [...prev, { 
-            role: 'model', 
-            text: "Connection error. Please check configuration.",
-            isError: true 
-        }]);
+            setMessages(prev => [...prev, { 
+                role: 'model', 
+                text: "Connection error. All API keys may be exhausted. Please try again later.",
+                isError: true 
+            }]);
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -650,7 +609,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             setFeedback(result.text);
             setLastScore(result.score);
         } catch (error) {
-            setFeedback("Sorry, I couldn't check your answer right now. Please try again.");
+            setFeedback("Sorry, I couldn't check your answer right now due to a connection issue. Please try again.");
         } finally {
             setIsChecking(false);
         }
@@ -817,7 +776,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
                         <AlertCircle size={48} className="mb-4 text-red-400" />
                         <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Unable to generate tasks</h3>
-                        <p className="mb-6 max-w-xs mx-auto">There was an issue connecting to the AI tutor. Please check your connection.</p>
+                        <p className="mb-6 max-w-xs mx-auto">There was an issue connecting to the AI tutor. Please check your connection or quota.</p>
                         <button 
                             onClick={() => window.location.reload()}
                             className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-900/20"

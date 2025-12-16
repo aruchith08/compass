@@ -1,10 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI } from "@google/genai";
-import { Mic, Send, RefreshCw, X, Loader2, Award, Briefcase, Code2, Users } from 'lucide-react';
-
-// Reuse the API Key logic (in a real app, this should be an env var or context)
-const getApiKey = () => "AIzaSyCsrwyWyYdquFKvekzJId5_ab9jW9PPvKM";
+import { Mic, Send, RefreshCw, X, Loader2, Award, Briefcase } from 'lucide-react';
+import { runGenAI } from '../services/ai';
 
 type InterviewType = 'Technical' | 'Behavioral' | 'System Design';
 
@@ -24,19 +21,11 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
 
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // Initialize Client
-    const initializeClient = () => {
-        const key = getApiKey();
-        return new GoogleGenAI({ apiKey: key });
-    };
-
     const generateQuestion = async () => {
         setIsGenerating(true);
         setFeedback(null);
         setScore(null);
         setUserAnswer('');
-        
-        const ai = initializeClient();
         
         let prompt = "";
         if (type === 'Behavioral') {
@@ -48,11 +37,13 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         }
 
         try {
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt
+            await runGenAI(async (ai) => {
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt
+                });
+                setQuestion(response.text?.trim() || "Describe a challenging project you worked on.");
             });
-            setQuestion(response.text?.trim() || "Describe a challenging project you worked on.");
         } catch (error) {
             console.error("Error generating question", error);
             setQuestion("Tell me about a time you handled a conflict in a team.");
@@ -72,7 +63,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         if (!userAnswer.trim()) return;
         setIsEvaluating(true);
 
-        const ai = initializeClient();
         const prompt = `You are a strict technical interviewer.
         
         Question: "${question}"
@@ -90,20 +80,22 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         `;
 
         try {
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt
+            await runGenAI(async (ai) => {
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt
+                });
+                
+                const text = response.text || "";
+                // Extract score broadly
+                const scoreMatch = text.match(/Score:\s*(\d+)/i);
+                const extractedScore = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+                
+                setScore(extractedScore);
+                setFeedback(text);
             });
-            
-            const text = response.text || "";
-            // Extract score broadly
-            const scoreMatch = text.match(/Score:\s*(\d+)/i);
-            const extractedScore = scoreMatch ? parseInt(scoreMatch[1]) : 5;
-            
-            setScore(extractedScore);
-            setFeedback(text);
         } catch (error) {
-            setFeedback("Error evaluating answer. Please try again.");
+            setFeedback("Error evaluating answer. Check internet connection.");
         } finally {
             setIsEvaluating(false);
         }

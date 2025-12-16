@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
              ))}
           </div>
           
-          <form onSubmit={handleAddDaily} className="relative mt-auto pt-2">
+          <form onSubmit={handleAddDaily} className="relative mt-auto">
              <input 
                type="text" 
                value={newDaily}
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
                placeholder="Add routine task..."
                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-indigo-500 transition-colors dark:text-white"
              />
-             <button type="submit" className="absolute right-2 top-1/2 -translate-y-0 p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors">
+             <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors">
                <Plus size={14} />
              </button>
           </form>
@@ -219,7 +219,7 @@ const Dashboard: React.FC = () => {
              ))}
           </div>
 
-          <form onSubmit={handleAddHomework} className="relative mt-auto pt-2">
+          <form onSubmit={handleAddHomework} className="relative mt-auto">
              <input 
                type="text" 
                value={newHomework}
@@ -227,7 +227,7 @@ const Dashboard: React.FC = () => {
                placeholder="Add homework assignment..."
                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-rose-500 transition-colors dark:text-white"
              />
-             <button type="submit" className="absolute right-2 top-1/2 -translate-y-0 p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md transition-colors">
+             <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md transition-colors">
                <Plus size={14} />
              </button>
           </form>

@@ -38,32 +38,13 @@ const Dashboard: React.FC = () => {
   const handlePerplexityClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroid = /android/.test(userAgent);
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isMobile = /iphone|ipad|ipod|android/.test(userAgent);
 
-    if (isAndroid) {
-      // Android: Use Intent URL to force open app or fallback to browser
-      // Package ID for Perplexity: ai.perplexity.app.android
-      const intentUrl = "intent://www.perplexity.ai/#Intent;scheme=https;package=ai.perplexity.app.android;S.browser_fallback_url=https://www.perplexity.ai;end";
-      window.location.href = intentUrl;
-    } else if (isIOS) {
-      // iOS: Try custom URL scheme with fallback
-      // This attempts to open 'perplexity://'. If it fails (user remains on page), we redirect to web.
-      const appScheme = "perplexity://";
-      const webUrl = "https://www.perplexity.ai/";
-      
-      const start = Date.now();
-      
-      // Attempt to open app
-      window.location.href = appScheme;
-
-      // Fallback check
-      setTimeout(() => {
-        // If the user is still here after 500ms, the app likely didn't open.
-        if (Date.now() - start < 1000) {
-           window.location.href = webUrl;
-        }
-      }, 500);
+    if (isMobile) {
+      // Use the provided Smart Deep Link. 
+      // This link type (sng.link) automatically detects the OS and tries to open the app via Universal Links/App Schemes.
+      // If the app is not installed, it falls back to the web or store based on its internal configuration.
+      window.location.href = "https://perplexity.sng.link/A6awk/ppas?_smtype=3&pvid=83882534-5238-4282-8b29-06f008299556&_ios_dl=perplexity-app%3A%2F%2F&_android_dl=perplexity-app%3A%2F%2F&_web_params=utm_source%3Demail%26utm_campaign%3DGA_launch&_dl=perplexity-app%3A%2F%2F&_p=origin%3Dmobile-header%26pvid%3D83882534-5238-4282-8b29-06f008299556%26pathname%3D%252F&_ddl=perplexity-app%3A%2F%2F";
     } else {
       // Desktop: Open in new tab
       window.open("https://www.perplexity.ai/", "_blank");

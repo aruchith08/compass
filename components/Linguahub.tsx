@@ -127,8 +127,16 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
     return runGenAI(async (ai) => {
-        // Map history to GenAI format
-        const chatHistory = history.map(msg => ({
+        // Sanitize history: Filter out messages with empty text to avoid "ContentUnion" errors
+        const validHistory = history.filter(msg => msg.text && msg.text.trim().length > 0);
+
+        // Sanitize logic: Ensure we don't send consecutive 'user' messages. 
+        // If the last message in history is 'user', remove it, because 'chat.sendMessage' acts as the new 'user' turn.
+        if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
+            validHistory.pop();
+        }
+
+        const chatHistory = validHistory.map(msg => ({
             role: msg.role,
             parts: [{ text: msg.text }]
         }));
@@ -141,7 +149,8 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
             },
         });
 
-        const result = await chat.sendMessage(message);
+        // Fixed: sendMessage requires an object with a message property in the new SDK
+        const result = await chat.sendMessage({ message });
         return result.text || "I'm sorry, I couldn't generate a response.";
     });
 };
@@ -397,14 +406,13 @@ const ChatWidget = () => {
         setIsLoading(true);
 
         try {
-            // Pass the FULL history to the key-rotated service
-            // This ensures that even if the key rotates, the new client receives the context
+            // Pass the FULL history to the service
             const response = await sendMessageToGemini(userMsg, newHistory.filter(m => !m.isError));
             setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
             setMessages(prev => [...prev, { 
                 role: 'model', 
-                text: "Connection error. All API keys may be exhausted. Please try again later.",
+                text: "Chat Error: ContentUnion is required or connection failed. Please check your connection and try again.",
                 isError: true 
             }]);
         } finally {

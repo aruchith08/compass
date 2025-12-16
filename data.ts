@@ -106,6 +106,20 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false
   },
   {
+    id: "Y1_M03",
+    year: 1,
+    name: "Calculus for AI",
+    description: "Derivatives, Chain Rule, Gradients, Partial Derivatives. Essential for understanding Backpropagation.",
+    category: "Mathematics",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "3Blue1Brown Calculus",
+    resource_link: "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr",
+    is_project: false,
+    is_output: false
+  },
+  {
     id: "Y1_M02",
     year: 1,
     name: "Probability & Statistics",
@@ -214,7 +228,7 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     id: "Y2_DA01",
     year: 2,
     name: "Python Data Libraries",
-    description: "Master Numpy, Pandas, Matplotlib, Seaborn.",
+    description: "Master Numpy, Pandas, Matplotlib, Seaborn. Data Cleaning & Visualization.",
     category: "Data Analysis",
     priority: "High",
     status: "To Do",
@@ -239,7 +253,7 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false
   },
 
-  // 2. Machine Learning
+  // 2. Machine Learning Foundations
   {
     id: "Y2_ML01",
     year: 2,
@@ -251,6 +265,34 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     role_alignment: ["AI/ML Engineer", "Data Scientist"],
     resource_name: "Andrew Ng ML (Coursera)",
     resource_link: "https://www.coursera.org/specializations/machine-learning-introduction",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y2_ML02",
+    year: 2,
+    name: "Unsupervised Learning",
+    description: "K-Means Clustering, Hierarchical Clustering, PCA (Dimensionality Reduction), Anomaly Detection.",
+    category: "Machine Learning",
+    priority: "Medium",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "StatQuest Clustering",
+    resource_link: "https://www.youtube.com/watch?v=4b5d3muPQmA",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y2_ML03",
+    year: 2,
+    name: "Advanced ML: Ensembles",
+    description: "Bagging, Boosting (XGBoost, LightGBM, CatBoost), Stacking. Essential for Kaggle.",
+    category: "Machine Learning",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "Kaggle Learn",
+    resource_link: "https://www.kaggle.com/learn",
     is_project: false,
     is_output: false
   },
@@ -318,7 +360,7 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     id: "Y2_PR04",
     year: 2,
     name: "House Price Prediction",
-    description: "Regression model project. Build full pipeline.",
+    description: "End-to-end Regression project. Data cleaning -> Model -> Prediction.",
     category: "Projects",
     priority: "High",
     status: "To Do",
@@ -344,12 +386,12 @@ export const ROADMAP_DATA: RoadmapItem[] = [
   },
 
   // ==================== YEAR 3: ADVANCED ====================
-  // 1. Deep Learning
+  // 1. Deep Learning Basics
   {
     id: "Y3_DL01",
     year: 3,
     name: "Deep Learning Concepts",
-    description: "Neural Networks, Backpropagation, CNN (Images), RNN, LSTM (Text/Sequences), Transformers.",
+    description: "Neural Networks, Perceptrons, Backpropagation, Activation Functions, Optimizers (Adam/SGD).",
     category: "Deep Learning",
     priority: "High",
     status: "To Do",
@@ -359,6 +401,51 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_project: false,
     is_output: false
   },
+  // 2. Deep Learning Applications
+  {
+    id: "Y3_DL04",
+    year: 3,
+    name: "Computer Vision (CV)",
+    description: "CNN Architectures (ResNet, VGG, EfficientNet), Object Detection (YOLO), OpenCV.",
+    category: "Deep Learning",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "Fast.ai Part 1",
+    resource_link: "https://course.fast.ai/",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y3_DL02",
+    year: 3,
+    name: "NLP Fundamentals",
+    description: "Text Preprocessing, Tokenization, Word Embeddings (Word2Vec, GloVe), RNNs/LSTMs.",
+    category: "Deep Learning",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "Hugging Face NLP Course",
+    resource_link: "https://huggingface.co/learn/nlp-course",
+    is_project: false,
+    is_output: false
+  },
+  // 3. Modern AI (LLMs)
+  {
+    id: "Y3_DL03",
+    year: 3,
+    name: "Modern AI: LLMs & Transformers",
+    description: "Attention Mechanism, Transformer Architecture (BERT, GPT), Fine-tuning, Prompt Engineering.",
+    category: "Deep Learning",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "Andrej Karpathy - Zero to Hero",
+    resource_link: "https://karpathy.ai/zero-to-hero.html",
+    is_project: false,
+    is_output: false
+  },
+
   {
     id: "Y3_AS01",
     year: 3,
@@ -438,8 +525,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
   {
     id: "Y3_PR01",
     year: 3,
-    name: "Image Classification",
-    description: "Build an Image Classification System using CNNs.",
+    name: "Image Classification System",
+    description: "Build a CNN-based classifier (e.g., Plant Disease Detection).",
     category: "Projects",
     priority: "High",
     status: "To Do",
@@ -465,69 +552,37 @@ export const ROADMAP_DATA: RoadmapItem[] = [
   },
 
   // ==================== YEAR 4: SPECIALIZATION + JOB READY ====================
-  // 1. Final Focus
+  // 1. GenAI Frameworks & Tools
   {
-    id: "Y4_FF01",
+    id: "Y4_GA01",
     year: 4,
-    name: "Select Specialization",
-    description: "Finalize path: AI/ML Engineer, Data Scientist, AI Security, or Full Stack.",
-    category: "Career",
+    name: "GenAI Frameworks (RAG)",
+    description: "LangChain, LlamaIndex, Vector Databases (Pinecone, ChromaDB). Building RAG pipelines.",
+    category: "Deep Learning",
     priority: "High",
     status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "Self-Reflection",
-    resource_link: "#",
-    is_project: false,
-    is_output: true
-  },
-
-  // 2. Major Project
-  {
-    id: "Y4_MP01",
-    year: 4,
-    name: "Capstone Project",
-    description: "Choose ONE: AI-Based Threat Detection, SaaS Platform, Fraud Detection. Must include Report + Demo.",
-    category: "Projects",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "GitHub + Documentation",
-    resource_link: "#",
-    is_project: true,
-    is_output: true
-  },
-
-  // 3. Interview Prep (Daily)
-  {
-    id: "Y4_IP01",
-    year: 4,
-    name: "DSA Daily",
-    description: "Data Structures & Algorithms. Practice daily on LeetCode.",
-    category: "Interview Prep",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "Striver (Take U Forward)",
-    resource_link: "https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2/",
+    role_alignment: ["AI/ML Engineer"],
+    resource_name: "LangChain Docs",
+    resource_link: "https://python.langchain.com/docs/get_started/introduction",
     is_project: false,
     is_output: false
   },
+
+  // 2. MLOps Essentials
   {
-    id: "Y4_IP02",
+    id: "Y4_MLOPS01",
     year: 4,
-    name: "System Design",
-    description: "Scalability, Load Balancing, DB Sharding, Caching.",
-    category: "Interview Prep",
-    priority: "Medium",
+    name: "MLOps Essentials",
+    description: "Model Tracking (MLflow), Model Serving (FastAPI/BentoML), Drift Detection, Feature Stores.",
+    category: "MLOps",
+    priority: "High",
     status: "To Do",
-    role_alignment: ["AI/ML Engineer", "Data Scientist", "Full Stack Developer"],
-    resource_name: "Gaurav Sen / Hussein Nasser",
-    resource_link: "https://www.youtube.com/playlist?list=PLMCXHnjXnTnvo6alSjVkgxV-VH6EPyvoX",
+    role_alignment: ["AI/ML Engineer", "Data Scientist"],
+    resource_name: "Made With ML",
+    resource_link: "https://madewithml.com/",
     is_project: false,
     is_output: false
   },
-  
-  // 4. Job Ready Skills
   {
     id: "Y4_DP01",
     year: 4,
@@ -542,6 +597,110 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_project: false,
     is_output: false
   },
+
+  // 3. AI Project Building (End-to-End)
+  {
+    id: "Y4_PR_E2E",
+    year: 4,
+    name: "End-to-End GenAI SaaS",
+    description: "Build a full stack GenAI app. React Frontend + FastAPI Backend + LLM Integration + Vector DB.",
+    category: "Projects",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Full Stack Developer"],
+    resource_name: "GitHub Submission",
+    resource_link: "#",
+    is_project: true,
+    is_output: true
+  },
+  {
+    id: "Y4_MP01",
+    year: 4,
+    name: "Capstone Project",
+    description: "Final Major Project. Choose ONE: AI-Based Threat Detection, SaaS Platform, or Fraud Detection System.",
+    category: "Projects",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "GitHub + Documentation",
+    resource_link: "#",
+    is_project: true,
+    is_output: true
+  },
+
+  // 4. Portfolio & Job Prep
+  {
+    id: "Y4_FF01",
+    year: 4,
+    name: "Select Specialization",
+    description: "Finalize path: AI/ML Engineer, Data Scientist, AI Security, or Full Stack.",
+    category: "Career",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "Self-Reflection",
+    resource_link: "#",
+    is_project: false,
+    is_output: true
+  },
+  {
+    id: "Y4_IP01",
+    year: 4,
+    name: "DSA: Top 75 Blind",
+    description: "Solve the Blind 75 LeetCode list. Focus on Array, DP, and Graphs.",
+    category: "Interview Prep",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "Blind 75 List",
+    resource_link: "https://leetcode.com/discuss/general-discussion/460599/blind-75-leetcode-questions",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y4_IP02",
+    year: 4,
+    name: "System Design: HLD/LLD",
+    description: "High Level (Load Balancers, Caching) vs Low Level (Class Diagrams). Design Twitter/Uber.",
+    category: "Interview Prep",
+    priority: "Medium",
+    status: "To Do",
+    role_alignment: ["AI/ML Engineer", "Data Scientist", "Full Stack Developer"],
+    resource_name: "System Design Primer",
+    resource_link: "https://github.com/donnemartin/system-design-primer",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y4_IP03",
+    year: 4,
+    name: "Behavioral: STAR Method",
+    description: "Prepare 5 stories for 'Tell me about a time you failed/led/conflicted'. Situation, Task, Action, Result.",
+    category: "Interview Prep",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "The STAR Method",
+    resource_link: "https://www.careereducation.columbia.edu/resources/star-method-behavioral-interviewing",
+    is_project: false,
+    is_output: false
+  },
+  {
+    id: "Y4_IP04",
+    year: 4,
+    name: "Mock Interviews (P2P)",
+    description: "Do at least 3 mock interviews. Use Pramp or ask a friend.",
+    category: "Interview Prep",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "Pramp",
+    resource_link: "https://www.pramp.com/",
+    is_project: false,
+    is_output: false
+  },
+  
+  // 5. Job Ready Skills (Web specific)
   {
     id: "Y4_FS01",
     year: 4,

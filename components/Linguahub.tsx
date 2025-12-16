@@ -4,7 +4,7 @@ import {
     Headphones, BookOpen, PenTool, Mic, 
     Star, ArrowRight, Layers, CheckCircle2, 
     Loader2, PlayCircle, Volume2, 
-    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Globe
+    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Globe, Sparkles
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User } from '../types';
@@ -47,6 +47,14 @@ export interface DailyChallenge {
     hiddenContent?: string;
     requiresInput?: boolean;
     options?: string[];
+}
+
+export interface VocabularyWord {
+    word: string;
+    phonetic: string;
+    partOfSpeech: string;
+    definition: string;
+    example: string;
 }
 
 export interface DailySessionData {
@@ -210,6 +218,70 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
     }
 };
 
+const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
+    const ai = initializeClient();
+    if (!ai) return null;
+
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            word: { type: Type.STRING },
+            phonetic: { type: Type.STRING },
+            partOfSpeech: { type: Type.STRING },
+            definition: { type: Type.STRING },
+            example: { type: Type.STRING },
+        },
+        required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
+    };
+
+    const prompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9.
+    Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'.
+    
+    Return a JSON object with:
+    - word: The word itself.
+    - phonetic: IPA pronunciation guide.
+    - partOfSpeech: e.g., Adjective, Noun, Verb.
+    - definition: Clear, academic definition.
+    - example: A sentence demonstrating its usage in a high-level context.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: schema,
+                temperature: 1.2
+            }
+        });
+        return JSON.parse(response.text || "{}");
+    } catch (error) {
+        console.error("Vocab generation failed:", error);
+        return null;
+    }
+};
+
+const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
+    const ai = initializeClient();
+    if (!ai) return "Unable to check.";
+    
+    const prompt = `Evaluate the usage of the word "${word}" in the following sentence:
+    "${sentence}"
+    
+    Is it used correctly grammatically and contextually?
+    Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+             model: 'gemini-2.5-flash',
+             contents: prompt
+        });
+        return response.text || "No feedback generated.";
+    } catch (e) {
+        return "Error checking sentence.";
+    }
+};
+
 const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
     const ai = initializeClient();
     if (!ai) {
@@ -241,7 +313,7 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
     2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a "True/False/Not Given" question or a specific detail question based on the text.
     3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'.
     4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'.
-    5. 'Vocabulary': Ask for a synonym, antonym, or sentence usage of a Band 8+ academic word (e.g., "Ubiquitous", "Ephemeral") in 'content'.
+    5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'.
 
     Ensure the difficulty matches IELTS Band 7.0-8.0.`;
 
@@ -466,6 +538,13 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const [isSessionComplete, setIsSessionComplete] = useState(false);
     const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
+    // Vocab State
+    const [vocabWord, setVocabWord] = useState<VocabularyWord | null>(null);
+    const [vocabInput, setVocabInput] = useState('');
+    const [vocabFeedback, setVocabFeedback] = useState<string | null>(null);
+    const [isVocabLoading, setIsVocabLoading] = useState(true);
+    const [isVocabChecking, setIsVocabChecking] = useState(false);
+
     // Interaction State
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState<string | null>(null);
@@ -473,52 +552,61 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const [isChecking, setIsChecking] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-    // Load Session Logic
+    // Load Data
     useEffect(() => {
         if (!user) return;
 
-        const loadDailySession = async () => {
+        const loadData = async () => {
             const today = new Date().toDateString();
             const username = user.username;
-            const storageKey = `lingua_session_${username}_${today}`;
+            const sessionKey = `lingua_session_${username}_${today}`;
+            const vocabKey = `lingua_vocab_${username}_${today}`;
             
-            const savedData = localStorage.getItem(storageKey);
+            // Load Vocab
+            const savedVocab = localStorage.getItem(vocabKey);
+            if (savedVocab) {
+                setVocabWord(JSON.parse(savedVocab));
+                setIsVocabLoading(false);
+            } else {
+                setIsVocabLoading(true);
+                const word = await generateVocabularyWord();
+                if(word) {
+                    localStorage.setItem(vocabKey, JSON.stringify(word));
+                    setVocabWord(word);
+                }
+                setIsVocabLoading(false);
+            }
 
-            if (savedData) {
-                // Load existing session for today
-                const session = JSON.parse(savedData);
+            // Load Daily Challenges
+            const savedSession = localStorage.getItem(sessionKey);
+            if (savedSession) {
+                const session = JSON.parse(savedSession);
                 setTodayTasks(session.tasks);
                 setCurrentTaskIndex(session.currentIndex);
                 setIsSessionComplete(session.isComplete);
                 setIsLoadingTasks(false);
             } else {
-                // Generate new session for today
                 setIsLoadingTasks(true);
-                try {
-                    const newTasks = await generateDailyChallenges();
-                    if (newTasks && newTasks.length > 0) {
-                        const newSession = {
-                            date: today,
-                            tasks: newTasks,
-                            currentIndex: 0,
-                            isComplete: false
-                        };
-                        localStorage.setItem(storageKey, JSON.stringify(newSession));
-                        setTodayTasks(newTasks);
-                        setCurrentTaskIndex(0);
-                        setIsSessionComplete(false);
-                    } else {
-                        setTodayTasks([]);
-                    }
-                } catch (error) {
-                    console.error("Error init tasks", error);
-                } finally {
-                    setIsLoadingTasks(false);
+                const newTasks = await generateDailyChallenges();
+                if (newTasks && newTasks.length > 0) {
+                    const newSession = {
+                        date: today,
+                        tasks: newTasks,
+                        currentIndex: 0,
+                        isComplete: false
+                    };
+                    localStorage.setItem(sessionKey, JSON.stringify(newSession));
+                    setTodayTasks(newTasks);
+                    setCurrentTaskIndex(0);
+                    setIsSessionComplete(false);
+                } else {
+                    setTodayTasks([]);
                 }
+                setIsLoadingTasks(false);
             }
         };
 
-        loadDailySession();
+        loadData();
     }, [user]);
 
     // Persist Progress
@@ -554,6 +642,16 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         } finally {
             setIsChecking(false);
         }
+    };
+
+    const handleCheckVocab = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!vocabWord || !vocabInput.trim()) return;
+
+        setIsVocabChecking(true);
+        const result = await checkVocabularyUsage(vocabWord.word, vocabInput);
+        setVocabFeedback(result);
+        setIsVocabChecking(false);
     };
 
     const handleNextTask = () => {
@@ -596,6 +694,79 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 <p className="text-slate-500 dark:text-slate-400">Your IELTS AI Training Partner.</p>
                 </div>
             </div>
+
+            {/* Section: Vocabulary Builder */}
+            <section className="animate-in fade-in slide-in-from-top-4 duration-500 delay-100">
+                <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="text-purple-500" size={20} />
+                    <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Word of the Day</h2>
+                </div>
+                
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm relative overflow-hidden min-h-[250px] flex flex-col justify-center">
+                    {isVocabLoading ? (
+                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-slate-500">
+                             <Loader2 size={32} className="animate-spin text-purple-500" />
+                             <p>Curating today's advanced vocabulary...</p>
+                        </div>
+                    ) : vocabWord ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-4">
+                                <div>
+                                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                                        <h3 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white">{vocabWord.word}</h3>
+                                        <span className="text-slate-500 font-mono text-sm">/{vocabWord.phonetic}/</span>
+                                        <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase">{vocabWord.partOfSpeech}</span>
+                                    </div>
+                                    <p className="text-slate-700 dark:text-slate-300 mt-2 text-lg leading-relaxed">{vocabWord.definition}</p>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border-l-4 border-purple-500">
+                                    <p className="italic text-slate-600 dark:text-slate-400 font-serif text-lg">"{vocabWord.example}"</p>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-slate-50 dark:bg-slate-800/30 rounded-xl p-5 border border-slate-100 dark:border-slate-800 flex flex-col">
+                                <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+                                    <PenTool size={16} /> Try it yourself
+                                </h4>
+                                {!vocabFeedback ? (
+                                    <form onSubmit={handleCheckVocab} className="flex flex-col gap-3 flex-1">
+                                        <textarea
+                                            value={vocabInput}
+                                            onChange={(e) => setVocabInput(e.target.value)}
+                                            placeholder={`Write a sentence using "${vocabWord.word}"...`}
+                                            className="w-full p-3 text-sm border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none h-24"
+                                        />
+                                        <button 
+                                            type="submit"
+                                            disabled={isVocabChecking || !vocabInput.trim()}
+                                            className="mt-auto w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                        >
+                                            {isVocabChecking ? <Loader2 size={16} className="animate-spin" /> : "Check Usage"}
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-2">
+                                        <div className="flex-1 text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700 mb-3 overflow-y-auto max-h-[120px]">
+                                            {vocabFeedback}
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                setVocabFeedback(null);
+                                                setVocabInput('');
+                                            }}
+                                            className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white py-2 rounded-lg font-medium transition-colors"
+                                        >
+                                            Try Another Sentence
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center text-red-400">Failed to load vocabulary word.</div>
+                    )}
+                </div>
+            </section>
 
             {/* Section: Daily AI Tasks */}
             <section className="animate-in fade-in slide-in-from-top-4 duration-500">

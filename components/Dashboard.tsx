@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { ArrowRight, Target, Trophy, AlertCircle, Quote, Flame, Filter, ListTodo, BookOpen, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { ArrowRight, Target, Trophy, AlertCircle, Quote, Flame, Filter, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink } from 'lucide-react';
 import { Role } from '../types';
 
 const Dashboard: React.FC = () => {
@@ -335,6 +335,41 @@ const Dashboard: React.FC = () => {
                <p className="mt-4 text-xs text-slate-500 italic">"If you do this seriously for 3-4 years, you will be ahead of 90% of students."</p>
             </div>
          </div>
+      </div>
+
+      {/* Quick Tools / External Apps */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+         <a 
+           href="https://gamma.app/create" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm hover:border-indigo-500 hover:shadow-md transition-all group flex items-center space-x-4 cursor-pointer"
+         >
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl group-hover:scale-110 transition-transform">
+               <Presentation size={24} />
+            </div>
+            <div className="flex-1">
+               <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">PPT Maker</h3>
+               <p className="text-xs text-slate-500 dark:text-slate-400">Generate slides with Gamma AI</p>
+            </div>
+            <ExternalLink size={18} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+         </a>
+
+         <a 
+           href="https://www.perplexity.ai/" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm hover:border-teal-500 hover:shadow-md transition-all group flex items-center space-x-4 cursor-pointer"
+         >
+            <div className="p-3 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 rounded-xl group-hover:scale-110 transition-transform">
+               <Search size={24} />
+            </div>
+            <div className="flex-1">
+               <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">Perplexity AI</h3>
+               <p className="text-xs text-slate-500 dark:text-slate-400">Smart search & research</p>
+            </div>
+            <ExternalLink size={18} className="text-slate-300 group-hover:text-teal-500 transition-colors" />
+         </a>
       </div>
     </div>
   );

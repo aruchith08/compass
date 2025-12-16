@@ -61,49 +61,49 @@ export interface DailySessionData {
 export const SKILL_DATA: SkillCategory[] = [
     {
         id: SkillType.LISTENING,
-        title: 'Listening',
-        description: 'Improve comprehension through podcasts and audio.',
+        title: 'IELTS Listening',
+        description: 'Practice comprehension with varied accents and contexts.',
         icon: <Headphones className="w-8 h-8 text-emerald-500" />,
         resources: [
-        { name: 'British Council', url: 'https://learnenglish.britishcouncil.org/skills/listening' },
-        { name: 'BBC Learning English', url: 'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english' },
+        { name: 'British Council Listening', url: 'https://learnenglish.britishcouncil.org/skills/listening' },
+        { name: 'IELTS Liz Listening', url: 'https://ieltsliz.com/ielts-listening/' },
         { name: 'TED Talks (Education)', url: 'https://www.ted.com/topics/education' },
-        { name: 'IELTS Liz', url: 'https://ieltsliz.com/ielts-listening/' },
+        { name: 'BBC 6 Minute English', url: 'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english' },
         ],
     },
     {
         id: SkillType.READING,
-        title: 'Reading',
-        description: 'Enhance vocabulary and speed with diverse texts.',
+        title: 'IELTS Reading',
+        description: 'Academic texts, skimming, scanning, and detail questions.',
         icon: <BookOpen className="w-8 h-8 text-blue-500" />,
         resources: [
-        { name: 'British Council', url: 'https://learnenglish.britishcouncil.org/skills/reading' },
+        { name: 'British Council Reading', url: 'https://learnenglish.britishcouncil.org/skills/reading' },
+        { name: 'IELTS Buddy Reading', url: 'https://www.ieltsbuddy.com/ielts-reading.html' },
         { name: 'Breaking News English', url: 'https://breakingnewsenglish.com/' },
         { name: 'Project Gutenberg', url: 'https://www.gutenberg.org/' },
-        { name: 'UsingEnglish Comprehension', url: 'https://www.usingenglish.com/comprehension/' },
         ],
     },
     {
         id: SkillType.WRITING,
-        title: 'Writing',
-        description: 'Practice structure, grammar, and style.',
+        title: 'IELTS Writing',
+        description: 'Task 1 (Charts/Letters) and Task 2 (Essays).',
         icon: <PenTool className="w-8 h-8 text-purple-500" />,
         resources: [
+        { name: 'IELTS Liz Writing', url: 'https://ieltsliz.com/ielts-writing-task-1-and-task-2/' },
         { name: 'Cambridge Write & Improve', url: 'https://writeandimprove.com/' },
         { name: 'Purdue OWL', url: 'https://owl.purdue.edu/owl/purdue_owl.html' },
         { name: 'Hemingway Editor', url: 'https://hemingwayapp.com/' },
-        { name: 'IELTS Buddy Writing', url: 'https://www.ieltsbuddy.com/ielts-writing.html' },
         ],
     },
     {
         id: SkillType.SPEAKING,
-        title: 'Speaking',
-        description: 'Build confidence in pronunciation and fluency.',
+        title: 'IELTS Speaking',
+        description: 'Fluency, pronunciation, and cue card topics.',
         icon: <Mic className="w-8 h-8 text-orange-500" />,
         resources: [
-        { name: 'TalkEnglish', url: 'https://www.talkenglish.com/speaking/listbasics.aspx' },
-        { name: 'Toastmasters Tips', url: 'https://www.toastmasters.org/resources/public-speaking-tips' },
+        { name: 'IELTS Liz Speaking', url: 'https://ieltsliz.com/ielts-speaking-free-lessons-essential-tips/' },
         { name: 'IELTS Speaking Samples', url: 'https://ielts-up.com/speaking/ielts-speaking-samples.html' },
+        { name: 'TalkEnglish', url: 'https://www.talkenglish.com/speaking/listbasics.aspx' },
         ],
     },
 ];
@@ -120,7 +120,6 @@ let client: GoogleGenAI | null = null;
 let chatSession: any | null = null;
 
 const getApiKey = () => {
-   
     return "AIzaSyCsrwyWyYdquFKvekzJId5_ab9jW9PPvKM"; 
 }
 
@@ -140,7 +139,7 @@ const startChat = () => {
         chatSession = ai.chats.create({
             model: 'gemini-2.5-flash',
             config: {
-            systemInstruction: 'You are a helpful, encouraging, and knowledgeable language learning assistant named LinguaBot. Keep your answers concise and focused on helping the user learn English.',
+            systemInstruction: 'You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria (Lexical Resource, Grammatical Range, Coherence, Fluency).',
             },
         });
     }
@@ -173,23 +172,24 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
         return { text: "API Key missing.", score: 0 };
     }
 
-    const contextStr = hiddenContext ? `\nContext (User did not see this text, but heard/read it): "${hiddenContext}"` : "";
+    const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
 
-    const prompt = `You are a strict but helpful English tutor.
+    const prompt = `You are a certified IELTS Examiner.
     
-    Task: Evaluate the student's answer.
+    Task: Evaluate the candidate's response to the following IELTS practice task.
     
-    Challenge Question: "${challenge}"${contextStr}
-    Student Answer: "${userAnswer}"
+    Task Type: "${challenge}"${contextStr}
+    Candidate Response: "${userAnswer}"
     
     Requirements:
-    1. Give a score out of 10.
-    2. Provide specific feedback on grammar, vocabulary, and accuracy.
-    3. If the answer is wrong, provide the correction.
+    1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria.
+    2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response.
+    3. For Listening/Reading: Check factual accuracy against the context.
+    4. Provide specific corrections and tips to improve the band score.
     
     Output Format (Strictly follow this):
-    Score: [0-10]/10
-    Feedback: [Your feedback here]`;
+    Score: [Band Score]/9
+    Feedback: [Detailed feedback]`;
 
     try {
         const response = await ai.models.generateContent({
@@ -199,8 +199,8 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
         
         const responseText = response.text || "No response generated.";
         
-        // Parse score
-        const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/10/i);
+        // Parse score (Band 0-9)
+        const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
         const score = scoreMatch ? parseFloat(scoreMatch[1]) : 0;
         
         return { text: responseText, score };
@@ -217,7 +217,7 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
          return [];
     }
 
-    // Schema for 10 tasks
+    // Schema for tasks
     const schema = {
         type: Type.ARRAY,
         items: {
@@ -225,25 +225,25 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         properties: {
             id: { type: Type.STRING },
             category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
-            type: { type: Type.STRING, description: 'Short label like "Word of the Day"' },
+            type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
             content: { type: Type.STRING, description: 'The question or task instruction' },
             requiresInput: { type: Type.BOOLEAN },
-            hiddenContent: { type: Type.STRING, description: 'Optional text for listening/reading tasks that user does not see immediately' },
+            hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
         },
         required: ['id', 'category', 'type', 'content', 'requiresInput'],
         }
     };
 
-    const prompt = `Generate 10 unique, diverse, and engaging English language learning challenges for a daily practice session.
+    const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges.
     
-    Mix the categories: 
-    - Vocabulary (e.g., obscure words, synonyms)
-    - Grammar (e.g., error correction)
-    - Idioms (e.g., define or use in sentence)
-    - Listening (provide a short transcript in hiddenContent for the user to "hear" via TTS)
-    - Speaking (pronunciation or description tasks)
-    
-    Make them fun and varied. Ensure the content is suitable for intermediate learners.`;
+    Strictly generate one task for each of these categories: 
+    1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) about a university conversation or news report in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script (e.g. "What time does the library close?").
+    2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a "True/False/Not Given" question or a specific detail question based on the text.
+    3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'.
+    4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'.
+    5. 'Vocabulary': Ask for a synonym, antonym, or sentence usage of a Band 8+ academic word (e.g., "Ubiquitous", "Ephemeral") in 'content'.
+
+    Ensure the difficulty matches IELTS Band 7.0-8.0.`;
 
     try {
         const response = await ai.models.generateContent({
@@ -305,7 +305,7 @@ const SkillModal = ({ isOpen, onClose, skill }: { isOpen: boolean, onClose: () =
                 <div className="bg-white/20 p-2 rounded-lg">
                 {skill.icon}
                 </div>
-                <h2 className="text-xl font-bold">{skill.title} Resources</h2>
+                <h2 className="text-xl font-bold">{skill.title}</h2>
             </div>
             <button 
                 onClick={onClose}
@@ -346,7 +346,7 @@ const ChatWidget = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([
-        { role: 'model', text: "Hi! I'm LinguaBot. Ask me anything about English grammar, vocabulary, or learning tips!" }
+        { role: 'model', text: "Hello! I'm LinguaBot, your IELTS Tutor. I can help with grammar, vocabulary, or simulate a speaking test. How can I help you today?" }
     ]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -389,7 +389,7 @@ const ChatWidget = () => {
             <div className="bg-emerald-600 dark:bg-slate-950 text-white p-4 flex justify-between items-center shadow-sm">
                 <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
-                <h3 className="font-semibold">Ask AI Assistant</h3>
+                <h3 className="font-semibold">IELTS AI Tutor</h3>
                 </div>
                 <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1 rounded-full transition">
                 <X size={20} />
@@ -430,7 +430,7 @@ const ChatWidget = () => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a question..."
+                placeholder="Ask about IELTS..."
                 className="flex-1 bg-slate-100 dark:bg-slate-800 dark:text-white border-0 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder-slate-400"
                 />
                 <button 
@@ -593,7 +593,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <Globe className="text-emerald-500" />
                     Lingua<span className="text-emerald-600 dark:text-emerald-400">Hub</span>
                 </h2>
-                <p className="text-slate-500 dark:text-slate-400">Your AI-powered English language assistant.</p>
+                <p className="text-slate-500 dark:text-slate-400">Your IELTS AI Training Partner.</p>
                 </div>
             </div>
 
@@ -602,7 +602,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Star className="text-amber-500 fill-amber-500" size={20} />
-                    <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Daily AI Session</h2>
+                    <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Daily IELTS Challenges</h2>
                 </div>
                 {!isLoadingTasks && !isSessionComplete && (
                     <div className="text-sm font-medium px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300">
@@ -616,7 +616,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 {isLoadingTasks ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-4 text-slate-500">
                         <Loader2 size={40} className="animate-spin text-emerald-500" />
-                        <p className="animate-pulse">Consulting AI for today's curriculum...</p>
+                        <p className="animate-pulse">Consulting AI for today's IELTS tasks...</p>
                     </div>
                 ) : isSessionComplete ? (
                     <div className="flex flex-col items-center justify-center py-8 md:py-12 gap-6 text-center animate-in zoom-in duration-300">
@@ -626,7 +626,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         <div>
                             <h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2">All Done For Today!</h3>
                             <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                                Great job completing your daily challenges. Come back tomorrow for a brand new set of AI-generated tasks tailored for you.
+                                Great job completing your daily IELTS challenges. Come back tomorrow for a new set of tasks.
                             </p>
                         </div>
                     </div>
@@ -653,6 +653,19 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                             "{currentTask?.content}"
                         </h3>
                     </div>
+                    
+                    {/* Text Display for Reading */}
+                    {currentTask?.category === 'Reading' && currentTask.hiddenContent && (
+                        <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl border-l-4 border-blue-500 mb-4 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
+                                <BookOpen size={16} />
+                                <span className="text-xs font-bold uppercase">Reading Passage</span>
+                            </div>
+                            <p className="text-sm md:text-base leading-relaxed text-slate-700 dark:text-slate-300 font-serif whitespace-pre-line">
+                                {currentTask.hiddenContent}
+                            </p>
+                        </div>
+                    )}
                     
                     {/* Audio Controls */}
                     {currentTask?.category === 'Listening' && currentTask.hiddenContent && (
@@ -711,13 +724,13 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                 }`}>
                                     <div className="flex items-center justify-between gap-2 mb-2 border-b border-black/5 dark:border-white/5 pb-2">
                                         <strong className="font-semibold flex items-center gap-1">
-                                            AI Feedback
+                                            Examiner Feedback
                                         </strong>
                                         {lastScore !== null && (
                                             <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                                                 lastScore >= 7 ? 'bg-emerald-200 text-emerald-800' : 'bg-amber-200 text-amber-800'
                                             }`}>
-                                                Score: {lastScore}/10
+                                                Band: {lastScore}/9
                                             </span>
                                         )}
                                     </div>
@@ -742,7 +755,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <section>
                 <div className="flex items-center gap-2 mb-4 md:mb-6">
                     <Layers className="text-emerald-600 dark:text-emerald-500" size={20} />
-                    <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Core Skills</h2>
+                    <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">IELTS Skills Resources</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -764,7 +777,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         {skill.description}
                         </p>
                         <div className="flex items-center text-emerald-600 dark:text-emerald-400 text-sm font-medium mt-auto">
-                        Start Practice <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                        View Resources <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                     </button>
                     ))}

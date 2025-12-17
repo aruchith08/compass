@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock } from 'lucide-react';
 import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
+import TimetableModal from './TimetableModal';
 
 const Dashboard: React.FC = () => {
   const { 
@@ -17,6 +18,7 @@ const Dashboard: React.FC = () => {
   // Dashboard now defaults to All Roles view
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
+  const [showTimetable, setShowTimetable] = useState(false);
 
   // Daily Tasks Logic
   const handleAddDaily = (e: React.FormEvent) => {
@@ -132,6 +134,13 @@ const Dashboard: React.FC = () => {
               >
                  <Search size={20} />
               </a>
+              <button 
+                 onClick={() => setShowTimetable(true)}
+                 className="p-2.5 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all hover:-translate-y-0.5 shadow-sm shadow-purple-100/50 dark:shadow-none"
+                 title="Class Timetable"
+              >
+                 <CalendarClock size={20} />
+              </button>
            </div>
         </div>
       </div>
@@ -451,6 +460,9 @@ const Dashboard: React.FC = () => {
 
       {/* === ACADEMIC SYLLABUS SECTION === */}
       <SyllabusViewer />
+
+      {/* === TIMETABLE MODAL === */}
+      {showTimetable && <TimetableModal user={user} onClose={() => setShowTimetable(false)} />}
     </div>
   );
 };

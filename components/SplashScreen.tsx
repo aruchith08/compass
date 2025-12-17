@@ -74,23 +74,23 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050b14] overflow-hidden transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50 dark:bg-[#050b14] overflow-hidden transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
     >
       {/* Ambient Glows */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-900/10 to-slate-950/90 z-0"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-100/40 to-slate-50/90 dark:from-emerald-900/10 dark:to-slate-950/90 z-0"></div>
       
       {/* Vignette */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050b14_90%)]"></div>
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#f8fafc_90%)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,#050b14_90%)]"></div>
 
       <div className="relative z-10 flex flex-col items-center">
         
         {/* Logo Container with Radar Animation */}
         <div className="relative mb-12 flex items-center justify-center animate-scale-in duration-1000">
             {/* Container constraints: strict circular clipping */}
-            <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20 bg-slate-900/80 backdrop-blur-xl">
+            <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
                 
                 {/* Main Compass Icon (Emerald) */}
-                <Compass size={72} className="text-emerald-400 relative z-10" strokeWidth={1.5} />
+                <Compass size={72} className="text-emerald-600 dark:text-emerald-400 relative z-10" strokeWidth={1.5} />
                 
                 {/* RADAR SWEEP ANIMATION */}
                 <div className="absolute inset-0 z-0 animate-radar-spin opacity-80">
@@ -98,10 +98,10 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                 </div>
 
                 {/* Inner Radial Shadow */}
-                <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.5)_0%,transparent_70%)]"></div>
+                <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.5)_0%,transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.5)_0%,transparent_70%)]"></div>
                 
                 {/* Glass Shine effect */}
-                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent z-30 rounded-t-full opacity-50"></div>
+                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent dark:from-white/10 dark:to-transparent z-30 rounded-t-full opacity-50"></div>
             </div>
             
             {/* Subtle Outer Pulse */}
@@ -110,17 +110,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
         {/* Text Decoding Effect */}
         <div className="text-center z-20 flex flex-col items-center">
-            <h1 className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-emerald-100 to-slate-400 tracking-[0.2em] font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] min-h-[80px]">
+            <h1 className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-900 via-emerald-700 to-slate-500 dark:from-white dark:via-emerald-100 dark:to-slate-400 tracking-[0.2em] font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] min-h-[80px]">
                 {scrambleText}
             </h1>
             
             {/* Subtitle with Typewriter/Reveal effect */}
             <div className={`mt-4 flex items-center justify-center gap-3 transition-all duration-1000 ${showSubtitle ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-emerald-500/50"></div>
-                <p className="text-emerald-400/90 text-sm md:text-base tracking-[0.4em] uppercase font-medium font-mono">
+                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-emerald-600/50 dark:to-emerald-500/50"></div>
+                <p className="text-emerald-700/90 dark:text-emerald-400/90 text-sm md:text-base tracking-[0.4em] uppercase font-medium font-mono">
                     Navigate Your Future
                 </p>
-                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-emerald-500/50"></div>
+                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-emerald-600/50 dark:to-emerald-500/50"></div>
             </div>
         </div>
       </div>

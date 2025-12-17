@@ -45,21 +45,25 @@ const App: React.FC = () => {
   // Track date for midnight reset
   const dateRef = useRef(new Date().toDateString());
   
-  // Theme State - Default to dark
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  // Theme State - Initialize based on LocalStorage or System Preference
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('roadmap_theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        return savedTheme;
+      }
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
 
   // Load User from LocalStorage on mount (Persistent Session)
   useEffect(() => {
     const savedUser = localStorage.getItem('roadmap_user_session');
     if (savedUser) {
       handleLogin(savedUser);
-    }
-    // Initialize theme
-    if (document.documentElement.classList.contains('dark')) {
-      setTheme('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-      setTheme('dark');
     }
   }, []);
 
@@ -184,7 +188,11 @@ const App: React.FC = () => {
   }, [items, user]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setTheme(prev => {
+      const newTheme = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('roadmap_theme', newTheme);
+      return newTheme;
+    });
   };
 
   const toggleStatus = (id: string, newStatus: Status) => {

@@ -18,7 +18,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-500">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl animate-blob"></div>
@@ -27,18 +27,18 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
       </div>
 
       <div className="relative z-10 w-full max-w-md p-8">
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all hover:border-slate-700 animate-scale-in">
+        <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all hover:border-slate-300 dark:hover:border-slate-700 animate-scale-in">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl mb-4 shadow-lg shadow-emerald-900/20 animate-bounce" style={{ animationDuration: '3s' }}>
               <Cpu className="text-white" size={32} />
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Access Roadmap</h1>
-            <p className="text-slate-400 mt-2 text-sm">AIML • Data Science • Security • Full Stack</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Access Roadmap</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">AIML • Data Science • Security • Full Stack</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="username" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Username / Identity
               </label>
               <div className="relative group">
@@ -49,7 +49,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full bg-slate-950 border border-slate-800 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder:text-slate-600 group-hover:border-slate-700"
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 group-hover:border-slate-300 dark:group-hover:border-slate-700"
                 />
               </div>
               <p className="text-xs text-slate-500 flex items-center gap-1">
@@ -63,8 +63,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
               disabled={isLoading || !username.trim()}
               className={`w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-white font-semibold transition-all duration-200
                 ${isLoading || !username.trim() 
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 active:scale-[0.98]'
+                  ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-900/20 hover:shadow-emerald-500/40 dark:hover:shadow-emerald-900/40 active:scale-[0.98]'
                 }
               `}
             >
@@ -79,8 +79,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-slate-800 text-center">
-             <div className="flex items-center justify-center space-x-6 text-slate-500">
+          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
+             <div className="flex items-center justify-center space-x-6 text-slate-400 dark:text-slate-500">
                 <div className="flex flex-col items-center">
                    <Database size={16} className="mb-1" />
                    <span className="text-[10px]">Browser Save</span>

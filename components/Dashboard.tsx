@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { ArrowRight, Target, Trophy, AlertCircle, Quote, Flame, Filter, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote } from 'lucide-react';
 import { Role } from '../types';
 
 const Dashboard: React.FC = () => {
@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
   } = useRoadmap();
   
-  const [selectedRole, setSelectedRole] = useState<Role | "All Roles">("All Roles");
+  // Dashboard now defaults to All Roles view
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
 
@@ -55,27 +55,24 @@ const Dashboard: React.FC = () => {
     fill: '#06b6d4'
   }));
 
-  // Overall Progress (Filtered by selected role)
-  const totalProgress = getCompletionPercentage(selectedRole === "All Roles" ? undefined : selectedRole);
+  // Overall Progress (Aggregate)
+  const totalProgress = getCompletionPercentage("All Roles");
   const overallData = [
     { name: 'Completed', value: totalProgress, fill: '#06b6d4' },
     { name: 'Remaining', value: 100 - totalProgress, fill: '#1e293b' }
   ];
 
-  // Next Focus Items
+  // Next Focus Items (Global High Priority)
   const nextFocusItems = items
     .filter(i => {
-      const matchesRole = selectedRole === "All Roles" || i.role_alignment.includes(selectedRole) || i.role_alignment.includes("All Roles");
+      // Show high priority items for any role
       const isPending = (i.status === 'To Do' || i.status === 'In Progress');
       const isHighPriority = i.priority === 'High';
-      return matchesRole && isPending && isHighPriority;
+      return isPending && isHighPriority;
     })
     .slice(0, 3);
 
-  const completedCount = items.filter(i => {
-    const matchesRole = selectedRole === "All Roles" || i.role_alignment.includes(selectedRole) || i.role_alignment.includes("All Roles");
-    return matchesRole && i.status === 'Completed';
-  }).length;
+  const completedCount = items.filter(i => i.status === 'Completed').length;
   
   return (
     <div className="space-y-8 animate-fade-in pb-12 w-full max-w-full overflow-hidden">
@@ -110,21 +107,6 @@ const Dashboard: React.FC = () => {
               >
                  <Search size={20} />
               </a>
-           </div>
-
-           {/* Role Filter */}
-           <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
-             <Filter size={16} className="text-slate-500 ml-2" />
-             <select 
-               value={selectedRole}
-               onChange={(e) => setSelectedRole(e.target.value as Role | "All Roles")}
-               className="bg-transparent text-sm font-medium text-slate-900 dark:text-slate-300 focus:outline-none p-1 max-w-[150px]"
-             >
-               <option value="All Roles">All Roles</option>
-               {roles.map(r => (
-                 <option key={r} value={r}>{r}</option>
-               ))}
-             </select>
            </div>
         </div>
       </div>
@@ -239,7 +221,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-sm transition-colors duration-300 min-w-0">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
             <Target className="mr-2 text-cyan-500" size={20} /> 
-            {selectedRole === "All Roles" ? "Total Progress" : `${selectedRole} Progress`}
+            Total Progress
           </h3>
           <div className="w-full relative z-10 flex items-center justify-center" style={{ height: '250px', minHeight: '250px' }}>
             <ResponsiveContainer width="99%" height="100%">

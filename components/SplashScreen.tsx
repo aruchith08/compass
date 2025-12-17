@@ -81,28 +81,32 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
       <div className="relative z-10 flex flex-col items-center">
         
-        {/* Logo Container - STATIC (No rotation) */}
+        {/* Logo Container with Radar Animation */}
         <div className="relative mb-12 flex items-center justify-center animate-scale-in duration-1000">
-            {/* Container constraints */}
+            {/* Container constraints: strict circular clipping */}
             <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/20 bg-slate-900/80 backdrop-blur-xl">
                 
                 {/* Main Compass Icon (Default) */}
                 <Compass size={72} className="text-cyan-400 relative z-10" strokeWidth={1.5} />
                 
-                {/* Static Background Gradient (Removed animate-spin) */}
-                <div className="absolute inset-0 z-0 bg-gradient-to-tr from-cyan-500/20 via-transparent to-transparent"></div>
-
-                {/* Static Light Overlay (Removed spinning rectangles) */}
-                <div className="absolute inset-0 z-20 pointer-events-none mix-blend-plus-lighter">
-                      {/* Static Glow */}
-                      <div className="absolute top-1/2 left-1/2 w-[150%] h-[150%] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(6,182,212,0.3)_0%,transparent_70%)]"></div>
+                {/* RADAR SWEEP ANIMATION */}
+                {/* 
+                   We use inset-0 to match the exact size of the container. 
+                   The conic-gradient creates a circular sweep effect.
+                   The rotation strictly spins this gradient layer within the rounded bounds.
+                */}
+                <div className="absolute inset-0 z-0 animate-radar-spin opacity-80">
+                   <div className="w-full h-full" style={{ background: 'conic-gradient(from 0deg, transparent 90deg, rgba(6,182,212,0.1) 180deg, rgba(6,182,212,0.8) 360deg)' }}></div>
                 </div>
+
+                {/* Inner Radial Shadow to soften the center (prevents harsh lines near icon) */}
+                <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.5)_0%,transparent_70%)]"></div>
                 
                 {/* Glass Shine effect */}
                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent z-30 rounded-t-full opacity-50"></div>
             </div>
             
-            {/* Subtle Outer Pulse (Kept as it is a soft glow, not a moving rectangle) */}
+            {/* Subtle Outer Pulse */}
             <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-3xl -z-10 animate-pulse-slow"></div>
         </div>
 
@@ -122,8 +126,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             </div>
         </div>
       </div>
-      
-      {/* Removed Moving Loading Bar */}
+
+      {/* Custom Keyframes for Radar Spin */}
+      <style>{`
+        @keyframes radar-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-radar-spin {
+          animation: radar-spin 3s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };

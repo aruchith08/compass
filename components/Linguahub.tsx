@@ -273,8 +273,8 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
             const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges.
             
             Strictly generate one task for each of these categories: 
-            1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) about a university conversation or news report in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script (e.g. "What time does the library close?").
-            2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a "True/False/Not Given" question or a specific detail question based on the text.
+            1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script.
+            2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text.
             3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'.
             4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'.
             5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'.
@@ -412,7 +412,7 @@ const ChatWidget = () => {
         } catch (error) {
             setMessages(prev => [...prev, { 
                 role: 'model', 
-                text: "Chat Error: ContentUnion is required or connection failed. Please check your connection and try again.",
+                text: "Chat Error: Connection failed. Please check your connection and try again.",
                 isError: true 
             }]);
         } finally {
@@ -423,9 +423,9 @@ const ChatWidget = () => {
     return (
         <div className="fixed bottom-24 lg:bottom-6 right-6 z-40 flex flex-col items-end">
         {isOpen && (
-            <div className="mb-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col h-[500px] transition-all animate-fade-in">
+            <div className="mb-4 w-80 md:w-96 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 dark:border-white/10 overflow-hidden flex flex-col h-[500px] transition-all animate-fade-in">
             {/* Header */}
-            <div className="bg-emerald-600 dark:bg-slate-950 text-white p-4 flex justify-between items-center shadow-sm">
+            <div className="bg-emerald-600/90 dark:bg-slate-950/90 backdrop-blur-md text-white p-4 flex justify-between items-center shadow-sm">
                 <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
                 <h3 className="font-semibold">IELTS AI Tutor</h3>
@@ -436,7 +436,7 @@ const ChatWidget = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-900/30">
                 {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div 
@@ -464,7 +464,7 @@ const ChatWidget = () => {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSubmit} className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+            <form onSubmit={handleSubmit} className="p-3 bg-white/50 dark:bg-slate-900/50 border-t border-slate-200/50 dark:border-white/10 flex gap-2 backdrop-blur-sm">
                 <input
                 type="text"
                 value={input}
@@ -660,6 +660,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     };
 
     const currentTask = todayTasks[currentTaskIndex];
+    const glassCardClass = "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg rounded-2xl";
 
     return (
         <div className="space-y-8 animate-fade-in pb-12">
@@ -681,7 +682,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Word of the Day</h2>
                 </div>
                 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm relative overflow-hidden min-h-[250px] flex flex-col justify-center">
+                <div className={`${glassCardClass} p-6 relative overflow-hidden min-h-[250px] flex flex-col justify-center`}>
                     {isVocabLoading ? (
                         <div className="flex flex-col items-center justify-center py-8 gap-4 text-slate-500">
                              <Loader2 size={32} className="animate-spin text-purple-500" />
@@ -698,12 +699,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                     </div>
                                     <p className="text-slate-700 dark:text-slate-300 mt-2 text-lg leading-relaxed">{vocabWord.definition}</p>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border-l-4 border-purple-500">
+                                <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-xl border-l-4 border-purple-500">
                                     <p className="italic text-slate-600 dark:text-slate-400 font-serif text-lg">"{vocabWord.example}"</p>
                                 </div>
                             </div>
                             
-                            <div className="bg-slate-50 dark:bg-slate-800/30 rounded-xl p-5 border border-slate-100 dark:border-slate-800 flex flex-col">
+                            <div className="bg-slate-50/50 dark:bg-slate-800/30 rounded-xl p-5 border border-slate-100/50 dark:border-white/10 flex flex-col">
                                 <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                                     <PenTool size={16} /> Try it yourself
                                 </h4>
@@ -713,7 +714,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                             value={vocabInput}
                                             onChange={(e) => setVocabInput(e.target.value)}
                                             placeholder={`Write a sentence using "${vocabWord.word}"...`}
-                                            className="w-full p-3 text-sm border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none h-24"
+                                            className="w-full p-3 text-sm border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white resize-none h-24"
                                         />
                                         <button 
                                             type="submit"
@@ -725,7 +726,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                     </form>
                                 ) : (
                                     <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-2">
-                                        <div className="flex-1 text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700 mb-3 overflow-y-auto max-h-[120px]">
+                                        <div className="flex-1 text-sm text-slate-700 dark:text-slate-300 bg-white/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 mb-3 overflow-y-auto max-h-[120px]">
                                             {vocabFeedback}
                                         </div>
                                         <button 
@@ -761,7 +762,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 )}
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-8 shadow-sm transition-all min-h-[300px] flex flex-col justify-center relative">
+                <div className={`${glassCardClass} p-4 md:p-8 transition-all min-h-[300px] flex flex-col justify-center relative`}>
                 
                 {isLoadingTasks ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-4 text-slate-500">
@@ -808,7 +809,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     
                     <div className="flex-1 w-full space-y-4">
                     <div>
-                        <span className="inline-block px-2 py-0.5 mb-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded text-xs font-medium uppercase">
+                        <span className="inline-block px-2 py-0.5 mb-2 bg-slate-100/50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded text-xs font-medium uppercase">
                             {currentTask?.type}
                         </span>
                         <h3 className="text-lg md:text-2xl font-serif text-slate-800 dark:text-slate-100 italic leading-relaxed">
@@ -818,7 +819,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     
                     {/* Text Display for Reading */}
                     {currentTask?.category === 'Reading' && currentTask.hiddenContent && (
-                        <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl border-l-4 border-blue-500 mb-4 shadow-sm">
+                        <div className="bg-slate-100/50 dark:bg-slate-800/50 p-4 rounded-xl border-l-4 border-blue-500 mb-4 shadow-sm">
                             <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
                                 <BookOpen size={16} />
                                 <span className="text-xs font-bold uppercase">Reading Passage</span>
@@ -845,7 +846,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     )}
 
                     {/* Interaction Area */}
-                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 mt-4">
+                    <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100/50 dark:border-white/5 mt-4">
                         {!feedback ? (
                             <form onSubmit={handleCheckAnswer} className="flex flex-col gap-3">
                                 <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -857,7 +858,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                             value={userAnswer}
                                             onChange={(e) => setUserAnswer(e.target.value)}
                                             placeholder="Type your response here..."
-                                            className="w-full px-4 py-3 min-h-[100px] border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-y text-base"
+                                            className="w-full px-4 py-3 min-h-[100px] border border-slate-300/50 dark:border-slate-700/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-y text-base"
                                         />
                                         <button 
                                             type="submit" 
@@ -881,8 +882,8 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 <div className={`p-4 rounded-lg border text-sm leading-relaxed mb-4 ${
                                     (lastScore && lastScore >= 7) 
-                                    ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' 
-                                    : 'bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800 text-slate-800 dark:text-amber-100'
+                                    ? 'bg-emerald-50/50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' 
+                                    : 'bg-amber-50/50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800 text-slate-800 dark:text-amber-100'
                                 }`}>
                                     <div className="flex items-center justify-between gap-2 mb-2 border-b border-black/5 dark:border-white/5 pb-2">
                                         <strong className="font-semibold flex items-center gap-1">
@@ -925,7 +926,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <button
                         key={skill.id}
                         onClick={() => setSelectedSkill(skill)}
-                        className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:border-emerald-200 dark:hover:border-emerald-700 hover:-translate-y-1 transition-all duration-300 text-left group h-full flex flex-col active:scale-95"
+                        className={`${glassCardClass} p-5 md:p-6 hover:shadow-xl hover:border-emerald-200 dark:hover:border-emerald-700 hover:-translate-y-1 transition-all duration-300 text-left group h-full flex flex-col active:scale-95`}
                     >
                         <div className="mb-4 bg-slate-50 dark:bg-slate-800 w-fit p-3 rounded-xl group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors">
                         {React.cloneElement(skill.icon as React.ReactElement<any>, {
@@ -947,7 +948,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             </section>
 
             {/* Section: Practice Papers */}
-            <section className="bg-slate-900 dark:bg-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden transition-colors duration-300">
+            <section className="bg-slate-900/60 dark:bg-slate-800/60 backdrop-blur-md rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden transition-colors duration-300 border border-white/10">
                 <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                 
                 <div className="relative z-10">

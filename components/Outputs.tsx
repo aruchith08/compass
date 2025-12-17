@@ -39,9 +39,9 @@ const Outputs: React.FC = () => {
               <div 
                 key={project.id} 
                 onClick={() => setSelectedItem(project)}
-                className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full min-h-[200px]"
+                className="group relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl p-5 hover:border-emerald-500/50 shadow-lg hover:shadow-xl transition-all cursor-pointer flex flex-col h-full min-h-[200px]"
               >
-                <div className="absolute top-5 right-5 text-slate-400 dark:text-slate-600 group-hover:text-emerald-500 transition-colors z-10 bg-white dark:bg-slate-900 rounded-full p-1.5 shadow-sm border border-slate-100 dark:border-slate-800">
+                <div className="absolute top-5 right-5 text-slate-400 dark:text-slate-600 group-hover:text-emerald-500 transition-colors z-10 bg-white/80 dark:bg-slate-900/80 rounded-full p-1.5 shadow-sm border border-slate-100 dark:border-slate-800">
                   <Github size={20} />
                 </div>
                 
@@ -58,18 +58,18 @@ const Outputs: React.FC = () => {
                   {project.description}
                 </p>
                 
-                <div className="flex flex-wrap items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 mt-auto gap-3">
+                <div className="flex flex-wrap items-center justify-between pt-4 border-t border-slate-100/50 dark:border-white/10 mt-auto gap-3">
                   <div className="flex gap-2 flex-wrap">
                      {project.role_alignment.slice(0, 2).map((r, i) => (
-                       <span key={i} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 font-medium whitespace-nowrap">
+                       <span key={i} className="text-[10px] bg-slate-100/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 px-2 py-1 rounded border border-slate-200/50 dark:border-white/10 font-medium whitespace-nowrap">
                          {r === "All Roles" ? "Core" : r.split(" ")[0]}
                        </span>
                      ))}
                   </div>
                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide whitespace-nowrap ${
-                     project.status === 'Completed' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 
-                     project.status === 'In Progress' ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 
-                     'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                     project.status === 'Completed' ? 'bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 
+                     project.status === 'In Progress' ? 'bg-amber-100/50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 
+                     'bg-slate-100/50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400'
                    }`}>
                      {project.status}
                    </span>
@@ -77,7 +77,7 @@ const Outputs: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-16 text-center text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
+            <div className="col-span-full py-16 text-center text-slate-500 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm">
               <FolderGit2 className="mx-auto mb-3 opacity-50" size={32} />
               <p>No projects found in your roadmap.</p>
             </div>
@@ -105,7 +105,7 @@ const Outputs: React.FC = () => {
                     />
                  ))
              ) : (
-                 <div className="text-slate-500 text-sm text-center py-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                 <div className="text-slate-500 text-sm text-center py-10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl">
                     No technical tasks assigned.
                  </div>
              )}
@@ -130,7 +130,7 @@ const Outputs: React.FC = () => {
                     />
                  ))
              ) : (
-                 <div className="text-slate-500 text-sm text-center py-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                 <div className="text-slate-500 text-sm text-center py-10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl">
                     No behavioral tasks assigned.
                  </div>
              )}
@@ -156,7 +156,7 @@ const Outputs: React.FC = () => {
                     />
                  ))
              ) : (
-                <div className="text-slate-500 text-sm text-center py-12 col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="text-slate-500 text-sm text-center py-12 col-span-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl">
                     No career milestones found.
                 </div>
              )}

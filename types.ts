@@ -59,3 +59,32 @@ export interface RoadmapContextType {
   addHomeworkTask: (text: string) => void;
   deleteHomeworkTask: (id: string) => void;
 }
+
+// Syllabus Types
+export interface SyllabusUnit {
+  title: string;
+  topics: string;
+}
+
+export interface SyllabusCourse {
+  sNo: number;
+  code: string;
+  title: string;
+  l: number;
+  t: number;
+  p: number;
+  credits: number;
+  units?: SyllabusUnit[];
+}
+
+export interface SyllabusSemester {
+  id: string;
+  title: string;
+  courses: SyllabusCourse[];
+  totalCredits: number;
+}
+
+export interface ElectiveGroup {
+  title: string;
+  courses: { code: string; title: string }[];
+}

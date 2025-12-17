@@ -1,5 +1,5 @@
 
-import { RoadmapItem } from './types';
+import { RoadmapItem, SyllabusSemester, ElectiveGroup } from './types';
 
 export const ROADMAP_DATA: RoadmapItem[] = [
   // ==================== YEAR 1: STRONG FOUNDATION ====================
@@ -758,5 +758,408 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_link: "#",
     is_project: false,
     is_output: false
+  }
+];
+
+export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
+  {
+    id: "1-1",
+    title: "I Year I Semester",
+    totalCredits: 20,
+    courses: [
+      { 
+        sNo: 1, code: "MA101BS", title: "Matrices and Calculus", l: 3, t: 1, p: 0, credits: 4,
+        units: [
+          { title: "Matrices", topics: "Rank, Echelon form, Normal form, Inverse by Gauss-Jordan, System of linear equations, Gauss Seidel." },
+          { title: "Eigen values & Vectors", topics: "Linear Transformation, Cayley-Hamilton Theorem, Diagonalization, Quadratic forms." },
+          { title: "Single Variable Calculus", topics: "Mean value theorems, Rolle's, Lagrange's, Cauchy's, Taylor's Series, Curve Tracing." },
+          { title: "Multivariable Calculus (Diff)", topics: "Partial Differentiation, Euler's Theorem, Jacobian, Maxima/Minima, Lagrange multipliers." },
+          { title: "Multivariable Calculus (Int)", topics: "Double Integrals, Change of order, Triple Integrals, Applications: Areas/Volumes." }
+        ]
+      },
+      { 
+        sNo: 2, code: "PH102BS", title: "Advanced Engineering Physics", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Crystallography", topics: "Unit cell, lattice parameters, crystal structures, Bragg's law, defects, SEM." },
+          { title: "Quantum Mechanics", topics: "de-Broglie, Heisenberg uncertainty, Schrodinger equation, Particle in 1D box, Band theory." },
+          { title: "Quantum Computing", topics: "Qubits, Bloch's sphere, Superposition, Entanglement, Quantum gates, Algorithms (Shor, Grover)." },
+          { title: "Magnetic & Dielectric", topics: "Permittivity, Polarization, Ferroelectricity, Piezoelectricity, Hall Effect, Magnetic materials." },
+          { title: "Lasers & Fiber Optics", topics: "Population inversion, Ruby/He-Ne Laser, Optical Fibers, Total Internal Reflection, Sensors." }
+        ]
+      },
+      { 
+        sNo: 3, code: "CS103ES", title: "Programming for Problem Solving", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Intro to C", topics: "Data types, Operators, Expressions, Control Structures (if, switch, while, for)." },
+          { title: "Functions & Pointers", topics: "User-defined functions, Recursion, Parameter passing, Pointer arithmetic, Call by reference." },
+          { title: "Arrays & Strings", topics: "1D/2D Arrays, String handling functions, Pointers to arrays." },
+          { title: "Structures & Unions", topics: "Defining structures, Array of structures, Nested structures, Unions, Enum." },
+          { title: "Files & Preprocessor", topics: "File handling (fopen, fclose, fread, fwrite), Command line args, Preprocessor directives." }
+        ]
+      },
+      { 
+        sNo: 4, code: "EE104ES", title: "Basic Electrical Engineering", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "DC Circuits", topics: "Ohm's Law, KVL, KCL, Mesh/Nodal Analysis, Thevenin's, Norton's, Superposition Theorems." },
+          { title: "AC Circuits", topics: "RL, RC, RLC Series/Parallel, Resonance, Power Factor, 3-Phase Systems." },
+          { title: "Transformers", topics: "Ideal/Practical, EMF Equation, Equivalent Circuit, Losses, Efficiency, Regulation." },
+          { title: "Electrical Machines", topics: "DC Generators/Motors, Induction Motors, Synchronous Generators (Basic construction/operation)." },
+          { title: "Electrical Installations", topics: "Switchgear, MCB, ELCB, Earthing, Batteries, Power Factor Improvement." }
+        ]
+      },
+      { 
+        sNo: 5, code: "ME105ES", title: "Engineering Drawing and Computer Aided Drafting", l: 2, t: 0, p: 2, credits: 3,
+        units: [
+          { title: "Introduction", topics: "Scales, Conic Sections, Cycloids, Involutes." },
+          { title: "Orthographic Projections", topics: "Projections of Points, Lines, Planes." },
+          { title: "Projections of Solids", topics: "Prisms, Pyramids, Cylinders, Cones." },
+          { title: "Sections & Development", topics: "Sectional views, Development of surfaces." },
+          { title: "Isometric Projections", topics: "Isometric views of planes/solids, Conversion from Orthographic to Isometric." }
+        ]
+      },
+      { sNo: 6, code: "PH106BS", title: "Advanced Engineering Physics Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 7, code: "CS107ES", title: "Programming for Problem Solving Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "EE108ES", title: "Basic Electrical Engineering Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "CS109ES", title: "IT Workshop", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 10, code: "-", title: "Induction Program", l: 0, t: 0, p: 0, credits: 0 },
+    ]
+  },
+  {
+    id: "1-2",
+    title: "I Year II Semester",
+    totalCredits: 20,
+    courses: [
+      { 
+        sNo: 1, code: "MA201BS", title: "Ordinary Differential Equations and Vector Calculus", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "First Order ODE", topics: "Exact, Linear, Bernoulli equations, Newton's Law of Cooling, Growth/Decay." },
+          { title: "Higher Order ODE", topics: "Constant coefficients, Method of Variation of Parameters, Cauchy-Euler equations." },
+          { title: "Laplace Transforms", topics: "Properties, Inverse Laplace, Convolution, Solving ODEs using Laplace." },
+          { title: "Vector Differentiation", topics: "Gradient, Divergence, Curl, Directional Derivative, Vector identities." },
+          { title: "Vector Integration", topics: "Line, Surface, Volume integrals, Green's, Gauss, Stokes theorems." }
+        ]
+      },
+      { 
+        sNo: 2, code: "CH202BS", title: "Engineering Chemistry", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Water Chemistry", topics: "Hardness, Softening methods (Lime-Soda, Zeolite), Potable water, Desalination." },
+          { title: "Electrochemistry", topics: "Electrode potential, Nernst equation, Batteries (Lead-Acid, Li-ion), Fuel Cells." },
+          { title: "Corrosion", topics: "Types (Dry/Wet), Galvanic, Pitting, Factors affecting, Prevention (Cathodic protection, Coatings)." },
+          { title: "Polymers", topics: "Thermoplastics/Thermosets, PVC, Teflon, Nylon, Biodegradable polymers, Conducting polymers." },
+          { title: "Fuels & Combustion", topics: "Coal analysis, Petroleum refining, Octane/Cetane number, Lubricants, Nanomaterials." }
+        ]
+      },
+      { 
+        sNo: 3, code: "CS203ES", title: "Data Structures", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Introduction", topics: "Linked Lists (Singly, Doubly, Circular), Stacks, Queues (Array/Linked implementations)." },
+          { title: "Trees", topics: "Binary Trees, BST, AVL Trees, Tree Traversals (Inorder, Preorder, Postorder)." },
+          { title: "Search Trees & Heaps", topics: "B-Trees, B+ Trees, Priority Queues, Binary Heaps." },
+          { title: "Graphs", topics: "Representation (Matrix/List), BFS, DFS, Spanning Trees (Prim's, Kruskal's)." },
+          { title: "Hashing & Sorting", topics: "Hash functions, Collision resolution, Bubble, Selection, Insertion, Quick, Merge Sort." }
+        ]
+      },
+      { 
+        sNo: 4, code: "EC204ES", title: "Electronic Devices and Circuits", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Diodes", topics: "PN Junction, VI Characteristics, Zener Diode, Rectifiers (Half/Full Wave), Clippers/Clampers." },
+          { title: "Bipolar Junction Transistor", topics: "Construction, CB/CE/CC Configurations, Input/Output Characteristics." },
+          { title: "Transistor Biasing", topics: "Operating Point, Load Line, Biasing methods (Fixed, Self), Stability." },
+          { title: "BJT Amplifiers", topics: "Small signal analysis, h-parameters, CE Amplifier analysis." },
+          { title: "FET & Special Devices", topics: "JFET, MOSFET (Enhancement/Depletion), SCR, UJT, LED, Photo Diode." }
+        ]
+      },
+      { 
+        sNo: 5, code: "EN205HS", title: "English for Skill Enhancement", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Vocabulary & Grammar", topics: "Word formation, Synonyms/Antonyms, Prepositions, Articles, Tenses, Correction of sentences." },
+          { title: "Reading Skills", topics: "Skimming, Scanning, Intensive/Extensive reading, Comprehension." },
+          { title: "Writing Skills", topics: "Paragraph writing, Letter writing, Email etiquette, Report writing." },
+          { title: "Listening & Speaking", topics: "Effective communication, Barriers, Jam sessions, Role plays." },
+          { title: "Soft Skills", topics: "Teamwork, Emotional Intelligence, Interview skills, Presentation skills." }
+        ]
+      },
+      { sNo: 6, code: "CH206BS", title: "Engineering Chemistry Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 7, code: "CS207ES", title: "Data Structures Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "EN208HS", title: "English Language and Communication Skills Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "ME209ES", title: "Engineering Workshop", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 10, code: "CS210ES", title: "Python Programming Lab", l: 0, t: 0, p: 2, credits: 1 },
+    ]
+  },
+  {
+    id: "2-1",
+    title: "II Year I Semester",
+    totalCredits: 20,
+    courses: [
+      { 
+        sNo: 1, code: "MA401BS", title: "Mathematical and Statistical Foundations", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Number Theory", topics: "GCD, Euclidean Algorithm, Prime Factorization, Congruences, Fermat's Theorem." },
+          { title: "Random Variables", topics: "Discrete/Continuous RV, Expectation, Variance, Binomial, Poisson Distributions." },
+          { title: "Sampling Distributions", topics: "Normal Distribution, Central Limit Theorem, Sampling distributions." },
+          { title: "Hypothesis Testing", topics: "Null/Alternative Hypothesis, Type I/II errors, z-test, t-test, Chi-square test." },
+          { title: "Applied Statistics", topics: "Curve fitting (Least squares), Correlation, Regression Analysis." }
+        ]
+      },
+      { 
+        sNo: 2, code: "CS302PC", title: "Computer Organization and Architecture", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Basic Structure", topics: "Functional units, Bus structures, Performance, Data representation." },
+          { title: "Machine Instructions", topics: "Instruction formats, Addressing modes, Assembly language, Stacks/Queues." },
+          { title: "Input/Output", topics: "Interrupts, DMA, Standard I/O Interfaces (PCI, USB, SCSI)." },
+          { title: "Memory System", topics: "RAM/ROM, Cache memory, Mapping functions, Virtual memory." },
+          { title: "Arithmetic & Processing", topics: "Addition/Subtraction, Multiplication/Division algorithms, Pipelining, Hazards." }
+        ]
+      },
+      { 
+        sNo: 3, code: "CS303PC", title: "Object Oriented Programming through Java", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Java Basics", topics: "OOP concepts, Data types, Control statements, Arrays, Classes, Objects, Methods." },
+          { title: "Inheritance & Packages", topics: "Types of inheritance, Super keyword, Method overriding, Abstract classes, Packages, Interfaces." },
+          { title: "Exception Handling", topics: "Try-catch-finally, Throw/Throws, Custom exceptions, Multithreading concepts." },
+          { title: "Collections & I/O", topics: "ArrayList, LinkedList, HashMap, File I/O, Serialization." },
+          { title: "GUI Programming", topics: "AWT, Swing, Event Handling, Layout Managers, Applets." }
+        ]
+      },
+      { 
+        sNo: 4, code: "CS304PC", title: "Software Engineering", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Introduction", topics: "Software Myths, Process Models (Waterfall, Agile, Spiral), CMMI." },
+          { title: "Requirements", topics: "Functional/Non-functional, SRS, Elicitation, Validation." },
+          { title: "Design", topics: "Architecture, UML Diagrams (Class, Use Case, Sequence), Design Patterns." },
+          { title: "Testing", topics: "Black-box vs White-box, Unit/Integration/System Testing, Debugging." },
+          { title: "Quality & Maintenance", topics: "Risk Management, Quality Assurance, ISO 9000, Maintenance." }
+        ]
+      },
+      { 
+        sNo: 5, code: "CS305PC", title: "Database Management System", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Intro & ER Model", topics: "Database Architecture, Data Models, ER Diagrams, Attributes, Relationships." },
+          { title: "Relational Model", topics: "Integrity constraints, Relational Algebra, SQL basics (DDL, DML, DCL)." },
+          { title: "Advanced SQL", topics: "Joins, Subqueries, Triggers, Views, Normalization (1NF, 2NF, 3NF, BCNF)." },
+          { title: "Transactions", topics: "ACID properties, Serializability, Concurrency Control, Locking protocols." },
+          { title: "Storage & Indexing", topics: "File organization, Indexing (B+ Trees), Hashing." }
+        ]
+      },
+      { sNo: 6, code: "MA306PC", title: "Computational Mathematics Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 7, code: "CS307PC", title: "Object Oriented Programming through Java Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "CS308PC", title: "Software Engineering Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "CS309PC", title: "Database Management Systems Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 10, code: "CS310SD", title: "Node JS/React JS/Django", l: 0, t: 0, p: 2, credits: 1 },
+    ]
+  },
+  {
+    id: "2-2",
+    title: "II Year II Semester",
+    totalCredits: 22,
+    courses: [
+      { 
+        sNo: 1, code: "CS401PC", title: "Discrete Mathematics", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Logic", topics: "Propositional Logic, Predicates, Quantifiers, Rules of Inference." },
+          { title: "Sets & Relations", topics: "Set Theory, Relations, Functions, Equivalence Relations, Partial Ordering." },
+          { title: "Algebraic Structures", topics: "Groups, Subgroups, Homomorphisms, Lattices, Boolean Algebra." },
+          { title: "Combinatorics", topics: "Permutations, Combinations, Binomial Coeff, Pigeonhole Principle, Recurrence Relations." },
+          { title: "Graph Theory", topics: "Graphs, Euler/Hamiltonian paths, Planar graphs, Graph coloring, Trees." }
+        ]
+      },
+      { 
+        sNo: 2, code: "CS402PC", title: "Operating Systems", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Introduction", topics: "OS Services, System Calls, Process Concepts, Threads." },
+          { title: "CPU Scheduling", topics: "Scheduling Criteria, Algorithms (FCFS, SJF, RR), Deadlocks." },
+          { title: "Synchronization", topics: "Critical Section, Semaphores, Monitors, Classical Problems (Dining Philosophers)." },
+          { title: "Memory Management", topics: "Paging, Segmentation, Virtual Memory, Page Replacement Algorithms." },
+          { title: "File Systems", topics: "File concepts, Access methods, Directory structure, Disk scheduling." }
+        ]
+      },
+      { 
+        sNo: 3, code: "CS403PC", title: "Algorithms Design and Analysis", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Introduction", topics: "Asymptotic notations, Divide & Conquer (Merge Sort, Quick Sort)." },
+          { title: "Disjoint Sets & Backtracking", topics: "Union-Find, N-Queens, Graph Coloring, Hamiltonian Cycles." },
+          { title: "Dynamic Programming", topics: "Knapsack Problem, Matrix Chain Multiplication, LCS, Floyd-Warshall." },
+          { title: "Greedy Method", topics: "Job Sequencing, MST (Prim/Kruskal), Dijkstra's Algorithm." },
+          { title: "Branch & Bound", topics: "TSP, 0/1 Knapsack (BB), NP-Hard/NP-Complete classes." }
+        ]
+      },
+      { 
+        sNo: 4, code: "CS404PC", title: "Computer Networks", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Introduction", topics: "OSI/TCP-IP Models, Network Edge/Core, Switching." },
+          { title: "Application Layer", topics: "HTTP, FTP, SMTP, DNS, Socket Programming." },
+          { title: "Transport Layer", topics: "UDP, TCP, Congestion Control, Reliability." },
+          { title: "Network Layer", topics: "IP Addressing, Subnetting, Routing Algorithms (Link State, Distance Vector)." },
+          { title: "Link Layer", topics: "Error Detection, MAC Protocols, Ethernet, Wireless LANs." }
+        ]
+      },
+      { 
+        sNo: 5, code: "CS405PC", title: "Machine Learning", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Intro to ML", topics: "Types of Learning, Data Preprocessing, Overfitting/Underfitting." },
+          { title: "Supervised Learning", topics: "Regression, Decision Trees, KNN, SVM, Naive Bayes." },
+          { title: "Ensemble Learning", topics: "Bagging, Boosting, Random Forest." },
+          { title: "Unsupervised Learning", topics: "Clustering (K-Means, Hierarchical), PCA." },
+          { title: "Neural Networks", topics: "Perceptron, Activation Functions, Backpropagation, Intro to Deep Learning." }
+        ]
+      },
+      { 
+        sNo: 6, code: "MS406HS", title: "Innovation and Entrepreneurship", l: 2, t: 0, p: 0, credits: 2,
+        units: [
+          { title: "Fundamentals", topics: "Innovation vs Entrepreneurship, Types of Startups, Entrepreneurial Mindset." },
+          { title: "Design Thinking", topics: "Problem Identification, Ideation Techniques, Customer Validation." },
+          { title: "Business Model", topics: "Business Model Canvas, Value Proposition, Revenue Streams." },
+          { title: "Financing", topics: "Bootstrapping, Angel Investors, VC, Pitching." },
+          { title: "Legal & IPR", topics: "Intellectual Property Rights, Patents, Company Registration." }
+        ]
+      },
+      { sNo: 7, code: "CS407PC", title: "Operating Systems Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "CS408PC", title: "Computer Networks Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "CS409PC", title: "Machine Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 10, code: "CS410SD", title: "Data Visualization - R Programming/ Power BI", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 11, code: "VA400HS", title: "Indian Knowledge System", l: 1, t: 0, p: 0, credits: 1 },
+    ]
+  },
+  {
+    id: "3-1",
+    title: "III Year I Semester",
+    totalCredits: 21,
+    courses: [
+      { sNo: 1, code: "AI501PC", title: "Artificial Intelligence", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "AI502PC", title: "Automata theory and Compiler Design", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "AI503PC", title: "Data Analytics and Visualization", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 4, code: "PE-I", title: "Professional Elective-I", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 5, code: "OE-I", title: "Open Elective-I", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 6, code: "AI504PC", title: "Artificial Intelligence Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 7, code: "AI505PC", title: "Compiler Design Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "AI506PC", title: "Data Analytics and Visualization Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "AI507PC", title: "Field Based Research Project", l: 0, t: 0, p: 4, credits: 2 },
+      { sNo: 10, code: "AI508SD", title: "UI Design – Flutter/ Android Studio", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 11, code: "VA500HS/VA501HS", title: "Gender Sensitization/ Human Values and Professional Ethics", l: 1, t: 0, p: 0, credits: 1 },
+    ]
+  },
+  {
+    id: "3-2",
+    title: "III Year II Semester",
+    totalCredits: 20,
+    courses: [
+      { sNo: 1, code: "AI601PC", title: "Natural Language Processing", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "AI602PC", title: "Deep Learning", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "MS603HS", title: "Business Economics and Financial Analysis", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 4, code: "PE-II", title: "Professional Elective-II", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 5, code: "OE-II", title: "Open Elective-II", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 6, code: "AI604PC", title: "Natural Language Processing Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 7, code: "AI605PC", title: "Deep Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "AI606PC", title: "Chatbots Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "EN607HS", title: "English for Employability Skills Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 10, code: "AI608SD", title: "Prompt Engineering", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 11, code: "VA600ES", title: "Environmental Science", l: 1, t: 0, p: 0, credits: 1 },
+    ]
+  },
+  {
+    id: "4-1",
+    title: "IV Year I Semester",
+    totalCredits: 21,
+    courses: [
+      { sNo: 1, code: "AI701PC", title: "Reinforcement Learning", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "AI702PC", title: "Generative AI", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "MS703HS", title: "Fundamentals of Management for Engineers", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 4, code: "PE-III", title: "Professional Elective-III", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 5, code: "PE-IV", title: "Professional Elective-IV", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 6, code: "OE-III", title: "Open Elective-III", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 7, code: "AI704PC", title: "Reinforcement Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "AI705PC", title: "Generative AI Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "AI706PC", title: "Industry Oriented Mini Project/ Internship", l: 0, t: 0, p: 4, credits: 2 },
+    ]
+  },
+  {
+    id: "4-2",
+    title: "IV Year II Semester",
+    totalCredits: 20,
+    courses: [
+      { sNo: 1, code: "PE-V", title: "Professional Elective-V", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "PE-VI", title: "Professional Elective-VI", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "AI801PC", title: "Project Work", l: 0, t: 0, p: 42, credits: 14 },
+    ]
+  }
+];
+
+export const ELECTIVES_DATA: ElectiveGroup[] = [
+  {
+    title: "Professional Elective - I",
+    courses: [
+      { code: "CS511PE", title: "Computer Graphics" },
+      { code: "CS512PE", title: "Introduction to Data Science" },
+      { code: "CS513PE", title: "Software Testing Methodologies" },
+      { code: "CS514PE", title: "Data Mining" },
+      { code: "CS515PE", title: "Web Programming" },
+      { code: "CS516PE", title: "Distributed Systems" }
+    ]
+  },
+  {
+    title: "Professional Elective - II",
+    courses: [
+      { code: "CS621PE", title: "Image Processing" },
+      { code: "CS622PE", title: "Blockchain Technology" },
+      { code: "CS623PE", title: "Software Project Management" },
+      { code: "CS624PE", title: "Mining Massive Datasets" },
+      { code: "CS625PE", title: "Full Stack Development" },
+      { code: "CS626PE", title: "DevOps" }
+    ]
+  },
+  {
+    title: "Professional Elective - III",
+    courses: [
+      { code: "CS731PE", title: "Computer Vision" },
+      { code: "CS732PE", title: "Cryptography and Network Security" },
+      { code: "CS733PE", title: "Penetration Testing and Incident Response" },
+      { code: "CS734PE", title: "Data Stream Mining" },
+      { code: "CS735PE", title: "Cloud Computing" },
+      { code: "CS736PE", title: "Information Retrieval Systems" }
+    ]
+  },
+  {
+    title: "Professional Elective - IV",
+    courses: [
+      { code: "CS741PE", title: "Augmented Reality & Virtual Reality" },
+      { code: "CS742PE", title: "Agile Methodology" },
+      { code: "CS743PE", title: "Big Data Technologies" },
+      { code: "CS744PE", title: "Quantum Computing" },
+      { code: "CS745PE", title: "Robotic Process Automation" },
+      { code: "CS746PE", title: "Cyber Forensics" }
+    ]
+  },
+  {
+    title: "Professional Elective - V",
+    courses: [
+      { code: "CS851PE", title: "Social Media Mining" },
+      { code: "CS852PE", title: "Nature Inspired Computing" },
+      { code: "CS853PE", title: "Internet of Things" },
+      { code: "CS854PE", title: "Game Theory" },
+      { code: "CS855PE", title: "Mobile Application Development" },
+      { code: "CS856PE", title: "Human Computer Interaction" }
+    ]
+  },
+  {
+    title: "Professional Elective - VI",
+    courses: [
+      { code: "CS861PE", title: "High Performance Computing" },
+      { code: "CS862PE", title: "Edge Computing" },
+      { code: "CS863PE", title: "Graph Theory" },
+      { code: "CS864PE", title: "Adhoc & Sensor Networks" },
+      { code: "CS865PE", title: "Sustainable Engineering" },
+      { code: "CS866PE", title: "Distributed Databases" }
+    ]
+  },
+  {
+    title: "Open Electives",
+    courses: [
+      { code: "AI511OE", title: "Fundamentals of AI" },
+      { code: "AI512OE", title: "Machine Learning Basics" },
+      { code: "AI621OE", title: "Introduction to NLP" },
+      { code: "AI622OE", title: "AI applications" },
+      { code: "AI731OE", title: "Chatbots" },
+      { code: "AI732OE", title: "Computer Vision with Open CV" }
+    ]
   }
 ];

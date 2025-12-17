@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap } from 'lucide-react';
 import { Role } from '../types';
+import SyllabusViewer from './SyllabusViewer';
 
 const Dashboard: React.FC = () => {
   const { 
@@ -31,6 +32,14 @@ const Dashboard: React.FC = () => {
     if(newHomework.trim()) {
       addHomeworkTask(newHomework);
       setNewHomework('');
+    }
+  };
+
+  // Scroll to Syllabus Section
+  const scrollToSyllabus = () => {
+    const section = document.getElementById('syllabus-section');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -93,6 +102,13 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-wrap items-center gap-3">
            {/* External Tools Icons */}
            <div className="flex gap-2">
+              <button 
+                 onClick={scrollToSyllabus}
+                 className="p-2.5 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all hover:-translate-y-0.5 shadow-sm shadow-emerald-100/50 dark:shadow-none"
+                 title="Academic Syllabus"
+              >
+                 <GraduationCap size={20} />
+              </button>
               <a 
                  href="https://gamma.app/create" 
                  target="_blank" 
@@ -134,11 +150,13 @@ const Dashboard: React.FC = () => {
                <div key={task.id} className="flex items-start group">
                  <button 
                    onClick={() => toggleDailyTask(task.id)}
-                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all duration-300 ${
-                     task.completed ? 'bg-indigo-500 border-indigo-500 text-white scale-110' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-400'
+                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                     task.completed 
+                       ? 'bg-indigo-500 border-indigo-500 text-white scale-105 shadow-sm shadow-indigo-500/30' 
+                       : 'bg-slate-100/50 dark:bg-slate-800/80 border-slate-300 dark:border-slate-500 hover:border-indigo-400 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-700'
                    }`}
                  >
-                   {task.completed && <CheckCircle size={14} />}
+                   {task.completed && <CheckCircle size={14} strokeWidth={3} />}
                  </button>
                  <span className={`text-sm flex-1 break-words transition-colors duration-300 ${task.completed ? 'text-slate-400 line-through decoration-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
@@ -191,11 +209,13 @@ const Dashboard: React.FC = () => {
                <div key={task.id} className="flex items-start group">
                  <button 
                    onClick={() => toggleHomeworkTask(task.id)}
-                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all duration-300 ${
-                     task.completed ? 'bg-rose-500 border-rose-500 text-white scale-110' : 'border-slate-300 dark:border-slate-600 hover:border-rose-400'
+                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                     task.completed 
+                       ? 'bg-rose-500 border-rose-500 text-white scale-105 shadow-sm shadow-rose-500/30' 
+                       : 'bg-slate-100/50 dark:bg-slate-800/80 border-slate-300 dark:border-slate-500 hover:border-rose-400 dark:hover:border-rose-400 hover:bg-white dark:hover:bg-slate-700'
                    }`}
                  >
-                   {task.completed && <CheckCircle size={14} />}
+                   {task.completed && <CheckCircle size={14} strokeWidth={3} />}
                  </button>
                  <span className={`text-sm flex-1 break-words transition-colors duration-300 ${task.completed ? 'text-slate-400 line-through decoration-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
@@ -399,6 +419,9 @@ const Dashboard: React.FC = () => {
             </div>
          </div>
       </div>
+
+      {/* === ACADEMIC SYLLABUS SECTION === */}
+      <SyllabusViewer />
     </div>
   );
 };

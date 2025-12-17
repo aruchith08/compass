@@ -59,7 +59,13 @@ const Dashboard: React.FC = () => {
   // Role Readiness Data
   const roles: Role[] = ["AI/ML Engineer", "Data Scientist", "Data Analyst", "AI Security Officer", "Full Stack Developer"];
   const roleData = roles.map(role => ({
-    name: role.replace("Officer", "").replace("Engineer", "Eng").replace("Developer", "Dev"),
+    // Shorten names for chart, keep full for mobile list
+    name: role
+      .replace("Officer", "")
+      .replace("Engineer", "Eng")
+      .replace("Developer", "Dev")
+      .replace("Scientist", "Sci"),
+    fullName: role,
     score: getCompletionPercentage(role),
     fill: '#10b981'
   }));
@@ -286,7 +292,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Role Readiness Bar Chart */}
+        {/* Role Readiness Bar Chart (Responsive) */}
         <div className={`${glassCardClass}`}>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
             <span className="p-1.5 bg-amber-100/50 dark:bg-amber-500/10 rounded-lg mr-2">
@@ -294,7 +300,30 @@ const Dashboard: React.FC = () => {
             </span>
             Role Readiness
           </h3>
-          <div className="w-full" style={{ height: '250px', minHeight: '250px' }}>
+          
+          {/* Mobile View: List with Progress Bars */}
+          <div className="block md:hidden space-y-4 pt-2">
+             {roleData.map((role) => (
+                <div key={role.name} className="space-y-1.5">
+                   <div className="flex justify-between items-end">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{role.fullName}</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">{role.score}%</span>
+                   </div>
+                   <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                         className="h-full rounded-full transition-all duration-1000 ease-out"
+                         style={{ 
+                            width: `${role.score}%`,
+                            backgroundColor: role.score >= 80 ? '#10b981' : role.score >= 50 ? '#059669' : '#64748b' 
+                         }}
+                      />
+                   </div>
+                </div>
+             ))}
+          </div>
+
+          {/* Desktop View: Bar Chart */}
+          <div className="hidden md:block w-full" style={{ height: '250px', minHeight: '250px' }}>
             <ResponsiveContainer width="99%" height="100%">
               <BarChart data={roleData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <XAxis 

@@ -17,6 +17,7 @@ import Resources from './components/Resources';
 import Outputs from './components/Outputs';
 import Login from './components/Login';
 import Linguahub from './components/Linguahub';
+import SplashScreen from './components/SplashScreen';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
@@ -31,6 +32,7 @@ const FIXED_DAILY_TASKS = [
 ];
 
 const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -276,6 +278,10 @@ const App: React.FC = () => {
       default: return <Dashboard />;
     }
   };
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
 
   if (!user) {
     return <Login onLogin={handleLogin} isLoading={isLoading} />;

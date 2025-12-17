@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { SyllabusCourse, SyllabusUnit } from '../types';
 import { X, CheckCircle2, Circle, BookOpen, Trophy, FileText, PieChart, Copy, Check } from 'lucide-react';
 
@@ -13,16 +13,16 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
   const [checkedTopics, setCheckedTopics] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   
-  // Generate a unique ID for topics to handle persistence
-  // We use a combination of unit index and topic index/text hash
-  const getTopicId = (unitTitle: string, topicText: string, index: number) => {
-    return `${course.code}_${unitTitle.substring(0, 5)}_${index}`;
-  };
-
   // Helper to parse topics string into array
   const parseTopics = (topicsStr: string): string[] => {
     // Split by comma or bullet points if present, then trim
     return topicsStr.split(/,|•|–/).map(t => t.trim()).filter(t => t.length > 2);
+  };
+
+  // Generate a robust unique ID for topics using indices
+  // Previous version caused collisions with similar unit titles
+  const getTopicId = (unitIdx: number, topicIdx: number) => {
+    return `${course.code}_u${unitIdx}_t${topicIdx}`;
   };
 
   // Load saved progress
@@ -59,14 +59,30 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
     });
   };
 
-  // Calculate stats
+  // Accurate Stats Calculation
+  // We calculate completedCount by iterating through the ACTUAL renderable topics
+  // This avoids "ghost" progress from old/invalid IDs in local storage
+  const { totalTopics, completedCount, progress } = useMemo(() => {
+    const allUnits = course.units || [];
+    let total = 0;
+    let completed = 0;
+
+    allUnits.forEach((unit, unitIdx) => {
+      const topics = parseTopics(unit.topics);
+      total += topics.length;
+      topics.forEach((_, topicIdx) => {
+        const id = getTopicId(unitIdx, topicIdx);
+        if (checkedTopics.has(id)) {
+          completed++;
+        }
+      });
+    });
+
+    const prog = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { totalTopics: total, completedCount: completed, progress: prog };
+  }, [course, checkedTopics]);
+
   const allUnits = course.units || [];
-  let totalTopics = 0;
-  allUnits.forEach(u => {
-    totalTopics += parseTopics(u.topics).length;
-  });
-  const completedTopics = checkedTopics.size;
-  const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -107,7 +123,7 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1"><Trophy size={14} className="text-amber-500" /> Syllabus Progress</span>
-              <span>{progress}% Completed</span>
+              <span>{progress}% Completed ({completedCount}/{totalTopics})</span>
             </div>
             <div className="h-2.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
@@ -141,7 +157,7 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
                   {/* Checklist */}
                   <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
                     {topics.map((topic, topicIdx) => {
-                      const id = getTopicId(unit.title, topic, topicIdx);
+                      const id = getTopicId(unitIdx, topicIdx);
                       const isChecked = checkedTopics.has(id);
 
                       return (

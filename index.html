@@ -58,6 +58,8 @@
               'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               'blob': 'blob 7s infinite',
               'radar-spin': 'radar-spin 3s linear infinite',
+              'confetti-burst': 'confettiBurst 4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards',
+              'sparkle': 'sparkle 1.5s ease-in-out infinite',
             },
             keyframes: {
               fadeIn: {
@@ -89,6 +91,28 @@
               'radar-spin': {
                 'from': { transform: 'rotate(0deg)' },
                 'to': { transform: 'rotate(360deg)' }
+              },
+              confettiBurst: {
+                '0%': { 
+                  transform: 'translate(0, 0) scale(0) rotate(0deg)', 
+                  opacity: '1' 
+                },
+                '15%': {
+                  transform: 'translate(var(--x-mid), var(--y-mid)) scale(1.2) rotate(180deg)',
+                  opacity: '1'
+                },
+                '35%': {
+                  transform: 'translate(calc(var(--x-mid) * 1.1), calc(var(--y-mid) * 1.05)) scale(1) rotate(270deg)',
+                  opacity: '1'
+                },
+                '100%': { 
+                  transform: 'translate(var(--x-end), 600px) scale(0.7) rotate(var(--rotation))', 
+                  opacity: '0' 
+                },
+              },
+              sparkle: {
+                '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                '50%': { opacity: '1', transform: 'scale(1.2)' },
               }
             }
           }

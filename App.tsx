@@ -5,7 +5,7 @@ import {
   CheckSquare, 
   Library, 
   Briefcase, 
-  GraduationCap,
+  Compass,
   LogOut,
   Sun,
   Moon,
@@ -289,9 +289,9 @@ const App: React.FC = () => {
         <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-[60] flex items-center justify-between px-4">
            <div className="flex items-center gap-2">
              <div className="p-1.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-sm">
-                <GraduationCap className="text-white" size={18} />
+                <Compass className="text-white" size={18} />
              </div>
-             <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Roadmap</span>
+             <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
            </div>
            <div className="flex items-center gap-2">
               <button 
@@ -313,10 +313,10 @@ const App: React.FC = () => {
         <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col shadow-xl">
           <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg shadow-cyan-500/20">
-              <GraduationCap className="text-white" size={24} />
+              <Compass className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="font-bold text-lg tracking-wide text-slate-900 dark:text-slate-100">Tech Roadmap</h1>
+              <h1 className="font-bold text-lg tracking-wide text-slate-900 dark:text-slate-100">Compass</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">Hybrid Profile Tracker</p>
             </div>
           </div>

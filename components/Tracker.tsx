@@ -42,15 +42,15 @@ const Tracker: React.FC = () => {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Yearly Roadmap Tracker</h2>
             
             {/* Filter Section */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="grid grid-cols-2 gap-2 w-full md:w-auto md:flex md:items-center md:gap-3">
                
                {/* Role Filter */}
-               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <Layers size={16} className="text-slate-500 ml-2" />
+               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0">
+                  <Layers size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value as Role | "All Roles")}
-                    className="bg-transparent text-sm font-medium text-slate-900 dark:text-slate-300 focus:outline-none p-1 max-w-[150px]"
+                    className="bg-transparent text-sm font-medium text-slate-900 dark:text-slate-300 focus:outline-none p-1 w-full truncate cursor-pointer"
                   >
                     <option value="All Roles">All Roles</option>
                     {roles.map(r => (
@@ -60,12 +60,12 @@ const Tracker: React.FC = () => {
                </div>
 
                {/* Priority Filter */}
-               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <Filter size={16} className="text-slate-500 ml-2" />
+               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0">
+                  <Filter size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={filterPriority}
                     onChange={(e) => setFilterPriority(e.target.value)}
-                    className="bg-transparent text-sm font-medium text-slate-900 dark:text-slate-300 focus:outline-none p-1"
+                    className="bg-transparent text-sm font-medium text-slate-900 dark:text-slate-300 focus:outline-none p-1 w-full truncate cursor-pointer"
                   >
                     <option value="All">All Priorities</option>
                     <option value="High">High</option>

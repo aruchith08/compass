@@ -9,7 +9,7 @@ import {
   LogOut,
   Sun,
   Moon,
-  Globe
+  Languages
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -265,7 +265,7 @@ const App: React.FC = () => {
     { id: 'tracker', label: 'Roadmap', icon: CheckSquare },
     { id: 'resources', label: 'Learn', icon: Library },
     { id: 'outputs', label: 'Portfolio', icon: Briefcase },
-    { id: 'linguahub', label: 'Linguahub', icon: Globe },
+    { id: 'linguahub', label: 'Linguahub', icon: Languages },
   ];
 
   const renderContent = () => {

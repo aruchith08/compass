@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
-import { ExternalLink, Search, BookOpen, Filter } from 'lucide-react';
+import { ExternalLink, Search, BookOpen, Filter, Tag } from 'lucide-react';
 
 const Resources: React.FC = () => {
   const { items } = useRoadmap();
@@ -23,7 +23,7 @@ const Resources: React.FC = () => {
     });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 md:pb-0">
        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Learning Resources</h2>
@@ -61,7 +61,8 @@ const Resources: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl overflow-hidden shadow-lg">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl overflow-hidden shadow-lg">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -107,12 +108,53 @@ const Resources: React.FC = () => {
             </tbody>
           </table>
         </div>
-        {resources.length === 0 && (
-          <div className="p-8 text-center text-slate-500">
-            No resources found matching your criteria.
-          </div>
-        )}
       </div>
+
+      {/* Mobile Card View */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+         {resources.map((item) => (
+            <div key={item.id} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-xl p-4 shadow-sm">
+               <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                     <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <BookOpen size={20} />
+                     </div>
+                     <div>
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base leading-tight">
+                           {item.resource_name}
+                        </h3>
+                        <div className="flex items-center gap-1.5 mt-1 text-slate-500 dark:text-slate-400 text-xs">
+                           <Tag size={12} />
+                           <span>{item.category}</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <div className="mb-4 text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-white/5">
+                  <span className="text-xs font-semibold text-slate-400 uppercase block mb-1">Related Task</span>
+                  {item.name}
+               </div>
+
+               <a 
+                  href={item.resource_link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 p-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors font-medium text-sm"
+               >
+                  <span>Open Resource</span>
+                  <ExternalLink size={16} />
+               </a>
+            </div>
+         ))}
+      </div>
+
+      {resources.length === 0 && (
+        <div className="p-8 text-center text-slate-500 dark:text-slate-400 bg-white/40 dark:bg-slate-900/40 rounded-xl border border-dashed border-slate-200 dark:border-white/10">
+           <BookOpen size={32} className="mx-auto mb-2 opacity-50" />
+           <p>No resources found matching your criteria.</p>
+        </div>
+      )}
     </div>
   );
 };

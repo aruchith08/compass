@@ -80,20 +80,34 @@
       }
     </script>
     <style>
+      :root {
+        --scrollbar-track: #f1f5f9; /* slate-100 */
+        --scrollbar-thumb: #cbd5e1; /* slate-300 */
+        --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
+      }
+
+      .dark {
+        --scrollbar-track: #0f172a; /* slate-900 */
+        --scrollbar-thumb: #334155; /* slate-700 */
+        --scrollbar-thumb-hover: #475569; /* slate-600 */
+      }
+
       /* Custom scrollbar for webkit */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: var(--scrollbar-track);
+        transition: background 0.3s;
       }
       ::-webkit-scrollbar-thumb {
-        background: #334155; 
+        background: var(--scrollbar-thumb);
         border-radius: 4px;
+        transition: background 0.3s;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
+        background: var(--scrollbar-thumb-hover);
       }
       /* Hide scrollbar for mobile-like feel but keep functionality where needed */
       .scrollbar-hide::-webkit-scrollbar {

@@ -20,15 +20,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-3xl animate-blob" style={{ animationDelay: '4s' }}></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md p-8">
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all hover:border-slate-700">
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all hover:border-slate-700 animate-scale-in">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl mb-4 shadow-lg shadow-cyan-900/20">
+            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl mb-4 shadow-lg shadow-cyan-900/20 animate-bounce" style={{ animationDuration: '3s' }}>
               <Cpu className="text-white" size={32} />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">Access Roadmap</h1>

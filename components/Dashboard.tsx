@@ -75,10 +75,10 @@ const Dashboard: React.FC = () => {
   const completedCount = items.filter(i => i.status === 'Completed').length;
   
   return (
-    <div className="space-y-8 animate-fade-in pb-12 w-full max-w-full overflow-hidden">
+    <div className="space-y-8 pb-12 w-full max-w-full overflow-hidden">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '0ms' }}>
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
             Welcome back, <span className="text-cyan-600 dark:text-cyan-400">{user?.username}</span>
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
                  href="https://gamma.app/create" 
                  target="_blank" 
                  rel="noopener noreferrer"
-                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm"
+                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all hover:-translate-y-0.5 shadow-sm"
                  title="PPT Maker (Gamma)"
               >
                  <Presentation size={20} />
@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
               <a 
                  href="https://www.perplexity.ai/" 
                  onClick={handlePerplexityClick}
-                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors shadow-sm"
+                 className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all hover:-translate-y-0.5 shadow-sm"
                  title="Perplexity AI"
               >
                  <Search size={20} />
@@ -112,10 +112,10 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* === DAILY FOCUS SECTION === */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full animate-slide-up" style={{ animationDelay: '100ms' }}>
         
         {/* Daily Routine */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0 transition-transform duration-300 hover:shadow-md hover:border-indigo-500/30">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
               <ListTodo className="mr-2 text-indigo-500" size={20} /> Daily Routine
@@ -128,13 +128,13 @@ const Dashboard: React.FC = () => {
                <div key={task.id} className="flex items-start group">
                  <button 
                    onClick={() => toggleDailyTask(task.id)}
-                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                     task.completed ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-400'
+                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all duration-300 ${
+                     task.completed ? 'bg-indigo-500 border-indigo-500 text-white scale-110' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-400'
                    }`}
                  >
                    {task.completed && <CheckCircle size={14} />}
                  </button>
-                 <span className={`text-sm flex-1 break-words ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
+                 <span className={`text-sm flex-1 break-words transition-colors duration-300 ${task.completed ? 'text-slate-400 line-through decoration-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
                  </span>
                  {!task.isFixed && (
@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Today's Homework */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col h-full min-h-[300px] min-w-0 transition-transform duration-300 hover:shadow-md hover:border-rose-500/30">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
               <BookOpen className="mr-2 text-rose-500" size={20} /> Today's Homework
@@ -182,13 +182,13 @@ const Dashboard: React.FC = () => {
                <div key={task.id} className="flex items-start group">
                  <button 
                    onClick={() => toggleHomeworkTask(task.id)}
-                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                     task.completed ? 'bg-rose-500 border-rose-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-rose-400'
+                   className={`mt-0.5 mr-3 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all duration-300 ${
+                     task.completed ? 'bg-rose-500 border-rose-500 text-white scale-110' : 'border-slate-300 dark:border-slate-600 hover:border-rose-400'
                    }`}
                  >
                    {task.completed && <CheckCircle size={14} />}
                  </button>
-                 <span className={`text-sm flex-1 break-words ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
+                 <span className={`text-sm flex-1 break-words transition-colors duration-300 ${task.completed ? 'text-slate-400 line-through decoration-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>
                    {task.text}
                  </span>
                  <button 
@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full animate-slide-up" style={{ animationDelay: '200ms' }}>
         {/* Overall Progress Chart */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-sm transition-colors duration-300 min-w-0">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
@@ -249,7 +249,7 @@ const Dashboard: React.FC = () => {
             </ResponsiveContainer>
             {/* Centered Percentage */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-4xl font-bold text-slate-900 dark:text-white">{totalProgress}%</span>
+              <span className="text-4xl font-bold text-slate-900 dark:text-white animate-scale-in">{totalProgress}%</span>
               <span className="text-xs text-slate-500 uppercase tracking-wider">Complete</span>
             </div>
           </div>
@@ -293,8 +293,8 @@ const Dashboard: React.FC = () => {
           
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[220px] custom-scrollbar">
              {nextFocusItems.length > 0 ? (
-               nextFocusItems.map(item => (
-                 <div key={item.id} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-cyan-500/30 transition-colors">
+               nextFocusItems.map((item, idx) => (
+                 <div key={item.id} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-cyan-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
                     <div className="flex justify-between items-start mb-1">
                        <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider bg-cyan-50 dark:bg-cyan-900/20 px-1.5 py-0.5 rounded">
                          Year {item.year}
@@ -319,8 +319,8 @@ const Dashboard: React.FC = () => {
       </div>
       
       {/* Motivation Quote */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg">
-        <div className="absolute top-0 right-0 p-12 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="absolute top-0 right-0 p-12 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none animate-pulse-slow"></div>
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
            <div className="flex-1">
               <Quote className="text-white/30 mb-2" size={32} />
@@ -333,7 +333,7 @@ const Dashboard: React.FC = () => {
            <div className="hidden md:flex gap-4">
               <button 
                 onClick={handlePerplexityClick}
-                className="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors shadow-lg flex items-center gap-2 group"
+                className="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all hover:scale-105 shadow-lg flex items-center gap-2 group"
               >
                 <Search size={18} />
                 <span>Deep Search Topic</span>
@@ -344,7 +344,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Real Advice & Verdict Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 animate-slide-up" style={{ animationDelay: '400ms' }}>
          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm transition-colors duration-300">
             <div className="flex items-center space-x-2 mb-4">
                <Quote className="text-cyan-600 dark:text-cyan-500" size={20} />

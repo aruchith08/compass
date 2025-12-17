@@ -39,13 +39,13 @@ const Tracker: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Yearly Roadmap Tracker</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white animate-fade-in">Yearly Roadmap Tracker</h2>
             
             {/* Filter Section */}
-            <div className="grid grid-cols-2 gap-2 w-full md:w-auto md:flex md:items-center md:gap-3">
+            <div className="grid grid-cols-2 gap-2 w-full md:w-auto md:flex md:items-center md:gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                
                {/* Role Filter */}
-               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0">
+               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0 transition-colors hover:border-cyan-500/30">
                   <Layers size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={selectedRole}
@@ -60,7 +60,7 @@ const Tracker: React.FC = () => {
                </div>
 
                {/* Priority Filter */}
-               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0">
+               <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm min-w-0 transition-colors hover:border-cyan-500/30">
                   <Filter size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={filterPriority}
@@ -77,7 +77,7 @@ const Tracker: React.FC = () => {
           </div>
 
           {/* Year Tabs */}
-          <div className="flex space-x-1 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-1 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl overflow-x-auto scrollbar-hide animate-slide-up" style={{ animationDelay: '100ms' }}>
             {years.map(year => (
               <button
                 key={year}
@@ -85,8 +85,8 @@ const Tracker: React.FC = () => {
                 className={`
                   flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap
                   ${activeYear === year 
-                    ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm' 
-                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm scale-100' 
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50'
                   }
                 `}
               >
@@ -97,10 +97,14 @@ const Tracker: React.FC = () => {
         </div>
 
         {/* Task Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredItems.length > 0 ? (
-            filteredItems.map(item => (
-              <div key={item.id} className="h-full">
+            filteredItems.map((item, idx) => (
+              <div 
+                key={item.id} 
+                className="h-full opacity-0 animate-slide-up" 
+                style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'forwards' }}
+              >
                 <TaskCard 
                   item={item} 
                   onClick={() => setSelectedItem(item)}
@@ -108,7 +112,7 @@ const Tracker: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-20 text-center flex flex-col items-center justify-center text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div className="col-span-full py-20 text-center flex flex-col items-center justify-center text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 animate-fade-in">
                <LayoutList size={48} className="mb-4 opacity-50" />
                <p className="text-lg font-medium">No tasks found for this filter.</p>
                <p className="text-sm">Try changing the year, priority, or role.</p>

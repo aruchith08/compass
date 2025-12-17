@@ -76,17 +76,25 @@ const Tracker: React.FC = () => {
             </div>
           </div>
 
-          {/* Year Tabs */}
-          <div className="flex space-x-1 bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-sm p-1.5 rounded-2xl overflow-x-auto scrollbar-hide animate-slide-up" style={{ animationDelay: '100ms' }}>
+          {/* Year Tabs with Sliding Animation */}
+          <div className="relative bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl grid grid-cols-4 isolate overflow-hidden">
+            {/* Sliding Pill Background */}
+            <div 
+                className="absolute top-0 bottom-0 left-0 w-1/4 p-1.5 transition-transform duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] z-0"
+                style={{ transform: `translateX(${(activeYear - 1) * 100}%)` }}
+            >
+                <div className="w-full h-full bg-white dark:bg-slate-800 shadow-sm rounded-xl"></div>
+            </div>
+
             {years.map(year => (
               <button
                 key={year}
                 onClick={() => setActiveYear(year)}
                 className={`
-                  flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap
+                  relative z-10 py-3 px-4 text-sm font-bold transition-colors duration-200 whitespace-nowrap text-center
                   ${activeYear === year 
-                    ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm scale-100' 
-                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50'
+                    ? 'text-cyan-600 dark:text-cyan-400' 
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                   }
                 `}
               >
@@ -96,14 +104,13 @@ const Tracker: React.FC = () => {
           </div>
         </div>
 
-        {/* Task Grid */}
+        {/* Task Grid - Removed Heavy Animation & Key */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredItems.length > 0 ? (
             filteredItems.map((item, idx) => (
               <div 
                 key={item.id} 
-                className="h-full opacity-0 animate-slide-up" 
-                style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'forwards' }}
+                className="h-full" 
               >
                 <TaskCard 
                   item={item} 

@@ -4,7 +4,7 @@ import {
     Headphones, BookOpen, PenTool, Mic, 
     Star, ArrowRight, Layers, CheckCircle2, 
     Loader2, PlayCircle, Volume2, 
-    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Globe, Sparkles
+    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Languages, Sparkles
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User } from '../types';
@@ -668,7 +668,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                    <Globe className="text-emerald-500" />
+                    <Languages className="text-emerald-500" />
                     Lingua<span className="text-emerald-600 dark:text-emerald-400">Hub</span>
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400">Your IELTS AI Training Partner.</p>

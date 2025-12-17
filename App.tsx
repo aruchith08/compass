@@ -289,14 +289,14 @@ const App: React.FC = () => {
         <Login onLogin={handleLogin} isLoading={isLoading} />
       ) : (
         <RoadmapContext.Provider value={contextValue}>
-          <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-cyan-500/30">
+          <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-emerald-500/30">
             
             {/* Global Light Mode Gradient Overlay */}
             <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-cyan-50/40 dark:opacity-0 pointer-events-none"></div>
 
             {/* Background Gradients for Glassmorphism (Enhanced for Light Mode) */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-400/30 dark:bg-cyan-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow"></div>
+               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-400/30 dark:bg-emerald-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow"></div>
                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/30 dark:bg-purple-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
                <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-blue-400/30 dark:bg-blue-500/20 rounded-full blur-[120px] opacity-60 dark:opacity-10 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
             </div>

@@ -8,11 +8,15 @@ interface SplashScreenProps {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const [isVisible, setIsVisible] = useState(true);
-  const [scrambleText, setScrambleText] = useState("LOADING");
   const [showSubtitle, setShowSubtitle] = useState(false);
   
   const TARGET_TEXT = "COMPASS";
   const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
+
+  // Initialize with random characters immediately, no 'LOADING' text
+  const [scrambleText, setScrambleText] = useState(() => 
+    TARGET_TEXT.split('').map(() => CHARS[Math.floor(Math.random() * CHARS.length)]).join("")
+  );
 
   // Scramble Text Effect
   useEffect(() => {
@@ -39,29 +43,28 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         }
       
         iteration += 1 / 4; // Slower iteration for smoother effect
-      }, 40);
+      }, 30);
     };
 
-    // Slight delay before text starts decoding
-    const delayStart = setTimeout(startScramble, 800);
+    // Start immediately without delay
+    startScramble();
 
     return () => {
         clearInterval(interval);
-        clearTimeout(delayStart);
     };
   }, []);
 
-  // Exit Logic (Extended Duration)
+  // Exit Logic
   useEffect(() => {
-    // Start fade out at 4.5s
+    // Start fade out at 3.5s
     const fadeTimer = setTimeout(() => {
       setIsVisible(false);
-    }, 4500);
+    }, 3500);
 
-    // Unmount at 5.5s
+    // Unmount at 4.5s
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 5500);
+    }, 4500);
 
     return () => {
         clearTimeout(fadeTimer);
@@ -86,20 +89,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             {/* Container constraints: strict circular clipping */}
             <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/20 bg-slate-900/80 backdrop-blur-xl">
                 
-                {/* Main Compass Icon (Default) */}
+                {/* Main Compass Icon (Cyan/Blue) */}
                 <Compass size={72} className="text-cyan-400 relative z-10" strokeWidth={1.5} />
                 
                 {/* RADAR SWEEP ANIMATION */}
-                {/* 
-                   We use inset-0 to match the exact size of the container. 
-                   The conic-gradient creates a circular sweep effect.
-                   The rotation strictly spins this gradient layer within the rounded bounds.
-                */}
                 <div className="absolute inset-0 z-0 animate-radar-spin opacity-80">
                    <div className="w-full h-full" style={{ background: 'conic-gradient(from 0deg, transparent 90deg, rgba(6,182,212,0.1) 180deg, rgba(6,182,212,0.8) 360deg)' }}></div>
                 </div>
 
-                {/* Inner Radial Shadow to soften the center (prevents harsh lines near icon) */}
+                {/* Inner Radial Shadow */}
                 <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.5)_0%,transparent_70%)]"></div>
                 
                 {/* Glass Shine effect */}
@@ -126,17 +124,6 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             </div>
         </div>
       </div>
-
-      {/* Custom Keyframes for Radar Spin */}
-      <style>{`
-        @keyframes radar-spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-radar-spin {
-          animation: radar-spin 3s linear infinite;
-        }
-      `}</style>
     </div>
   );
 };

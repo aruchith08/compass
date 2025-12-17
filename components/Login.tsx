@@ -21,15 +21,15 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
     <div className="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl animate-blob"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }}></div>
         <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-3xl animate-blob" style={{ animationDelay: '4s' }}></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md p-8">
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all hover:border-slate-700 animate-scale-in">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl mb-4 shadow-lg shadow-cyan-900/20 animate-bounce" style={{ animationDuration: '3s' }}>
+            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl mb-4 shadow-lg shadow-emerald-900/20 animate-bounce" style={{ animationDuration: '3s' }}>
               <Cpu className="text-white" size={32} />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">Access Roadmap</h1>
@@ -49,7 +49,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full bg-slate-950 border border-slate-800 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all placeholder:text-slate-600 group-hover:border-slate-700"
+                  className="w-full bg-slate-950 border border-slate-800 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder:text-slate-600 group-hover:border-slate-700"
                 />
               </div>
               <p className="text-xs text-slate-500 flex items-center gap-1">
@@ -64,7 +64,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
               className={`w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-white font-semibold transition-all duration-200
                 ${isLoading || !username.trim() 
                   ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-900/20 hover:shadow-cyan-900/40 active:scale-[0.98]'
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 active:scale-[0.98]'
                 }
               `}
             >

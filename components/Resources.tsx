@@ -39,7 +39,7 @@ const Resources: React.FC = () => {
              <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full sm:w-40 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 text-slate-900 dark:text-slate-200 text-sm rounded-lg focus:outline-none focus:border-cyan-500 block pl-9 p-2.5 appearance-none cursor-pointer"
+                className="w-full sm:w-40 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 text-slate-900 dark:text-slate-200 text-sm rounded-lg focus:outline-none focus:border-emerald-500 block pl-9 p-2.5 appearance-none cursor-pointer"
              >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -55,7 +55,7 @@ const Resources: React.FC = () => {
               placeholder="Search resources..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 text-slate-900 dark:text-slate-200 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-cyan-500 transition-colors"
+              className="w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 text-slate-900 dark:text-slate-200 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
             />
           </div>
         </div>
@@ -96,7 +96,7 @@ const Resources: React.FC = () => {
                       href={item.resource_link} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center p-2 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                     >
                       <span className="text-sm font-medium mr-2">Open</span>
                       <ExternalLink size={14} />

@@ -45,7 +45,7 @@ const Tracker: React.FC = () => {
             <div className="grid grid-cols-2 gap-2 w-full md:w-auto md:flex md:items-center md:gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                
                {/* Role Filter */}
-               <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2 rounded-xl border border-white/20 dark:border-white/10 shadow-sm min-w-0 transition-colors hover:border-cyan-500/30">
+               <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2 rounded-xl border border-white/20 dark:border-white/10 shadow-sm min-w-0 transition-colors hover:border-emerald-500/30">
                   <Layers size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={selectedRole}
@@ -60,7 +60,7 @@ const Tracker: React.FC = () => {
                </div>
 
                {/* Priority Filter */}
-               <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2 rounded-xl border border-white/20 dark:border-white/10 shadow-sm min-w-0 transition-colors hover:border-cyan-500/30">
+               <div className="flex items-center space-x-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2 rounded-xl border border-white/20 dark:border-white/10 shadow-sm min-w-0 transition-colors hover:border-emerald-500/30">
                   <Filter size={16} className="text-slate-500 ml-1 shrink-0" />
                   <select 
                     value={filterPriority}
@@ -93,7 +93,7 @@ const Tracker: React.FC = () => {
                 className={`
                   relative z-10 py-3 px-4 text-sm font-bold transition-colors duration-200 whitespace-nowrap text-center
                   ${activeYear === year 
-                    ? 'text-cyan-600 dark:text-cyan-400' 
+                    ? 'text-emerald-600 dark:text-emerald-400' 
                     : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                   }
                 `}

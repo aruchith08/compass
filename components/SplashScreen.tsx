@@ -77,7 +77,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050b14] overflow-hidden transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}
     >
       {/* Ambient Glows */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-900/10 to-slate-950/90 z-0"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-900/10 to-slate-950/90 z-0"></div>
       
       {/* Vignette */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050b14_90%)]"></div>
@@ -87,14 +87,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         {/* Logo Container with Radar Animation */}
         <div className="relative mb-12 flex items-center justify-center animate-scale-in duration-1000">
             {/* Container constraints: strict circular clipping */}
-            <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/20 bg-slate-900/80 backdrop-blur-xl">
+            <div className="relative w-36 h-36 flex items-center justify-center rounded-full overflow-hidden shadow-[0_0_50px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20 bg-slate-900/80 backdrop-blur-xl">
                 
-                {/* Main Compass Icon (Cyan/Blue) */}
-                <Compass size={72} className="text-cyan-400 relative z-10" strokeWidth={1.5} />
+                {/* Main Compass Icon (Emerald) */}
+                <Compass size={72} className="text-emerald-400 relative z-10" strokeWidth={1.5} />
                 
                 {/* RADAR SWEEP ANIMATION */}
                 <div className="absolute inset-0 z-0 animate-radar-spin opacity-80">
-                   <div className="w-full h-full" style={{ background: 'conic-gradient(from 0deg, transparent 90deg, rgba(6,182,212,0.1) 180deg, rgba(6,182,212,0.8) 360deg)' }}></div>
+                   <div className="w-full h-full" style={{ background: 'conic-gradient(from 0deg, transparent 90deg, rgba(16,185,129,0.1) 180deg, rgba(16,185,129,0.8) 360deg)' }}></div>
                 </div>
 
                 {/* Inner Radial Shadow */}
@@ -105,22 +105,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             </div>
             
             {/* Subtle Outer Pulse */}
-            <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-3xl -z-10 animate-pulse-slow"></div>
+            <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-3xl -z-10 animate-pulse-slow"></div>
         </div>
 
         {/* Text Decoding Effect */}
         <div className="text-center z-20 flex flex-col items-center">
-            <h1 className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-100 to-slate-400 tracking-[0.2em] font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] min-h-[80px]">
+            <h1 className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-emerald-100 to-slate-400 tracking-[0.2em] font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] min-h-[80px]">
                 {scrambleText}
             </h1>
             
             {/* Subtitle with Typewriter/Reveal effect */}
             <div className={`mt-4 flex items-center justify-center gap-3 transition-all duration-1000 ${showSubtitle ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-cyan-500/50"></div>
-                <p className="text-cyan-400/90 text-sm md:text-base tracking-[0.4em] uppercase font-medium font-mono">
+                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-emerald-500/50"></div>
+                <p className="text-emerald-400/90 text-sm md:text-base tracking-[0.4em] uppercase font-medium font-mono">
                     Navigate Your Future
                 </p>
-                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-cyan-500/50"></div>
+                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-emerald-500/50"></div>
             </div>
         </div>
       </div>

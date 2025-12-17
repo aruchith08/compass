@@ -51,7 +51,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
         relative backdrop-blur-md border rounded-xl transition-all duration-300 group cursor-pointer flex flex-col h-full
         ${item.status === 'Completed' 
           ? 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-white/5 opacity-75' 
-          : 'bg-white/80 dark:bg-slate-900/60 border-white/50 dark:border-white/10 shadow-sm shadow-indigo-50 dark:shadow-sm hover:shadow-lg hover:shadow-cyan-100/50 dark:hover:shadow-lg hover:-translate-y-1 hover:border-cyan-200 dark:hover:border-white/20'
+          : 'bg-white/80 dark:bg-slate-900/60 border-white/50 dark:border-white/10 shadow-sm shadow-indigo-50 dark:shadow-sm hover:shadow-lg hover:shadow-emerald-100/50 dark:hover:shadow-lg hover:-translate-y-1 hover:border-emerald-200 dark:hover:border-emerald-500/20'
         }
       `}
     >
@@ -74,7 +74,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
             <h4 className={`font-bold text-lg leading-tight mb-1 ${
               item.status === 'Completed' 
                 ? 'text-slate-500 dark:text-slate-500 line-through decoration-slate-400' 
-                : 'text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400'
+                : 'text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400'
             } transition-colors line-clamp-2`}>
               {item.name}
             </h4>
@@ -110,7 +110,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
             </div>
             
             {item.resource_name && (
-               <div className="text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors flex items-center gap-1 text-xs font-medium">
+               <div className="text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1 text-xs font-medium">
                  <span className="hidden sm:inline">Resource</span>
                  <ExternalLink size={14} />
                </div>

@@ -292,19 +292,19 @@ const App: React.FC = () => {
           <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-emerald-500/30">
             
             {/* Global Light Mode Gradient Overlay */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-cyan-50/40 dark:opacity-0 pointer-events-none"></div>
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/40 dark:opacity-0 pointer-events-none"></div>
 
             {/* Background Gradients for Glassmorphism (Enhanced for Light Mode) */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-400/30 dark:bg-emerald-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow"></div>
-               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/30 dark:bg-purple-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-               <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-blue-400/30 dark:bg-blue-500/20 rounded-full blur-[120px] opacity-60 dark:opacity-10 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
+               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400/30 dark:bg-teal-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+               <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-blue-400/30 dark:bg-blue-500/10 rounded-full blur-[120px] opacity-60 dark:opacity-10 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
             </div>
 
             {/* === MOBILE: TOP HEADER === */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-white/10 z-[60] flex items-center justify-between px-4 shadow-sm shadow-indigo-100/20 dark:shadow-none">
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-white/10 z-[60] flex items-center justify-between px-4 shadow-sm shadow-emerald-100/20 dark:shadow-none">
                <div className="flex items-center gap-2">
-                 <div className="p-1.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-sm">
+                 <div className="p-1.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-sm">
                     <Compass className="text-white" size={18} />
                  </div>
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
@@ -326,9 +326,9 @@ const App: React.FC = () => {
             </header>
 
             {/* === DESKTOP: SIDEBAR === */}
-            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 flex-col shadow-xl shadow-indigo-100/30 dark:shadow-black/20">
+            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 flex-col shadow-xl shadow-emerald-100/30 dark:shadow-black/20">
               <div className="p-6 border-b border-slate-100 dark:border-white/10 flex items-center space-x-3">
-                <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg shadow-cyan-500/20">
+                <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/20">
                   <Compass className="text-white" size={24} />
                 </div>
                 <div>
@@ -344,7 +344,7 @@ const App: React.FC = () => {
                  </div>
                  <button 
                     onClick={toggleTheme}
-                    className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                    className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                  >
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
@@ -357,11 +357,11 @@ const App: React.FC = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                       activeTab === item.id 
-                        ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 text-cyan-700 dark:text-cyan-400 border border-cyan-100 dark:border-white/10 shadow-sm shadow-cyan-100/50 dark:shadow-none' 
+                        ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-800/50 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-white/10 shadow-sm shadow-emerald-100/50 dark:shadow-none' 
                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-slate-700 dark:hover:text-slate-200'
                     }`}
                   >
-                    <item.icon size={20} className={activeTab === item.id ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'} />
+                    <item.icon size={20} className={activeTab === item.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'} />
                     <span className="font-medium">{item.label}</span>
                   </button>
                 ))}
@@ -392,10 +392,10 @@ const App: React.FC = () => {
                    key={item.id}
                    onClick={() => setActiveTab(item.id)}
                    className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
-                     activeTab === item.id ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500'
+                     activeTab === item.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'
                    }`}
                  >
-                   <div className={`p-1 rounded-full transition-all ${activeTab === item.id ? 'bg-cyan-100/50 dark:bg-cyan-500/20 scale-110' : ''}`}>
+                   <div className={`p-1 rounded-full transition-all ${activeTab === item.id ? 'bg-emerald-100/50 dark:bg-emerald-500/20 scale-110' : ''}`}>
                      <item.icon size={22} strokeWidth={activeTab === item.id ? 2.5 : 2} />
                    </div>
                    <span className="text-[10px] font-medium">{item.label}</span>

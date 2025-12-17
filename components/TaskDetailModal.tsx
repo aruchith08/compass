@@ -53,7 +53,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
               }`}>
                 {item.priority} Priority
               </span>
-              <span className="text-xs font-bold px-2 py-1 rounded-md bg-cyan-100 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">
+              <span className="text-xs font-bold px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                 {item.category}
               </span>
             </div>
@@ -91,7 +91,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
                   className={`
                     flex items-center justify-center space-x-2 p-3 rounded-xl border transition-all duration-200
                     ${item.status === status 
-                      ? `${statusBg[status]} border-transparent ring-2 ring-cyan-500/50` 
+                      ? `${statusBg[status]} border-transparent ring-2 ring-emerald-500/50` 
                       : 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}
                   `}
                 >
@@ -117,7 +117,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
                   href={item.resource_link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors font-medium text-sm"
+                  className="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors font-medium text-sm"
                 >
                   <span>Open Resource</span>
                   <ExternalLink size={16} />
@@ -131,7 +131,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
              <div>
                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Year</h3>
                <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-200">
-                 <Calendar size={18} className="text-cyan-500" />
+                 <Calendar size={18} className="text-emerald-500" />
                  <span>Year {item.year > 0 ? item.year : "Gen"}</span>
                </div>
              </div>

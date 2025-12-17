@@ -52,13 +52,13 @@ const Dashboard: React.FC = () => {
   const roleData = roles.map(role => ({
     name: role.replace("Officer", "").replace("Engineer", "Eng").replace("Developer", "Dev"),
     score: getCompletionPercentage(role),
-    fill: '#06b6d4'
+    fill: '#10b981'
   }));
 
   // Overall Progress (Aggregate)
   const totalProgress = getCompletionPercentage("All Roles");
   const overallData = [
-    { name: 'Completed', value: totalProgress, fill: '#06b6d4' },
+    { name: 'Completed', value: totalProgress, fill: '#10b981' },
     { name: 'Remaining', value: 100 - totalProgress, fill: '#1e293b' }
   ];
 
@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '0ms' }}>
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Welcome back, <span className="text-cyan-600 dark:text-cyan-400">{user?.username}</span>
+            Welcome back, <span className="text-emerald-600 dark:text-emerald-400">{user?.username}</span>
           </h2>
           <p className="text-slate-500 dark:text-slate-400">Track your journey to a powerful hybrid profile.</p>
         </div>
@@ -229,8 +229,8 @@ const Dashboard: React.FC = () => {
         {/* Overall Progress Chart */}
         <div className={`${glassCardClass} relative overflow-hidden`}>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-            <span className="p-1.5 bg-cyan-100/50 dark:bg-cyan-500/10 rounded-lg mr-2">
-                <Target className="text-cyan-600 dark:text-cyan-400" size={18} /> 
+            <span className="p-1.5 bg-emerald-100/50 dark:bg-emerald-500/10 rounded-lg mr-2">
+                <Target className="text-emerald-600 dark:text-emerald-400" size={18} /> 
             </span>
             Total Progress
           </h3>
@@ -291,7 +291,7 @@ const Dashboard: React.FC = () => {
                 />
                 <Bar dataKey="score" radius={[4, 4, 0, 0]}>
                   {roleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.score >= 80 ? '#10b981' : entry.score >= 50 ? '#06b6d4' : '#64748b'} />
+                    <Cell key={`cell-${index}`} fill={entry.score >= 80 ? '#10b981' : entry.score >= 50 ? '#059669' : '#64748b'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -311,9 +311,9 @@ const Dashboard: React.FC = () => {
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[220px] custom-scrollbar">
              {nextFocusItems.length > 0 ? (
                nextFocusItems.map((item, idx) => (
-                 <div key={item.id} className="p-3 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-cyan-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
+                 <div key={item.id} className="p-3 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-emerald-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
                     <div className="flex justify-between items-start mb-1">
-                       <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider bg-cyan-50 dark:bg-cyan-900/20 px-1.5 py-0.5 rounded">
+                       <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded">
                          Year {item.year}
                        </span>
                        <span className="text-[10px] text-slate-400">{item.category}</span>
@@ -336,7 +336,7 @@ const Dashboard: React.FC = () => {
       </div>
       
       {/* Motivation Quote */}
-      <div className="bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-none animate-slide-up border border-white/10" style={{ animationDelay: '300ms' }}>
+      <div className="bg-gradient-to-r from-emerald-600/90 to-teal-600/90 backdrop-blur-md rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg shadow-emerald-200/50 dark:shadow-none animate-slide-up border border-white/10" style={{ animationDelay: '300ms' }}>
         <div className="absolute top-0 right-0 p-12 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none animate-pulse-slow"></div>
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
            <div className="flex-1">
@@ -344,13 +344,13 @@ const Dashboard: React.FC = () => {
               <p className="text-lg md:text-xl font-medium italic opacity-95">
                 "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."
               </p>
-              <p className="mt-2 text-sm text-indigo-200 font-bold tracking-wide uppercase">— Brian Herbert</p>
+              <p className="mt-2 text-sm text-emerald-200 font-bold tracking-wide uppercase">— Brian Herbert</p>
            </div>
            
            <div className="hidden md:flex gap-4">
               <button 
                 onClick={handlePerplexityClick}
-                className="bg-white/90 text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-white transition-all hover:scale-105 shadow-lg flex items-center gap-2 group backdrop-blur-sm"
+                className="bg-white/90 text-emerald-600 px-6 py-3 rounded-xl font-bold hover:bg-white transition-all hover:scale-105 shadow-lg flex items-center gap-2 group backdrop-blur-sm"
               >
                 <Search size={18} />
                 <span>Deep Search Topic</span>
@@ -364,22 +364,22 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 animate-slide-up" style={{ animationDelay: '400ms' }}>
          <div className={`${glassCardClass}`}>
             <div className="flex items-center space-x-2 mb-4">
-               <span className="p-1.5 bg-cyan-100/50 dark:bg-cyan-500/10 rounded-lg">
-                   <Quote className="text-cyan-600 dark:text-cyan-500" size={18} />
+               <span className="p-1.5 bg-emerald-100/50 dark:bg-emerald-500/10 rounded-lg">
+                   <Quote className="text-emerald-600 dark:text-emerald-500" size={18} />
                </span>
                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Real Advice</h3>
             </div>
             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
                <li className="flex items-start">
-                  <span className="mr-2 text-cyan-600 dark:text-cyan-500">•</span>
+                  <span className="mr-2 text-emerald-600 dark:text-emerald-500">•</span>
                   You don't need 50 courses. You need deeper execution.
                </li>
                <li className="flex items-start">
-                  <span className="mr-2 text-cyan-600 dark:text-cyan-500">•</span>
+                  <span className="mr-2 text-emerald-600 dark:text-emerald-500">•</span>
                   Consistency &gt; Intelligence. Study 1-2 hours daily.
                </li>
                <li className="flex items-start">
-                  <span className="mr-2 text-cyan-600 dark:text-cyan-500">•</span>
+                  <span className="mr-2 text-emerald-600 dark:text-emerald-500">•</span>
                   Communication skills are mandatory. Explain your projects clearly.
                </li>
             </ul>

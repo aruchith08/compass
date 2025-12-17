@@ -74,8 +74,8 @@ const Dashboard: React.FC = () => {
 
   const completedCount = items.filter(i => i.status === 'Completed').length;
   
-  // Glassmorphism Card Style
-  const glassCardClass = "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg rounded-2xl p-6 transition-all duration-300 min-w-0";
+  // Glassmorphism Card Style - Enhanced for light mode colors
+  const glassCardClass = "bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 shadow-lg shadow-indigo-100/50 dark:shadow-none rounded-2xl p-6 transition-all duration-300 min-w-0";
 
   return (
     <div className="space-y-8 pb-12 w-full max-w-full overflow-hidden">
@@ -97,7 +97,7 @@ const Dashboard: React.FC = () => {
                  href="https://gamma.app/create" 
                  target="_blank" 
                  rel="noopener noreferrer"
-                 className="p-2.5 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-slate-200/50 dark:border-white/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all hover:-translate-y-0.5 shadow-sm"
+                 className="p-2.5 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all hover:-translate-y-0.5 shadow-sm shadow-indigo-100/50 dark:shadow-none"
                  title="PPT Maker (Gamma)"
               >
                  <Presentation size={20} />
@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
               <a 
                  href="https://www.perplexity.ai/" 
                  onClick={handlePerplexityClick}
-                 className="p-2.5 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-slate-200/50 dark:border-white/10 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all hover:-translate-y-0.5 shadow-sm"
+                 className="p-2.5 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all hover:-translate-y-0.5 shadow-sm shadow-teal-100/50 dark:shadow-none"
                  title="Perplexity AI"
               >
                  <Search size={20} />
@@ -118,12 +118,15 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full animate-slide-up" style={{ animationDelay: '100ms' }}>
         
         {/* Daily Routine */}
-        <div className={`${glassCardClass} flex flex-col h-full min-h-[300px] hover:shadow-xl hover:border-indigo-500/30`}>
+        <div className={`${glassCardClass} flex flex-col h-full min-h-[300px] hover:shadow-xl hover:shadow-indigo-200/50 dark:hover:shadow-none hover:border-indigo-200 dark:hover:border-indigo-500/30`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
-              <ListTodo className="mr-2 text-indigo-500" size={20} /> Daily Routine
+              <span className="p-1.5 bg-indigo-100/50 dark:bg-indigo-500/10 rounded-lg mr-2">
+                 <ListTodo className="text-indigo-600 dark:text-indigo-400" size={18} /> 
+              </span>
+              Daily Routine
             </h3>
-            <span className="text-xs text-slate-400">Resets Daily</span>
+            <span className="text-xs text-slate-400 font-medium px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">Resets Daily</span>
           </div>
           
           <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[200px] custom-scrollbar">
@@ -158,7 +161,7 @@ const Dashboard: React.FC = () => {
                value={newDaily}
                onChange={(e) => setNewDaily(e.target.value)}
                placeholder="Add routine task..."
-               className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-indigo-500 transition-colors dark:text-white placeholder-slate-400"
+               className="w-full bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition-colors dark:text-white placeholder-slate-400"
              />
              <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors">
                <Plus size={14} />
@@ -167,12 +170,15 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Today's Homework */}
-        <div className={`${glassCardClass} flex flex-col h-full min-h-[300px] hover:shadow-xl hover:border-rose-500/30`}>
+        <div className={`${glassCardClass} flex flex-col h-full min-h-[300px] hover:shadow-xl hover:shadow-rose-200/50 dark:hover:shadow-none hover:border-rose-200 dark:hover:border-rose-500/30`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
-              <BookOpen className="mr-2 text-rose-500" size={20} /> Today's Homework
+              <span className="p-1.5 bg-rose-100/50 dark:bg-rose-500/10 rounded-lg mr-2">
+                 <BookOpen className="text-rose-600 dark:text-rose-400" size={18} /> 
+              </span>
+              Today's Homework
             </h3>
-            <span className="text-xs text-slate-400">Clears Tomorrow</span>
+            <span className="text-xs text-slate-400 font-medium px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">Clears Tomorrow</span>
           </div>
 
           <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[200px] custom-scrollbar">
@@ -210,7 +216,7 @@ const Dashboard: React.FC = () => {
                value={newHomework}
                onChange={(e) => setNewHomework(e.target.value)}
                placeholder="Add homework assignment..."
-               className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-rose-500 transition-colors dark:text-white placeholder-slate-400"
+               className="w-full bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:border-rose-500 focus:bg-white dark:focus:bg-slate-800 transition-colors dark:text-white placeholder-slate-400"
              />
              <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md transition-colors">
                <Plus size={14} />
@@ -223,7 +229,9 @@ const Dashboard: React.FC = () => {
         {/* Overall Progress Chart */}
         <div className={`${glassCardClass} relative overflow-hidden`}>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-            <Target className="mr-2 text-cyan-500" size={20} /> 
+            <span className="p-1.5 bg-cyan-100/50 dark:bg-cyan-500/10 rounded-lg mr-2">
+                <Target className="text-cyan-600 dark:text-cyan-400" size={18} /> 
+            </span>
             Total Progress
           </h3>
           <div className="w-full relative z-10 flex items-center justify-center" style={{ height: '250px', minHeight: '250px' }}>
@@ -261,7 +269,10 @@ const Dashboard: React.FC = () => {
         {/* Role Readiness Bar Chart */}
         <div className={`${glassCardClass}`}>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-            <Trophy className="mr-2 text-amber-500" size={20} /> Role Readiness
+            <span className="p-1.5 bg-amber-100/50 dark:bg-amber-500/10 rounded-lg mr-2">
+                <Trophy className="text-amber-600 dark:text-amber-400" size={18} /> 
+            </span>
+            Role Readiness
           </h3>
           <div className="w-full" style={{ height: '250px', minHeight: '250px' }}>
             <ResponsiveContainer width="99%" height="100%">
@@ -291,15 +302,18 @@ const Dashboard: React.FC = () => {
         {/* Next Focus Actions */}
         <div className={`${glassCardClass} flex flex-col`}>
            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-            <Flame className="mr-2 text-rose-500" size={20} /> Next Priorities
+            <span className="p-1.5 bg-rose-100/50 dark:bg-rose-500/10 rounded-lg mr-2">
+                <Flame className="text-rose-600 dark:text-rose-400" size={18} /> 
+            </span>
+            Next Priorities
           </h3>
           
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[220px] custom-scrollbar">
              {nextFocusItems.length > 0 ? (
                nextFocusItems.map((item, idx) => (
-                 <div key={item.id} className="p-3 bg-slate-50/50 dark:bg-slate-800/40 rounded-xl border border-slate-100/50 dark:border-slate-700/50 hover:border-cyan-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
+                 <div key={item.id} className="p-3 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-cyan-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
                     <div className="flex justify-between items-start mb-1">
-                       <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider bg-cyan-50/50 dark:bg-cyan-900/20 px-1.5 py-0.5 rounded">
+                       <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider bg-cyan-50 dark:bg-cyan-900/20 px-1.5 py-0.5 rounded">
                          Year {item.year}
                        </span>
                        <span className="text-[10px] text-slate-400">{item.category}</span>
@@ -314,7 +328,7 @@ const Dashboard: React.FC = () => {
              )}
           </div>
           
-          <div className="mt-auto pt-4 border-t border-slate-100/50 dark:border-slate-700/50 flex justify-between items-center text-sm">
+          <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50 flex justify-between items-center text-sm">
              <span className="text-slate-500">Total Completed</span>
              <span className="font-bold text-slate-900 dark:text-white">{completedCount} Tasks</span>
           </div>
@@ -322,7 +336,7 @@ const Dashboard: React.FC = () => {
       </div>
       
       {/* Motivation Quote */}
-      <div className="bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg animate-slide-up border border-white/10" style={{ animationDelay: '300ms' }}>
+      <div className="bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-none animate-slide-up border border-white/10" style={{ animationDelay: '300ms' }}>
         <div className="absolute top-0 right-0 p-12 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none animate-pulse-slow"></div>
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
            <div className="flex-1">
@@ -350,7 +364,9 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 animate-slide-up" style={{ animationDelay: '400ms' }}>
          <div className={`${glassCardClass}`}>
             <div className="flex items-center space-x-2 mb-4">
-               <Quote className="text-cyan-600 dark:text-cyan-500" size={20} />
+               <span className="p-1.5 bg-cyan-100/50 dark:bg-cyan-500/10 rounded-lg">
+                   <Quote className="text-cyan-600 dark:text-cyan-500" size={18} />
+               </span>
                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Real Advice</h3>
             </div>
             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
@@ -371,7 +387,9 @@ const Dashboard: React.FC = () => {
 
          <div className={`${glassCardClass}`}>
             <div className="flex items-center space-x-2 mb-4">
-               <Flame className="text-rose-500" size={20} />
+               <span className="p-1.5 bg-rose-100/50 dark:bg-rose-500/10 rounded-lg">
+                   <Flame className="text-rose-600 dark:text-rose-500" size={18} />
+               </span>
                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Final Verdict</h3>
             </div>
             <div className="space-y-2 text-sm">

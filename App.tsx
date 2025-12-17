@@ -289,17 +289,20 @@ const App: React.FC = () => {
         <Login onLogin={handleLogin} isLoading={isLoading} />
       ) : (
         <RoadmapContext.Provider value={contextValue}>
-          <div className="flex h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-cyan-500/30">
+          <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-cyan-500/30">
             
-            {/* Background Gradients for Glassmorphism */}
+            {/* Global Light Mode Gradient Overlay */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-cyan-50/40 dark:opacity-0 pointer-events-none"></div>
+
+            {/* Background Gradients for Glassmorphism (Enhanced for Light Mode) */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/20 rounded-full blur-[120px] opacity-50 dark:opacity-20 animate-pulse-slow"></div>
-               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px] opacity-50 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-               <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] opacity-50 dark:opacity-10 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
+               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-400/30 dark:bg-cyan-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow"></div>
+               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/30 dark:bg-purple-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+               <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-blue-400/30 dark:bg-blue-500/20 rounded-full blur-[120px] opacity-60 dark:opacity-10 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
             </div>
 
             {/* === MOBILE: TOP HEADER === */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-white/10 z-[60] flex items-center justify-between px-4 shadow-sm">
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-white/10 z-[60] flex items-center justify-between px-4 shadow-sm shadow-indigo-100/20 dark:shadow-none">
                <div className="flex items-center gap-2">
                  <div className="p-1.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-sm">
                     <Compass className="text-white" size={18} />
@@ -309,13 +312,13 @@ const App: React.FC = () => {
                <div className="flex items-center gap-2">
                   <button 
                     onClick={toggleTheme}
-                    className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors"
+                    className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors text-slate-600 dark:text-slate-300"
                   >
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                   </button>
                   <button 
                     onClick={handleLogout}
-                    className="p-2 rounded-full text-red-500 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors"
+                    className="p-2 rounded-full text-rose-500 hover:bg-rose-50/50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <LogOut size={20} />
                   </button>
@@ -323,8 +326,8 @@ const App: React.FC = () => {
             </header>
 
             {/* === DESKTOP: SIDEBAR === */}
-            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border-r border-slate-200/50 dark:border-white/10 flex-col shadow-2xl">
-              <div className="p-6 border-b border-slate-200/50 dark:border-white/10 flex items-center space-x-3">
+            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 flex-col shadow-xl shadow-indigo-100/30 dark:shadow-black/20">
+              <div className="p-6 border-b border-slate-100 dark:border-white/10 flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg shadow-cyan-500/20">
                   <Compass className="text-white" size={24} />
                 </div>
@@ -334,14 +337,14 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200/50 dark:border-white/10">
+              <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 dark:border-white/10">
                  <div className="flex flex-col">
                     <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Logged in as</span>
-                    <span className="text-sm font-semibold truncate max-w-[120px]" title={user.username}>{user.username}</span>
+                    <span className="text-sm font-semibold truncate max-w-[120px] text-slate-800 dark:text-white" title={user.username}>{user.username}</span>
                  </div>
                  <button 
                     onClick={toggleTheme}
-                    className="p-2 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                    className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
                  >
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
@@ -354,8 +357,8 @@ const App: React.FC = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                       activeTab === item.id 
-                        ? 'bg-slate-200/50 dark:bg-slate-800/60 text-cyan-600 dark:text-cyan-400 border border-slate-200/50 dark:border-white/10 shadow-sm' 
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/30 hover:text-slate-900 dark:hover:text-slate-200'
+                        ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 text-cyan-700 dark:text-cyan-400 border border-cyan-100 dark:border-white/10 shadow-sm shadow-cyan-100/50 dark:shadow-none' 
+                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-slate-700 dark:hover:text-slate-200'
                     }`}
                   >
                     <item.icon size={20} className={activeTab === item.id ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'} />
@@ -364,10 +367,10 @@ const App: React.FC = () => {
                 ))}
               </nav>
 
-              <div className="p-4 border-t border-slate-200/50 dark:border-white/10">
+              <div className="p-4 border-t border-slate-100 dark:border-white/10">
                  <button 
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-red-200/50 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors text-sm font-medium"
+                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-rose-100 dark:border-red-900/30 text-rose-600 dark:text-red-400 hover:bg-rose-50 dark:hover:bg-red-900/10 transition-colors text-sm font-medium"
                  >
                     <LogOut size={16} />
                     <span>Sign Out</span>
@@ -383,7 +386,7 @@ const App: React.FC = () => {
             </main>
 
             {/* === MOBILE: BOTTOM NAVIGATION === */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-white/10 z-[60] flex items-center justify-around px-2 pb-safe">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-white/10 z-[60] flex items-center justify-around px-2 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.05)] dark:shadow-none">
                {navItems.map(item => (
                  <button
                    key={item.id}

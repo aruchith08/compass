@@ -38,8 +38,9 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
 
         try {
             await runGenAI(async (ai) => {
+                // Use gemini-3-flash-preview for basic text tasks like question generation.
                 const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3-flash-preview',
                     contents: prompt
                 });
                 setQuestion(response.text?.trim() || "Describe a challenging project you worked on.");
@@ -81,8 +82,9 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
 
         try {
             await runGenAI(async (ai) => {
+                // Use gemini-3-flash-preview for evaluation tasks.
                 const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3-flash-preview',
                     contents: prompt
                 });
                 

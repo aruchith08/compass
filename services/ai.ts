@@ -2,12 +2,11 @@
 import { GoogleGenAI } from "@google/genai";
 
 // ============================================================================
-// 🔑 API KEY CONFIGURATION
+// 🔑 GENAI CONFIGURATION
 // ============================================================================
-const API_KEY = "AIzaSyBMvXZn64jgN2oTQuk2h-QZ68N_K7W2ARw";
 
 /**
- * Executes a GenAI operation using the configured API key.
+ * Executes a GenAI operation using the configured API key from environment variables.
  * 
  * @param operation A function that takes a GoogleGenAI client and returns a promise.
  */
@@ -15,7 +14,9 @@ export const runGenAI = async <T>(
   operation: (ai: GoogleGenAI) => Promise<T>
 ): Promise<T> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    // Use this process.env.API_KEY string directly when initializing the client instance.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     return await operation(ai);
   } catch (error: any) {
     console.error("[GenAI] Request failed:", error);

@@ -69,9 +69,10 @@ const parseAIJSON = (text: string) => {
     try {
         if (!text) return null;
         let cleaned = text.trim();
-        // Remove markdown formatting if present
+        // Remove markdown formatting if present (common in AI responses)
         if (cleaned.includes('```')) {
-            cleaned = cleaned.replace(/```json/g, '').replace(/```/g, '').trim();
+            const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+            if (match) cleaned = match[0];
         }
         return JSON.parse(cleaned);
     } catch (e) {
@@ -143,7 +144,6 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
     return runGenAI(async (ai) => {
         // FILTER: history must alternate role user/model and MUST START with user.
-        // If the first message is the default greeting (model), we skip it for the API call.
         const chatHistory = history
             .filter(msg => msg.text && msg.text.trim().length > 0)
             .map(msg => ({
@@ -244,11 +244,11 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 type: Type.OBJECT,
                 properties: {
                     id: { type: Type.STRING },
-                    category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
-                    type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
-                    content: { type: Type.STRING, description: 'The question or task instruction' },
+                    category: { type: Type.STRING },
+                    type: { type: Type.STRING },
+                    content: { type: Type.STRING },
                     requiresInput: { type: Type.BOOLEAN },
-                    hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
+                    hiddenContent: { type: Type.STRING },
                 },
                 required: ['id', 'category', 'type', 'content', 'requiresInput'],
                 }
@@ -329,13 +329,13 @@ const ChatWidget = () => {
         const userMsg = input.trim();
         setInput('');
         
-        // Optimistic update of local UI history
+        // Use the messages state *before* adding the current user message to it to send as history
         const previousMessages = [...messages];
         setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setIsLoading(true);
         
         try {
-            // We pass the history to the helper which will ensure roles strictly alternate
+            // Helper handles role sequence constraints
             const response = await sendMessageToGemini(userMsg, previousMessages.filter(m => !m.isError));
             setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
@@ -394,7 +394,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const [isChecking, setIsChecking] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-    // FIX: Define currentTask here so it's accessible in the JSX and event handlers.
     const currentTask = todayTasks[currentTaskIndex];
 
     useEffect(() => {
@@ -448,7 +447,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
     const handleCheckAnswer = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Use currentTask from component scope
         if (!currentTask || !userAnswer.trim()) return;
         setIsChecking(true);
         try {
@@ -547,7 +545,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Language Power-Ups</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Spelling Bee Card */}
                     <a 
                         href="https://www.merriam-webster.com/games/spell-it" 
                         target="_blank" 
@@ -569,7 +566,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         </div>
                     </a>
 
-                    {/* Dictionary Tool Card */}
                     <a 
                         href="https://www.merriam-webster.com/" 
                         target="_blank" 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
     Headphones, BookOpen, PenTool, Mic, 
@@ -65,15 +64,21 @@ export interface DailySessionData {
     isComplete: boolean;
 }
 
-// --- Robust JSON Cleaning Helper ---
-const cleanAIJson = (text: string) => {
-    if (!text) return "";
-    let cleaned = text.trim();
-    if (cleaned.includes('```')) {
-        const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if (match) cleaned = match[0];
+// --- Robust JSON Parsing Helper ---
+const parseAIJSON = (text: string) => {
+    try {
+        if (!text) return null;
+        let cleaned = text.trim();
+        // Remove markdown formatting if present (common in AI responses)
+        if (cleaned.includes('```')) {
+            const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+            if (match) cleaned = match[0];
+        }
+        return JSON.parse(cleaned);
+    } catch (e) {
+        console.error("AI JSON Parse Error:", e, text);
+        return null;
     }
-    return cleaned;
 };
 
 // --- CONSTANTS ---
@@ -207,8 +212,7 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                     temperature: 1.2
                 }
             });
-            const text = cleanAIJson(response.text || "{}");
-            return JSON.parse(text);
+            return parseAIJSON(response.text);
         });
     } catch (error) {
         console.error("Vocab generation failed:", error);
@@ -240,11 +244,11 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 type: Type.OBJECT,
                 properties: {
                     id: { type: Type.STRING },
-                    category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
-                    type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
-                    content: { type: Type.STRING, description: 'The question or task instruction' },
+                    category: { type: Type.STRING },
+                    type: { type: Type.STRING },
+                    content: { type: Type.STRING },
                     requiresInput: { type: Type.BOOLEAN },
-                    hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
+                    hiddenContent: { type: Type.STRING },
                 },
                 required: ['id', 'category', 'type', 'content', 'requiresInput'],
                 }
@@ -258,8 +262,7 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 responseSchema: schema
             }
             });
-            const jsonText = cleanAIJson(response.text || "[]");
-            return JSON.parse(jsonText);
+            return parseAIJSON(response.text) || [];
         });
     } catch (error) {
         console.error("Failed to generate daily tasks:", error);

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-// Added ArrowRight to the imports from lucide-react
 import { Mic, Send, RefreshCw, X, Loader2, Award, Briefcase, Zap, Star, ShieldCheck, MessageSquareQuote, ArrowRight } from 'lucide-react';
 import { runGenAI } from '../services/ai';
 
@@ -39,7 +38,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
 
         try {
             await runGenAI(async (ai) => {
-                // Flash is good for simple generation
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-flash-preview',
                     contents: aiPrompt
@@ -88,7 +86,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
 
         try {
             await runGenAI(async (ai) => {
-                // Pro model for better reasoning and evaluation
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-pro-preview',
                     contents: aiPrompt
@@ -124,14 +121,12 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                 }
             }}
         >
-            {/* Ambient Background Effects */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
             <div 
                 ref={modalRef} 
                 className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh] border border-white/20 dark:border-white/5 animate-scale-in"
             >
-                {/* Header */}
                 <div className="bg-slate-50 dark:bg-slate-950/50 p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
@@ -152,10 +147,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                     </button>
                 </div>
 
-                {/* Body */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                    
-                    {/* Mode Selection */}
                     <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5">
                         {(['Behavioral', 'Technical', 'System Design'] as InterviewType[]).map((t) => (
                             <button
@@ -177,7 +169,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                         ))}
                     </div>
 
-                    {/* Question Card */}
                     <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-800/50 dark:to-slate-900 border border-indigo-100 dark:border-white/10 rounded-2xl p-6 shadow-sm relative group">
                         <div className="flex items-center justify-between mb-4">
                             <span className="flex items-center gap-2 text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">
@@ -207,7 +198,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Answer Area */}
                     {!feedback ? (
                         <div className="space-y-4 animate-slide-up">
                             <div className="relative">
@@ -240,7 +230,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                         </div>
                     ) : (
                         <div className="space-y-6 animate-slide-up">
-                            {/* Evaluation Card */}
                             <div className="bg-white dark:bg-slate-800 border-2 border-indigo-100 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl">
                                 <div className="bg-indigo-600 p-4 flex items-center justify-between">
                                     <h3 className="font-bold text-white flex items-center gap-2">
@@ -290,7 +279,6 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                     )}
                 </div>
                 
-                {/* Footer Tip */}
                 <div className="p-4 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-white/10 text-center shrink-0">
                     <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
                         Tip: Speak your answer aloud while typing to practice fluency.

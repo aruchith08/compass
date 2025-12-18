@@ -3,9 +3,9 @@ import {
     Headphones, BookOpen, PenTool, Mic, 
     Star, ArrowRight, Layers, CheckCircle2, 
     Loader2, PlayCircle, Volume2, 
-    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Languages, Sparkles, SpellCheck, Zap
+    X, ExternalLink, MessageSquare, Send, AlertCircle, CalendarCheck, Languages, Sparkles, SpellCheck, Zap, RefreshCw
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { User } from '../types';
 import { runGenAI } from '../services/ai';
 
@@ -66,13 +66,13 @@ export interface DailySessionData {
 
 // --- Robust JSON Parsing Helper ---
 const parseAIJSON = (text: string) => {
+    if (!text) return null;
     try {
-        if (!text) return null;
         let cleaned = text.trim();
-        // Remove markdown formatting if present (common in AI responses)
-        if (cleaned.includes('```')) {
-            const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-            if (match) cleaned = match[0];
+        // Remove markdown formatting if present (common in AI responses even with JSON mode)
+        const jsonMatch = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+        if (jsonMatch) {
+            cleaned = jsonMatch[0];
         }
         return JSON.parse(cleaned);
     } catch (e) {
@@ -143,22 +143,34 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
     return runGenAI(async (ai) => {
-        // FILTER: history must alternate role user/model and MUST START with user.
-        const chatHistory = history
-            .filter(msg => msg.text && msg.text.trim().length > 0)
-            .map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.text }]
-            }));
+        // Filter valid messages
+        const validHistory = history.filter(msg => msg.text && msg.text.trim().length > 0 && !msg.isError);
+        
+        // Gemini Chat MUST start with 'user' and alternate 'user', 'model', 'user', ...
+        const sanitizedHistory: { role: string, parts: { text: string }[] }[] = [];
+        let expectingRole = 'user';
 
-        let sanitizedHistory: any[] = [];
-        if (chatHistory.length > 0) {
-            // First message in history MUST be role 'user' for the Gemini Chat API
-            if (chatHistory[0].role !== 'user') {
-                sanitizedHistory = chatHistory.slice(1);
-            } else {
-                sanitizedHistory = chatHistory;
+        // Find the first user message to start the chain
+        let startIndex = validHistory.findIndex(msg => msg.role === 'user');
+        
+        if (startIndex !== -1) {
+            for (let i = startIndex; i < validHistory.length; i++) {
+                const msg = validHistory[i];
+                if (msg.role === expectingRole) {
+                    sanitizedHistory.push({
+                        role: msg.role,
+                        parts: [{ text: msg.text }]
+                    });
+                    expectingRole = expectingRole === 'user' ? 'model' : 'user';
+                }
             }
+        }
+
+        // If the chat history ended with a user message, we must remove it because
+        // `sendMessage` will append the *new* user message. The API expects history to define the *past*.
+        // If history ends in 'user', it expects 'model' next, but we are sending 'user' via sendMessage.
+        if (sanitizedHistory.length > 0 && sanitizedHistory[sanitizedHistory.length - 1].role === 'user') {
+            sanitizedHistory.pop();
         }
 
         const chat = ai.chats.create({
@@ -176,11 +188,27 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string): Promise<{text: string, score: number}> => {
     return runGenAI(async (ai) => {
         const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
-        const aiPrompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. Task Type: "${challenge}"${contextStr} Candidate Response: "${userAnswer}" Requirements: 1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response. 3. For Listening/Reading: Check factual accuracy against the context. 4. Provide specific corrections and tips to improve the band score. Output Format (Strictly follow this): Score: [Band Score]/9 Feedback: [Detailed feedback]`;
+        const aiPrompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. 
+        Task Type: "${challenge}"
+        ${contextStr} 
+        Candidate Response: "${userAnswer}" 
+        
+        Requirements: 
+        1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 
+        2. Provide specific corrections and tips. 
+        
+        Output Format (Strictly follow this): 
+        Score: [Band Score]/9 
+        Feedback: [Detailed feedback]`;
+
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: aiPrompt
+            contents: aiPrompt,
+            config: {
+                temperature: 0.7
+            }
         });
+        
         const responseText = response.text || "No response generated.";
         const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
         const score = scoreMatch ? parseFloat(scoreMatch[1]) : 0;
@@ -191,7 +219,7 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
 const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
     try {
         return await runGenAI(async (ai) => {
-            const schema = {
+            const schema: Schema = {
                 type: Type.OBJECT,
                 properties: {
                     word: { type: Type.STRING },
@@ -202,7 +230,9 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                 },
                 required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
             };
-            const aiPrompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'. Return a JSON object with: - word: The word itself. - phonetic: IPA pronunciation guide. - partOfSpeech: e.g., Adjective, Noun, Verb. - definition: Clear, academic definition. - example: A sentence demonstrating its usage in a high-level context.`;
+            
+            const aiPrompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity'. Return strictly JSON.`;
+            
             const response = await ai.models.generateContent({
                 model: 'gemini-3-flash-preview',
                 contents: aiPrompt,
@@ -212,7 +242,8 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                     temperature: 1.2
                 }
             });
-            return parseAIJSON(response.text);
+            
+            return parseAIJSON(response.text || "{}");
         });
     } catch (error) {
         console.error("Vocab generation failed:", error);
@@ -223,7 +254,7 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
     try {
         return await runGenAI(async (ai) => {
-            const aiPrompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
+            const aiPrompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences).`;
             const response = await ai.models.generateContent({
                  model: 'gemini-3-flash-preview',
                  contents: aiPrompt
@@ -238,31 +269,34 @@ const checkVocabularyUsage = async (word: string, sentence: string): Promise<str
 const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
     try {
         return await runGenAI(async (ai) => {
-            const schema = {
+            const schema: Schema = {
                 type: Type.ARRAY,
                 items: {
-                type: Type.OBJECT,
-                properties: {
-                    id: { type: Type.STRING },
-                    category: { type: Type.STRING },
-                    type: { type: Type.STRING },
-                    content: { type: Type.STRING },
-                    requiresInput: { type: Type.BOOLEAN },
-                    hiddenContent: { type: Type.STRING },
-                },
-                required: ['id', 'category', 'type', 'content', 'requiresInput'],
+                    type: Type.OBJECT,
+                    properties: {
+                        id: { type: Type.STRING },
+                        category: { type: Type.STRING },
+                        type: { type: Type.STRING },
+                        content: { type: Type.STRING },
+                        requiresInput: { type: Type.BOOLEAN },
+                        hiddenContent: { type: Type.STRING },
+                    },
+                    required: ['id', 'category', 'type', 'content', 'requiresInput'],
                 }
             };
-            const aiPrompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Strictly generate one task for each of these categories: 1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script. 2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text. 3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'. 4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'. 5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'. Ensure the difficulty matches IELTS Band 7.0-8.0.`;
+            
+            const aiPrompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Categories: Listening, Reading, Speaking, Writing, Grammar. Provide context in 'hiddenContent' for Listening/Reading. Return strictly JSON.`;
+            
             const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: aiPrompt,
-            config: {
-                responseMimeType: 'application/json',
-                responseSchema: schema
-            }
+                model: 'gemini-3-flash-preview',
+                contents: aiPrompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: schema
+                }
             });
-            return parseAIJSON(response.text) || [];
+            
+            return parseAIJSON(response.text || "[]") || [];
         });
     } catch (error) {
         console.error("Failed to generate daily tasks:", error);
@@ -329,17 +363,15 @@ const ChatWidget = () => {
         const userMsg = input.trim();
         setInput('');
         
-        // Use the messages state *before* adding the current user message to it to send as history
-        const previousMessages = [...messages];
+        const currentHistory = [...messages];
         setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setIsLoading(true);
         
         try {
-            // Helper handles role sequence constraints
-            const response = await sendMessageToGemini(userMsg, previousMessages.filter(m => !m.isError));
+            const response = await sendMessageToGemini(userMsg, currentHistory);
             setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'model', text: "Chat Error: Connection failed. Please check your connection and try again.", isError: true }]);
+            setMessages(prev => [...prev, { role: 'model', text: "Chat Error: Connection failed. Please check your connection and API key.", isError: true }]);
         } finally {
             setIsLoading(false);
         }
@@ -396,6 +428,17 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
     const currentTask = todayTasks[currentTaskIndex];
 
+    const fetchVocab = async () => {
+        setIsVocabLoading(true);
+        const word = await generateVocabularyWord();
+        if (word && user) {
+            const today = new Date().toDateString();
+            localStorage.setItem(`lingua_vocab_${user.username}_${today}`, JSON.stringify(word));
+            setVocabWord(word);
+        }
+        setIsVocabLoading(false);
+    };
+
     useEffect(() => {
         if (!user) return;
         const loadData = async () => {
@@ -403,14 +446,15 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             const username = user.username;
             const sessionKey = `lingua_session_${username}_${today}`;
             const vocabKey = `lingua_vocab_${username}_${today}`;
+            
             const savedVocab = localStorage.getItem(vocabKey);
-            if (savedVocab) { setVocabWord(JSON.parse(savedVocab)); setIsVocabLoading(false); } 
-            else {
-                setIsVocabLoading(true);
-                const word = await generateVocabularyWord();
-                if(word) { localStorage.setItem(vocabKey, JSON.stringify(word)); setVocabWord(word); }
-                setIsVocabLoading(false);
+            if (savedVocab) { 
+                setVocabWord(JSON.parse(savedVocab)); 
+                setIsVocabLoading(false); 
+            } else {
+                fetchVocab();
             }
+
             const savedSession = localStorage.getItem(sessionKey);
             let sessionLoaded = false;
             if (savedSession) {
@@ -534,7 +578,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                                 )}
                             </div>
                         </div>
-                    ) : ( <div className="text-center text-red-400">Failed to load vocabulary word.</div> )}
+                    ) : ( 
+                        <div className="text-center space-y-4">
+                            <p className="text-red-400 flex items-center justify-center gap-2 font-medium"><AlertCircle size={20} /> Failed to connect to AI Hub.</p>
+                            <button onClick={fetchVocab} className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition flex items-center gap-2 mx-auto shadow-lg shadow-purple-500/20"><RefreshCw size={18} /> Retry Generation</button>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -600,7 +649,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 )}
                 </div>
                 <div className={`${glassCardClass} p-4 md:p-8 transition-all min-h-[300px] flex flex-col justify-center relative`}>
-                {isLoadingTasks ? ( <div className="flex flex-col items-center justify-center py-12 gap-4 text-slate-500"><Loader2 size={40} className="animate-spin text-emerald-500" /><p className="animate-pulse">Consulting AI for today's IELTS tasks...</p></div> ) : isSessionComplete ? ( <div className="flex flex-col items-center justify-center py-8 md:py-12 gap-6 text-center animate-in zoom-in duration-300"><div className="bg-emerald-100 dark:bg-emerald-900/50 p-6 rounded-full"><CalendarCheck size={64} className="text-emerald-600 dark:text-emerald-400" /></div><div><h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2">All Done For Today!</h3><p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">Great job completing your daily IELTS challenges. Come back tomorrow for a new set of tasks.</p></div></div> ) : todayTasks.length === 0 ? ( <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500"><AlertCircle size={48} className="mb-4 text-red-400" /><h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Unable to generate tasks</h3><p className="mb-6 max-w-xs mx-auto">There was an issue connecting to the AI tutor. Please check your connection or quota.</p><button onClick={() => window.location.reload()} className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-900/20">Retry Connection</button></div> ) : (
+                {isLoadingTasks ? ( <div className="flex flex-col items-center justify-center py-12 gap-4 text-slate-500"><Loader2 size={40} className="animate-spin text-emerald-500" /><p className="animate-pulse">Consulting AI for today's IELTS tasks...</p></div> ) : isSessionComplete ? ( <div className="flex flex-col items-center justify-center py-8 md:py-12 gap-6 text-center animate-in zoom-in duration-300"><div className="bg-emerald-100 dark:bg-emerald-900/50 p-6 rounded-full"><CalendarCheck size={64} className="text-emerald-600 dark:text-emerald-400" /></div><div><h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2">All Done For Today!</h3><p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">Great job completing your daily IELTS challenges. Come back tomorrow for a new set of tasks.</p></div></div> ) : todayTasks.length === 0 ? ( <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500"><AlertCircle size={48} className="mb-4 text-red-400" /><h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Unable to generate tasks</h3><p className="mb-6 max-w-xs mx-auto">Please check your internet connection and verify that your API key is correctly configured in vercel settings.</p><button onClick={() => window.location.reload()} className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-900/20">Retry Connection</button></div> ) : (
                     <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 w-full">
                     <div className="flex flex-row md:flex-col items-center gap-3 w-full md:w-auto md:min-w-[80px]">
                     <div className="bg-amber-50 dark:bg-amber-900/20 p-3 md:p-4 rounded-full shrink-0"><Star size={24} className="md:w-8 md:h-8 text-amber-500" /></div>

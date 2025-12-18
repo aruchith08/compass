@@ -1,98 +1,12 @@
 
-import { RoadmapItem, SyllabusSemester, ElectiveGroup } from './types';
+import { SyllabusSemester, ElectiveGroup, RoadmapItem } from './types';
+import { ROADMAP_DATA_ITEMS } from './roadmapData';
+import { LEARN_DATA_RESOURCES } from './learnData';
 
+// Combine specialized data sources into the main export
 export const ROADMAP_DATA: RoadmapItem[] = [
-  // ==================== YEAR 1: EXHAUSTIVE FOUNDATION ====================
-  {
-    id: "Y1_P01",
-    year: 1,
-    name: "Master Python Basics",
-    description: "Variables, loops, functions, lists, tuples, dictionaries, sets, file handling. Goal: Python should feel natural.",
-    category: "Programming",
-    priority: "High",
-    status: "Completed",
-    role_alignment: ["AI/ML Engineer", "Data Scientist", "Data Analyst", "AI Security Officer", "Full Stack Developer"],
-    resource_name: "Python for Everybody (Coursera/YouTube)",
-    resource_link: "https://www.youtube.com/watch?v=8DvywoWv6fI",
-    is_project: false,
-    is_output: false,
-    time_estimate: "4-6 weeks"
-  },
-  {
-    id: "Y1_P02",
-    year: 1,
-    name: "Python OOP & Error Handling",
-    description: "Object-Oriented Programming (Classes, Objects, Methods, Attributes) and Try/Except blocks.",
-    category: "Programming",
-    priority: "High",
-    status: "In Progress",
-    role_alignment: ["AI/ML Engineer", "Data Scientist", "AI Security Officer", "Full Stack Developer"],
-    resource_name: "Programming with Mosh",
-    resource_link: "https://www.youtube.com/watch?v=_uQrJ0TkZlc",
-    is_project: false,
-    is_output: false,
-    time_estimate: "2-3 weeks"
-  },
-  {
-    id: "Y1_FS01",
-    year: 1,
-    name: "Web Basics: HTML5 & CSS3",
-    description: "Semantic HTML, Box Model, Flexbox, Grid, Responsive Design, Media Queries.",
-    category: "Web Development",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["Full Stack Developer"],
-    resource_name: "The Odin Project (Foundations)",
-    resource_link: "https://www.theodinproject.com/paths/foundations/courses/foundations",
-    is_project: false,
-    is_output: false,
-    time_estimate: "3 weeks"
-  },
-  {
-    id: "Y1_FS02",
-    year: 1,
-    name: "JavaScript Fundamentals",
-    description: "Variables, DOM Manipulation, Events, ES6+ features (Arrow functions, Destructuring, Modules).",
-    category: "Web Development",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["Full Stack Developer"],
-    resource_name: "Namaste JavaScript (YouTube)",
-    resource_link: "https://www.youtube.com/playlist?list=PLlasXeu85E9cQ32gLCvAvr9vNaUccPVNP",
-    is_project: false,
-    is_output: false,
-    time_estimate: "4-5 weeks"
-  },
-  {
-    id: "Y1_T01",
-    year: 1,
-    name: "Git & GitHub Mastery",
-    description: "git add, commit, push, pull. Upload all work to GitHub.",
-    category: "Programming",
-    priority: "High",
-    status: "Completed",
-    role_alignment: ["All Roles"],
-    resource_name: "CodeWithHarry Git (1 hr)",
-    resource_link: "https://www.youtube.com/watch?v=gwWKnnCMQ5c",
-    is_project: false,
-    is_output: false,
-    time_estimate: "3-5 days"
-  },
-  {
-    id: "Y1_M01",
-    year: 1,
-    name: "Linear Algebra",
-    description: "Vectors, Matrices, Matrix multiplication, Dot product, Eigenvalues/Eigenvectors.",
-    category: "Mathematics",
-    priority: "High",
-    status: "In Progress",
-    role_alignment: ["AI/ML Engineer", "Data Scientist"],
-    resource_name: "3Blue1Brown - Essence of Linear Algebra",
-    resource_link: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab",
-    is_project: false,
-    is_output: false,
-    time_estimate: "3-4 weeks"
-  }
+    ...ROADMAP_DATA_ITEMS,
+    ...LEARN_DATA_RESOURCES
 ];
 
 export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [

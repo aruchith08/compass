@@ -1,14 +1,16 @@
 
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
-import { Github, FolderGit2, CheckSquare, Code2, Users } from 'lucide-react';
+import { Github, FolderGit2, CheckSquare, Code2, Users, Play, Sparkles, BrainCircuit } from 'lucide-react';
 import TaskCard from './TaskCard';
 import { RoadmapItem } from '../types';
 import TaskDetailModal from './TaskDetailModal';
+import MockInterview from './MockInterview';
 
 const Outputs: React.FC = () => {
   const { items } = useRoadmap();
   const [selectedItem, setSelectedItem] = useState<RoadmapItem | null>(null);
+  const [isInterviewOpen, setIsInterviewOpen] = useState(false);
 
   const projects = items.filter(item => item.is_project);
   const interviewPrep = items.filter(item => item.category === 'Interview Prep');
@@ -83,6 +85,32 @@ const Outputs: React.FC = () => {
             </div>
           )}
         </div>
+      </section>
+
+      {/* AI Interview Coach Highlight */}
+      <section className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+         <div className="relative group overflow-hidden rounded-3xl bg-slate-900 dark:bg-indigo-950/20 border border-indigo-500/20 p-8 shadow-2xl">
+            <div className="absolute top-0 right-0 p-12 bg-indigo-500/10 rounded-full blur-[80px] group-hover:scale-125 transition-transform duration-1000"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+               <div className="p-5 bg-indigo-600 rounded-3xl shadow-xl shadow-indigo-500/20 group-hover:rotate-6 transition-transform">
+                  <BrainCircuit className="text-white w-12 h-12" />
+               </div>
+               <div className="flex-1 text-center md:text-left">
+                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-2 mb-2">
+                    <span className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] bg-indigo-500/10 px-2 py-1 rounded">Feature Highlight</span>
+                    <div className="flex text-amber-400"><Sparkles size={12} fill="currentColor" /><Sparkles size={12} fill="currentColor" /></div>
+                  </div>
+                  <h2 className="text-3xl font-black text-white tracking-tight mb-3">AI Interview Simulator</h2>
+                  <p className="text-slate-400 max-w-lg leading-relaxed">Practice technical and behavioral questions with our expert IELTS-trained evaluator. Get instant feedback, band scores, and strategic advice.</p>
+               </div>
+               <button 
+                  onClick={() => setIsInterviewOpen(true)}
+                  className="px-8 py-4 bg-white text-indigo-900 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-all shadow-xl shadow-black/20 hover:bg-indigo-50"
+               >
+                  <Play size={18} fill="currentColor" /> Launch Coach
+               </button>
+            </div>
+         </div>
       </section>
 
       {/* Interview Prep Section */}
@@ -170,6 +198,12 @@ const Outputs: React.FC = () => {
           onClose={() => setSelectedItem(null)} 
         />
       )}
+
+      {/* Mock Interview Modal */}
+      <MockInterview 
+        isOpen={isInterviewOpen} 
+        onClose={() => setIsInterviewOpen(false)} 
+      />
     </div>
   );
 };

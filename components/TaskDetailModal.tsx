@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RoadmapItem, Status } from '../types';
-import { X, ExternalLink, Calendar, CheckCircle2, Circle, Clock, AlertTriangle, Tag } from 'lucide-react';
+import { X, ExternalLink, Calendar, CheckCircle2, Circle, Clock, AlertTriangle, Tag, Timer } from 'lucide-react';
 import { useRoadmap } from '../RoadmapContext';
 
 interface TaskDetailModalProps {
@@ -56,6 +56,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
               <span className="text-xs font-bold px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                 {item.category}
               </span>
+              {item.time_estimate && (
+                <span className="text-xs font-bold px-2 py-1 rounded-md bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                  <Timer size={14} />
+                  Est. {item.time_estimate}
+                </span>
+              )}
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
               {item.name}

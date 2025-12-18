@@ -16,7 +16,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Python for Everybody (Coursera/YouTube)",
     resource_link: "https://www.youtube.com/watch?v=8DvywoWv6fI",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-6 weeks"
   },
   {
     id: "Y1_P02",
@@ -30,7 +31,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Programming with Mosh",
     resource_link: "https://www.youtube.com/watch?v=_uQrJ0TkZlc",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "2-3 weeks"
   },
   // Full Stack Addition Y1
   {
@@ -45,7 +47,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "The Odin Project (Foundations)",
     resource_link: "https://www.theodinproject.com/paths/foundations/courses/foundations",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3 weeks"
   },
   {
     id: "Y1_FS02",
@@ -59,7 +62,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Namaste JavaScript (YouTube)",
     resource_link: "https://www.youtube.com/playlist?list=PLlasXeu85E9cQ32gLCvAvr9vNaUccPVNP",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-5 weeks"
   },
   {
     id: "Y1_C01",
@@ -73,7 +77,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "CodeWithHarry C Playlist",
     resource_link: "https://www.youtube.com/playlist?list=PLu0W_9lII9aiXlHcLx-mDH1Qul38wD3aR",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
   {
     id: "Y1_T01",
@@ -87,7 +92,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "CodeWithHarry Git (1 hr)",
     resource_link: "https://www.youtube.com/watch?v=gwWKnnCMQ5c",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3-5 days"
   },
 
   // 2. Mathematics (AI/DS/ML)
@@ -103,7 +109,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "3Blue1Brown - Essence of Linear Algebra",
     resource_link: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3-4 weeks"
   },
   {
     id: "Y1_M03",
@@ -117,7 +124,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "3Blue1Brown Calculus",
     resource_link: "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3 weeks"
   },
   {
     id: "Y1_M02",
@@ -131,7 +139,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "StatQuest with Josh Starmer",
     resource_link: "https://www.youtube.com/user/joshstarmer",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
 
   // 3. Computer Fundamentals
@@ -147,7 +156,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Neso Academy OS",
     resource_link: "https://www.youtube.com/playlist?list=PLBlnK6fEyqRiVhbXDGLXDk_OQAeuVcp2O",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
   {
     id: "Y1_CF02",
@@ -161,7 +171,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Kunal Kushwaha Networks",
     resource_link: "https://www.youtube.com/playlist?list=PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
   {
     id: "Y1_CF04",
@@ -175,7 +186,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Kunal Kushwaha Linux (1 Video)",
     resource_link: "https://www.youtube.com/watch?v=iwolPf6KN-k",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "1 week"
   },
 
   // 5. Mini Projects (Year 1)
@@ -191,7 +203,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Project Guide",
     resource_link: "https://www.freecodecamp.org/news/how-to-build-a-calculator-python/",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "2-3 days"
   },
   {
     id: "Y1_PR_FS1",
@@ -205,7 +218,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Design Inspiration",
     resource_link: "https://www.freecodecamp.org/news/how-to-build-a-portfolio-site-using-html-css-javascript-and-github-pages/",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "1 week"
   },
   {
     id: "Y1_PR02",
@@ -219,7 +233,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Python CRUD Guide",
     resource_link: "https://realpython.com/python-sql-libraries/",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "1 week"
   },
 
   // ==================== YEAR 2: CORE ====================
@@ -236,7 +251,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "freeCodeCamp Data Analysis",
     resource_link: "https://www.youtube.com/watch?v=r-uOLxNrNk4",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-5 weeks"
   },
   {
     id: "Y2_SQL01",
@@ -250,7 +266,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "HackerRank SQL",
     resource_link: "https://www.hackerrank.com/domains/sql",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3 weeks"
   },
 
   // 2. Machine Learning Foundations
@@ -266,7 +283,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Andrew Ng ML (Coursera)",
     resource_link: "https://www.coursera.org/specializations/machine-learning-introduction",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "6-8 weeks"
   },
   {
     id: "Y2_ML02",
@@ -280,7 +298,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "StatQuest Clustering",
     resource_link: "https://www.youtube.com/watch?v=4b5d3muPQmA",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3 weeks"
   },
   {
     id: "Y2_ML03",
@@ -294,7 +313,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Kaggle Learn",
     resource_link: "https://www.kaggle.com/learn",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
 
   // Full Stack Track Year 2
@@ -310,7 +330,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "React Official Docs",
     resource_link: "https://react.dev/learn",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "6-8 weeks"
   },
   {
     id: "Y2_FS02",
@@ -324,7 +345,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Tailwind CSS Docs",
     resource_link: "https://tailwindcss.com/docs",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "1 week"
   },
   {
     id: "Y2_FS03",
@@ -338,7 +360,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "FreeAPI.app",
     resource_link: "https://freeapi.app",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "1 week"
   },
 
   // Projects Year 2
@@ -354,7 +377,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Kaggle Dataset",
     resource_link: "https://www.kaggle.com/datasets",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "1 week"
   },
   {
     id: "Y2_PR04",
@@ -368,7 +392,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Kaggle Challenge",
     resource_link: "https://www.kaggle.com/c/house-prices-advanced-regression-techniques",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "2 weeks"
   },
   {
     id: "Y2_PR_FS01",
@@ -382,7 +407,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Tutorial Guide",
     resource_link: "https://www.youtube.com/watch?v=2jLJZD-TPhE",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "2-3 weeks"
   },
 
   // ==================== YEAR 3: ADVANCED ====================
@@ -399,7 +425,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Andrew Ng Deep Learning",
     resource_link: "https://www.coursera.org/specializations/deep-learning",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "6-10 weeks"
   },
   // 2. Deep Learning Applications
   {
@@ -414,7 +441,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Fast.ai Part 1",
     resource_link: "https://course.fast.ai/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "5-7 weeks"
   },
   {
     id: "Y3_DL02",
@@ -428,7 +456,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Hugging Face NLP Course",
     resource_link: "https://huggingface.co/learn/nlp-course",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-6 weeks"
   },
   // 3. Modern AI (LLMs)
   {
@@ -443,7 +472,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Andrej Karpathy - Zero to Hero",
     resource_link: "https://karpathy.ai/zero-to-hero.html",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "8-12 weeks"
   },
 
   {
@@ -458,7 +488,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "OpenAI Security Blogs",
     resource_link: "https://openai.com/research",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
 
   // Full Stack Track Year 3 (Backend)
@@ -474,7 +505,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Node.js Docs",
     resource_link: "https://nodejs.org/en/docs/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-6 weeks"
   },
   {
     id: "Y3_FS02",
@@ -488,7 +520,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "MongoDB University",
     resource_link: "https://learn.mongodb.com/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "3 weeks"
   },
   {
     id: "Y3_FS03",
@@ -502,7 +535,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Auth0 Blog",
     resource_link: "https://auth0.com/blog/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "2 weeks"
   },
 
   // Internships
@@ -518,7 +552,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "LinkedIn Internships",
     resource_link: "https://www.linkedin.com/jobs/internship-jobs/",
     is_project: false,
-    is_output: true
+    is_output: true,
+    time_estimate: "2-4 months"
   },
 
   // Projects Year 3
@@ -534,7 +569,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "CNN Guide",
     resource_link: "https://www.tensorflow.org/tutorials/images/classification",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "2-3 weeks"
   },
   {
     id: "Y3_PR_FS01",
@@ -548,7 +584,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "MERN Tutorial",
     resource_link: "https://www.mongodb.com/languages/mern-stack-tutorial",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "3 weeks"
   },
 
   // ==================== YEAR 4: SPECIALIZATION + JOB READY ====================
@@ -565,7 +602,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "LangChain Docs",
     resource_link: "https://python.langchain.com/docs/get_started/introduction",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-6 weeks"
   },
 
   // 2. MLOps Essentials
@@ -581,7 +619,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Made With ML",
     resource_link: "https://madewithml.com/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "6 weeks"
   },
   {
     id: "Y4_DP01",
@@ -595,7 +634,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Docker Docs",
     resource_link: "https://docs.docker.com",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4 weeks"
   },
 
   // 3. AI Project Building (End-to-End)
@@ -611,7 +651,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "SaaS Guide",
     resource_link: "https://www.freecodecamp.org/news/how-to-build-a-saas-platform/",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "4-6 weeks"
   },
   {
     id: "Y4_MP01",
@@ -625,7 +666,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Project Ideas",
     resource_link: "https://github.com/florinpop17/app-ideas",
     is_project: true,
-    is_output: true
+    is_output: true,
+    time_estimate: "3-4 months"
   },
 
   // 4. Portfolio & Job Prep
@@ -641,7 +683,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Career Roadmaps",
     resource_link: "https://roadmap.sh/ai",
     is_project: false,
-    is_output: true
+    is_output: true,
+    time_estimate: "1 week"
   },
   {
     id: "Y4_IP01",
@@ -655,7 +698,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Blind 75 List",
     resource_link: "https://leetcode.com/discuss/general-discussion/460599/blind-75-leetcode-questions",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "8-10 weeks"
   },
   {
     id: "Y4_IP02",
@@ -669,7 +713,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "System Design Primer",
     resource_link: "https://github.com/donnemartin/system-design-primer",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-6 weeks"
   },
   {
     id: "Y4_IP03",
@@ -683,7 +728,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "The STAR Method",
     resource_link: "https://www.careereducation.columbia.edu/resources/star-method-behavioral-interviewing",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "1-2 weeks"
   },
   {
     id: "Y4_IP04",
@@ -697,7 +743,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Pramp",
     resource_link: "https://www.pramp.com/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "2 weeks"
   },
   
   // 5. Job Ready Skills (Web specific)
@@ -713,7 +760,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Next.js Docs",
     resource_link: "https://nextjs.org",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "4-5 weeks"
   },
 
   // Soft Skills & Compulsory Items (Recurring/General)
@@ -729,7 +777,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Building Discipline",
     resource_link: "https://www.scotthyoung.com/blog/2020/05/04/self-discipline-guide/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "Continuous"
   },
   {
     id: "G_SS02",
@@ -743,7 +792,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Effective Communication",
     resource_link: "https://www.coursera.org/specializations/communication-skills-engineers",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "Continuous"
   },
   {
     id: "G_SS04",
@@ -757,7 +807,8 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     resource_name: "Portfolio Guide",
     resource_link: "https://www.freecodecamp.org/news/how-to-build-a-portfolio-site/",
     is_project: false,
-    is_output: false
+    is_output: false,
+    time_estimate: "Continuous"
   }
 ];
 

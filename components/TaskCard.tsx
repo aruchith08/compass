@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RoadmapItem, Status } from '../types';
-import { CheckCircle2, Circle, Clock, AlertTriangle, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, AlertTriangle, ExternalLink, Timer } from 'lucide-react';
 import { useRoadmap } from '../RoadmapContext';
 
 interface TaskCardProps {
@@ -70,6 +70,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
               <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate max-w-[150px]">
                 {item.category}
               </span>
+              {item.time_estimate && (
+                <span className="text-[9px] font-bold px-1.5 py-1 rounded-md bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
+                  <Timer size={10} />
+                  {item.time_estimate}
+                </span>
+              )}
             </div>
             <h4 className={`font-bold text-lg leading-tight mb-1 ${
               item.status === 'Completed' 
@@ -81,7 +87,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
           </div>
 
           <button 
-            onClick={handleStatusClick}
+            onClick={statusIcon[item.status] ? handleStatusClick : undefined}
             className={`flex-shrink-0 p-2 rounded-lg transition-colors ${statusBg[item.status]} ${statusColors[item.status]}`}
             title={`Current status: ${item.status}. Click to cycle.`}
           >

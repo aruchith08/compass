@@ -20,6 +20,7 @@ export interface RoadmapItem {
   resource_link?: string;
   is_project: boolean;
   is_output: boolean;
+  time_estimate?: string; // e.g., "4-6 weeks", "20 hrs"
 }
 
 export interface User {

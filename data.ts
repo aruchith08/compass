@@ -2,11 +2,13 @@
 import { SyllabusSemester, ElectiveGroup, RoadmapItem } from './types';
 import { ROADMAP_DATA_ITEMS } from './roadmapData';
 import { LEARN_DATA_RESOURCES } from './learnData';
+import { PORTFOLIO_DATA_ITEMS } from './portfolioData';
 
 // Combine specialized data sources into the main export
 export const ROADMAP_DATA: RoadmapItem[] = [
     ...ROADMAP_DATA_ITEMS,
-    ...LEARN_DATA_RESOURCES
+    ...LEARN_DATA_RESOURCES,
+    ...PORTFOLIO_DATA_ITEMS
 ];
 
 export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 // Added ArrowRight to the imports from lucide-react
 import { Mic, Send, RefreshCw, X, Loader2, Award, Briefcase, Zap, Star, ShieldCheck, MessageSquareQuote, ArrowRight } from 'lucide-react';

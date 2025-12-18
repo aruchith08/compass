@@ -64,6 +64,22 @@ export interface DailySessionData {
     isComplete: boolean;
 }
 
+// --- Robust JSON Parsing Helper ---
+const parseAIJSON = (text: string) => {
+    try {
+        if (!text) return null;
+        let cleaned = text.trim();
+        // Remove markdown formatting if present
+        if (cleaned.includes('```')) {
+            cleaned = cleaned.replace(/```json/g, '').replace(/```/g, '').trim();
+        }
+        return JSON.parse(cleaned);
+    } catch (e) {
+        console.error("AI JSON Parse Error:", e, text);
+        return null;
+    }
+};
+
 // --- CONSTANTS ---
 
 export const SKILL_DATA: SkillCategory[] = [
@@ -126,17 +142,28 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
     return runGenAI(async (ai) => {
-        const validHistory = history.filter(msg => msg.text && msg.text.trim().length > 0);
-        if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
-            validHistory.pop();
+        // FILTER: history must alternate role user/model and MUST START with user.
+        // If the first message is the default greeting (model), we skip it for the API call.
+        const chatHistory = history
+            .filter(msg => msg.text && msg.text.trim().length > 0)
+            .map(msg => ({
+                role: msg.role,
+                parts: [{ text: msg.text }]
+            }));
+
+        let sanitizedHistory: any[] = [];
+        if (chatHistory.length > 0) {
+            // First message in history MUST be role 'user' for the Gemini Chat API
+            if (chatHistory[0].role !== 'user') {
+                sanitizedHistory = chatHistory.slice(1);
+            } else {
+                sanitizedHistory = chatHistory;
+            }
         }
-        const chatHistory = validHistory.map(msg => ({
-            role: msg.role,
-            parts: [{ text: msg.text }]
-        }));
+
         const chat = ai.chats.create({
             model: 'gemini-3-flash-preview',
-            history: chatHistory,
+            history: sanitizedHistory,
             config: {
                 systemInstruction: 'You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria (Lexical Resource, Grammatical Range, Coherence, Fluency).',
             },
@@ -185,7 +212,7 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                     temperature: 1.2
                 }
             });
-            return JSON.parse(response.text || "{}");
+            return parseAIJSON(response.text);
         });
     } catch (error) {
         console.error("Vocab generation failed:", error);
@@ -235,8 +262,7 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 responseSchema: schema
             }
             });
-            const jsonText = response.text || "[]";
-            return JSON.parse(jsonText);
+            return parseAIJSON(response.text) || [];
         });
     } catch (error) {
         console.error("Failed to generate daily tasks:", error);
@@ -302,11 +328,15 @@ const ChatWidget = () => {
         if (!input.trim() || isLoading) return;
         const userMsg = input.trim();
         setInput('');
-        const newHistory: ChatMessage[] = [...messages, { role: 'user', text: userMsg }];
-        setMessages(newHistory);
+        
+        // Optimistic update of local UI history
+        const previousMessages = [...messages];
+        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setIsLoading(true);
+        
         try {
-            const response = await sendMessageToGemini(userMsg, newHistory.filter(m => !m.isError));
+            // We pass the history to the helper which will ensure roles strictly alternate
+            const response = await sendMessageToGemini(userMsg, previousMessages.filter(m => !m.isError));
             setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
             setMessages(prev => [...prev, { role: 'model', text: "Chat Error: Connection failed. Please check your connection and try again.", isError: true }]);
@@ -364,6 +394,9 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const [isChecking, setIsChecking] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
+    // FIX: Define currentTask here so it's accessible in the JSX and event handlers.
+    const currentTask = todayTasks[currentTaskIndex];
+
     useEffect(() => {
         if (!user) return;
         const loadData = async () => {
@@ -415,7 +448,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
     const handleCheckAnswer = async (e: React.FormEvent) => {
         e.preventDefault();
-        const currentTask = todayTasks[currentTaskIndex];
+        // Use currentTask from component scope
         if (!currentTask || !userAnswer.trim()) return;
         setIsChecking(true);
         try {
@@ -449,7 +482,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const currentTask = todayTasks[currentTaskIndex];
     const glassCardClass = "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg rounded-2xl";
 
     return (

@@ -341,7 +341,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="font-bold text-lg tracking-wide text-slate-900 dark:text-slate-100">Compass</h1>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Hybrid Profile Tracker</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">BY  Ruchith Alokam</p>
                 </div>
               </div>
 

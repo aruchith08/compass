@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
     Headphones, BookOpen, PenTool, Mic, 
@@ -64,23 +65,6 @@ export interface DailySessionData {
     isComplete: boolean;
 }
 
-// --- Robust JSON Parsing Helper ---
-const parseAIJSON = (text: string) => {
-    try {
-        if (!text) return null;
-        let cleaned = text.trim();
-        // Remove markdown formatting if present (common in AI responses)
-        if (cleaned.includes('```')) {
-            const match = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-            if (match) cleaned = match[0];
-        }
-        return JSON.parse(cleaned);
-    } catch (e) {
-        console.error("AI JSON Parse Error:", e, text);
-        return null;
-    }
-};
-
 // --- CONSTANTS ---
 
 export const SKILL_DATA: SkillCategory[] = [
@@ -143,27 +127,17 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
     return runGenAI(async (ai) => {
-        // FILTER: history must alternate role user/model and MUST START with user.
-        const chatHistory = history
-            .filter(msg => msg.text && msg.text.trim().length > 0)
-            .map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.text }]
-            }));
-
-        let sanitizedHistory: any[] = [];
-        if (chatHistory.length > 0) {
-            // First message in history MUST be role 'user' for the Gemini Chat API
-            if (chatHistory[0].role !== 'user') {
-                sanitizedHistory = chatHistory.slice(1);
-            } else {
-                sanitizedHistory = chatHistory;
-            }
+        const validHistory = history.filter(msg => msg.text && msg.text.trim().length > 0);
+        if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
+            validHistory.pop();
         }
-
+        const chatHistory = validHistory.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.text }]
+        }));
         const chat = ai.chats.create({
             model: 'gemini-3-flash-preview',
-            history: sanitizedHistory,
+            history: chatHistory,
             config: {
                 systemInstruction: 'You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria (Lexical Resource, Grammatical Range, Coherence, Fluency).',
             },
@@ -176,10 +150,10 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string): Promise<{text: string, score: number}> => {
     return runGenAI(async (ai) => {
         const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
-        const aiPrompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. Task Type: "${challenge}"${contextStr} Candidate Response: "${userAnswer}" Requirements: 1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response. 3. For Listening/Reading: Check factual accuracy against the context. 4. Provide specific corrections and tips to improve the band score. Output Format (Strictly follow this): Score: [Band Score]/9 Feedback: [Detailed feedback]`;
+        const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. Task Type: "${challenge}"${contextStr} Candidate Response: "${userAnswer}" Requirements: 1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response. 3. For Listening/Reading: Check factual accuracy against the context. 4. Provide specific corrections and tips to improve the band score. Output Format (Strictly follow this): Score: [Band Score]/9 Feedback: [Detailed feedback]`;
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: aiPrompt
+            contents: prompt
         });
         const responseText = response.text || "No response generated.";
         const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
@@ -202,17 +176,17 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                 },
                 required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
             };
-            const aiPrompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'. Return a JSON object with: - word: The word itself. - phonetic: IPA pronunciation guide. - partOfSpeech: e.g., Adjective, Noun, Verb. - definition: Clear, academic definition. - example: A sentence demonstrating its usage in a high-level context.`;
+            const prompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'. Return a JSON object with: - word: The word itself. - phonetic: IPA pronunciation guide. - partOfSpeech: e.g., Adjective, Noun, Verb. - definition: Clear, academic definition. - example: A sentence demonstrating its usage in a high-level context.`;
             const response = await ai.models.generateContent({
                 model: 'gemini-3-flash-preview',
-                contents: aiPrompt,
+                contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
                     responseSchema: schema,
                     temperature: 1.2
                 }
             });
-            return parseAIJSON(response.text);
+            return JSON.parse(response.text || "{}");
         });
     } catch (error) {
         console.error("Vocab generation failed:", error);
@@ -223,10 +197,10 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
     try {
         return await runGenAI(async (ai) => {
-            const aiPrompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
+            const prompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
             const response = await ai.models.generateContent({
                  model: 'gemini-3-flash-preview',
-                 contents: aiPrompt
+                 contents: prompt
             });
             return response.text || "No feedback generated.";
         });
@@ -244,25 +218,26 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 type: Type.OBJECT,
                 properties: {
                     id: { type: Type.STRING },
-                    category: { type: Type.STRING },
-                    type: { type: Type.STRING },
-                    content: { type: Type.STRING },
+                    category: { type: Type.STRING, enum: ['Grammar', 'Vocabulary', 'Idiom', 'Listening', 'Reading', 'Writing', 'Speaking'] },
+                    type: { type: Type.STRING, description: 'Short label like "IELTS Task 2" or "Reading Detail"' },
+                    content: { type: Type.STRING, description: 'The question or task instruction' },
                     requiresInput: { type: Type.BOOLEAN },
-                    hiddenContent: { type: Type.STRING },
+                    hiddenContent: { type: Type.STRING, description: 'Text for reading passages or listening transcripts' },
                 },
                 required: ['id', 'category', 'type', 'content', 'requiresInput'],
                 }
             };
-            const aiPrompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Strictly generate one task for each of these categories: 1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script. 2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text. 3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'. 4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'. 5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'. Ensure the difficulty matches IELTS Band 7.0-8.0.`;
+            const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Strictly generate one task for each of these categories: 1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script. 2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text. 3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'. 4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'. 5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'. Ensure the difficulty matches IELTS Band 7.0-8.0.`;
             const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: aiPrompt,
+            contents: prompt,
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: schema
             }
             });
-            return parseAIJSON(response.text) || [];
+            const jsonText = response.text || "[]";
+            return JSON.parse(jsonText);
         });
     } catch (error) {
         console.error("Failed to generate daily tasks:", error);
@@ -328,15 +303,11 @@ const ChatWidget = () => {
         if (!input.trim() || isLoading) return;
         const userMsg = input.trim();
         setInput('');
-        
-        // Use the messages state *before* adding the current user message to it to send as history
-        const previousMessages = [...messages];
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        const newHistory: ChatMessage[] = [...messages, { role: 'user', text: userMsg }];
+        setMessages(newHistory);
         setIsLoading(true);
-        
         try {
-            // Helper handles role sequence constraints
-            const response = await sendMessageToGemini(userMsg, previousMessages.filter(m => !m.isError));
+            const response = await sendMessageToGemini(userMsg, newHistory.filter(m => !m.isError));
             setMessages(prev => [...prev, { role: 'model', text: response }]);
         } catch (error) {
             setMessages(prev => [...prev, { role: 'model', text: "Chat Error: Connection failed. Please check your connection and try again.", isError: true }]);
@@ -394,8 +365,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const [isChecking, setIsChecking] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-    const currentTask = todayTasks[currentTaskIndex];
-
     useEffect(() => {
         if (!user) return;
         const loadData = async () => {
@@ -447,6 +416,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
     const handleCheckAnswer = async (e: React.FormEvent) => {
         e.preventDefault();
+        const currentTask = todayTasks[currentTaskIndex];
         if (!currentTask || !userAnswer.trim()) return;
         setIsChecking(true);
         try {
@@ -480,6 +450,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         window.speechSynthesis.speak(utterance);
     };
 
+    const currentTask = todayTasks[currentTaskIndex];
     const glassCardClass = "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg rounded-2xl";
 
     return (
@@ -545,6 +516,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-sm">Language Power-Ups</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Spelling Bee Card */}
                     <a 
                         href="https://www.merriam-webster.com/games/spell-it" 
                         target="_blank" 
@@ -566,6 +538,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         </div>
                     </a>
 
+                    {/* Dictionary Tool Card */}
                     <a 
                         href="https://www.merriam-webster.com/" 
                         target="_blank" 

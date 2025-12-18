@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
     Headphones, BookOpen, PenTool, Mic, 
@@ -150,10 +149,10 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string): Promise<{text: string, score: number}> => {
     return runGenAI(async (ai) => {
         const contextStr = hiddenContext ? `\nContext (Transcript/Passage): "${hiddenContext}"` : "";
-        const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. Task Type: "${challenge}"${contextStr} Candidate Response: "${userAnswer}" Requirements: 1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response. 3. For Listening/Reading: Check factual accuracy against the context. 4. Provide specific corrections and tips to improve the band score. Output Format (Strictly follow this): Score: [Band Score]/9 Feedback: [Detailed feedback]`;
+        const aiPrompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response to the following IELTS practice task. Task Type: "${challenge}"${contextStr} Candidate Response: "${userAnswer}" Requirements: 1. Assign a Band Score (0.0 - 9.0) based on strict IELTS criteria. 2. For Speaking/Writing: Assess Lexical Resource, Grammatical Range, Coherence, and Task Response. 3. For Listening/Reading: Check factual accuracy against the context. 4. Provide specific corrections and tips to improve the band score. Output Format (Strictly follow this): Score: [Band Score]/9 Feedback: [Detailed feedback]`;
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: prompt
+            contents: aiPrompt
         });
         const responseText = response.text || "No response generated.";
         const scoreMatch = responseText.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
@@ -176,10 +175,10 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
                 },
                 required: ['word', 'phonetic', 'partOfSpeech', 'definition', 'example'],
             };
-            const prompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'. Return a JSON object with: - word: The word itself. - phonetic: IPA pronunciation guide. - partOfSpeech: e.g., Adjective, Noun, Verb. - definition: Clear, academic definition. - example: A sentence demonstrating its usage in a high-level context.`;
+            const aiPrompt = `Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9. Examples of complexity: 'Ubiquitous', 'Ephemeral', 'Cacophony', 'Serendipity', 'Obfuscate', 'Mellifluous', 'Esoteric'. Return a JSON object with: - word: The word itself. - phonetic: IPA pronunciation guide. - partOfSpeech: e.g., Adjective, Noun, Verb. - definition: Clear, academic definition. - example: A sentence demonstrating its usage in a high-level context.`;
             const response = await ai.models.generateContent({
                 model: 'gemini-3-flash-preview',
-                contents: prompt,
+                contents: aiPrompt,
                 config: {
                     responseMimeType: 'application/json',
                     responseSchema: schema,
@@ -197,10 +196,10 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
     try {
         return await runGenAI(async (ai) => {
-            const prompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
+            const aiPrompt = `Evaluate the usage of the word "${word}" in the following sentence: "${sentence}" Is it used correctly grammatically and contextually? Respond with a short, helpful feedback message (max 2 sentences). If correct, praise the usage.`;
             const response = await ai.models.generateContent({
                  model: 'gemini-3-flash-preview',
-                 contents: prompt
+                 contents: aiPrompt
             });
             return response.text || "No feedback generated.";
         });
@@ -227,10 +226,10 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
                 required: ['id', 'category', 'type', 'content', 'requiresInput'],
                 }
             };
-            const prompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Strictly generate one task for each of these categories: 1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script. 2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text. 3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'. 4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'. 5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'. Ensure the difficulty matches IELTS Band 7.0-8.0.`;
+            const aiPrompt = `Generate 5 high-quality, exam-style IELTS preparation challenges. Strictly generate one task for each of these categories: 1. 'Listening': Provide a realistic IELTS audio script (approx 60-100 words) in 'hiddenContent'. The 'content' must be a specific comprehension question based on that script. 2. 'Reading': Provide a dense academic paragraph (approx 100-150 words) in 'hiddenContent'. The 'content' must be a question based on the text. 3. 'Speaking': Provide an IELTS Part 2 Cue Card topic or Part 3 abstract discussion question in 'content'. 4. 'Writing': Provide an IELTS Task 2 Essay prompt (Argumentative/Problem-Solution) in 'content'. 5. 'Grammar': Provide a sentence with a grammatical error and ask the user to correct it in 'content'. Ensure the difficulty matches IELTS Band 7.0-8.0.`;
             const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: prompt,
+            contents: aiPrompt,
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: schema

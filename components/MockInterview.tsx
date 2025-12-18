@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 // Added ArrowRight to the imports from lucide-react
 import { Mic, Send, RefreshCw, X, Loader2, Award, Briefcase, Zap, Star, ShieldCheck, MessageSquareQuote, ArrowRight } from 'lucide-react';
@@ -28,13 +27,13 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         setScore(null);
         setUserAnswer('');
         
-        let prompt = "";
+        let aiPrompt = "";
         if (type === 'Behavioral') {
-            prompt = "Generate a challenging behavioral interview question (e.g., STAR method based) for a software engineering candidate. Focus on leadership, conflict, or failure. Only return the question text.";
+            aiPrompt = "Generate a challenging behavioral interview question (e.g., STAR method based) for a software engineering candidate. Focus on leadership, conflict, or failure. Only return the question text.";
         } else if (type === 'Technical') {
-            prompt = "Generate a conceptual technical interview question for a software engineer specializing in AIML or Data Science. Focus on fundamentals like 'The bias-variance tradeoff', 'Regularization techniques', or 'Gradient Descent internals'. Only return the question text.";
+            aiPrompt = "Generate a conceptual technical interview question for a software engineer specializing in AIML or Data Science. Focus on fundamentals like 'The bias-variance tradeoff', 'Regularization techniques', or 'Gradient Descent internals'. Only return the question text.";
         } else {
-            prompt = "Generate a system design interview question for a scalable web application. Focus on components like 'Load balancing', 'Database sharding', or 'Caching strategies'. Only return the question text.";
+            aiPrompt = "Generate a system design interview question for a scalable web application. Focus on components like 'Load balancing', 'Database sharding', or 'Caching strategies'. Only return the question text.";
         }
 
         try {
@@ -42,7 +41,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                 // Flash is good for simple generation
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-flash-preview',
-                    contents: prompt
+                    contents: aiPrompt
                 });
                 setQuestion(response.text?.trim() || "Tell me about a project that didn't go as planned.");
             });
@@ -63,7 +62,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         if (!userAnswer.trim()) return;
         setIsEvaluating(true);
 
-        const prompt = `You are a Senior Engineering Manager and expert interviewer.
+        const aiPrompt = `You are a Senior Engineering Manager and expert interviewer.
         
         Task: Provide a deep evaluation of the candidate's response.
         Question: "${question}"
@@ -91,7 +90,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
                 // Pro model for better reasoning and evaluation
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-pro-preview',
-                    contents: prompt
+                    contents: aiPrompt
                 });
                 
                 const text = response.text || "";

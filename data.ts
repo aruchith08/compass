@@ -3,7 +3,6 @@ import { RoadmapItem, SyllabusSemester, ElectiveGroup } from './types';
 
 export const ROADMAP_DATA: RoadmapItem[] = [
   // ==================== YEAR 1: STRONG FOUNDATION ====================
-  // 1. Programming (Python + C + Git + JS)
   {
     id: "Y1_P01",
     year: 1,
@@ -34,7 +33,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "2-3 weeks"
   },
-  // Full Stack Addition Y1
   {
     id: "Y1_FS01",
     year: 1,
@@ -95,8 +93,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "3-5 days"
   },
-
-  // 2. Mathematics (AI/DS/ML)
   {
     id: "Y1_M01",
     year: 1,
@@ -142,8 +138,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4 weeks"
   },
-
-  // 3. Computer Fundamentals
   {
     id: "Y1_CF01",
     year: 1,
@@ -189,8 +183,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "1 week"
   },
-
-  // 5. Mini Projects (Year 1)
   {
     id: "Y1_PR01",
     year: 1,
@@ -238,7 +230,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
   },
 
   // ==================== YEAR 2: CORE ====================
-  // 1. Data Analysis (AIML/DS)
   {
     id: "Y2_DA01",
     year: 2,
@@ -269,8 +260,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "3 weeks"
   },
-
-  // 2. Machine Learning Foundations
   {
     id: "Y2_ML01",
     year: 2,
@@ -316,8 +305,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4 weeks"
   },
-
-  // Full Stack Track Year 2
   {
     id: "Y2_FS01",
     year: 2,
@@ -363,8 +350,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "1 week"
   },
-
-  // Projects Year 2
   {
     id: "Y2_PR01",
     year: 2,
@@ -412,7 +397,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
   },
 
   // ==================== YEAR 3: ADVANCED ====================
-  // 1. Deep Learning Basics
   {
     id: "Y3_DL01",
     year: 3,
@@ -428,7 +412,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "6-10 weeks"
   },
-  // 2. Deep Learning Applications
   {
     id: "Y3_DL04",
     year: 3,
@@ -459,7 +442,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4-6 weeks"
   },
-  // 3. Modern AI (LLMs)
   {
     id: "Y3_DL03",
     year: 3,
@@ -475,7 +457,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "8-12 weeks"
   },
-
   {
     id: "Y3_AS01",
     year: 3,
@@ -491,8 +472,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4 weeks"
   },
-
-  // Full Stack Track Year 3 (Backend)
   {
     id: "Y3_FS01",
     year: 3,
@@ -524,23 +503,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     time_estimate: "3 weeks"
   },
   {
-    id: "Y3_FS03",
-    year: 3,
-    name: "Authentication & Security",
-    description: "JWT, OAuth2, Hashing, Session Management, Cookies, CORS.",
-    category: "Web Development",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["Full Stack Developer"],
-    resource_name: "Auth0 Blog",
-    resource_link: "https://auth0.com/blog/",
-    is_project: false,
-    is_output: false,
-    time_estimate: "2 weeks"
-  },
-
-  // Internships
-  {
     id: "Y3_IN01",
     year: 3,
     name: "Internships (Min 2)",
@@ -556,40 +518,7 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     time_estimate: "2-4 months"
   },
 
-  // Projects Year 3
-  {
-    id: "Y3_PR01",
-    year: 3,
-    name: "Image Classification System",
-    description: "Build a CNN-based classifier (e.g., Plant Disease Detection).",
-    category: "Projects",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["AI/ML Engineer"],
-    resource_name: "CNN Guide",
-    resource_link: "https://www.tensorflow.org/tutorials/images/classification",
-    is_project: true,
-    is_output: true,
-    time_estimate: "2-3 weeks"
-  },
-  {
-    id: "Y3_PR_FS01",
-    year: 3,
-    name: "Full Stack Blog App",
-    description: "MERN Stack Application. CRUD operations, User Authentication, Database.",
-    category: "Projects",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["Full Stack Developer"],
-    resource_name: "MERN Tutorial",
-    resource_link: "https://www.mongodb.com/languages/mern-stack-tutorial",
-    is_project: true,
-    is_output: true,
-    time_estimate: "3 weeks"
-  },
-
   // ==================== YEAR 4: SPECIALIZATION + JOB READY ====================
-  // 1. GenAI Frameworks & Tools
   {
     id: "Y4_GA01",
     year: 4,
@@ -605,8 +534,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4-6 weeks"
   },
-
-  // 2. MLOps Essentials
   {
     id: "Y4_MLOPS01",
     year: 4,
@@ -637,8 +564,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_output: false,
     time_estimate: "4 weeks"
   },
-
-  // 3. AI Project Building (End-to-End)
   {
     id: "Y4_PR_E2E",
     year: 4,
@@ -655,38 +580,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     time_estimate: "4-6 weeks"
   },
   {
-    id: "Y4_MP01",
-    year: 4,
-    name: "Capstone Project",
-    description: "Final Major Project. Choose ONE: AI-Based Threat Detection, SaaS Platform, or Fraud Detection System.",
-    category: "Projects",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "Project Ideas",
-    resource_link: "https://github.com/florinpop17/app-ideas",
-    is_project: true,
-    is_output: true,
-    time_estimate: "3-4 months"
-  },
-
-  // 4. Portfolio & Job Prep
-  {
-    id: "Y4_FF01",
-    year: 4,
-    name: "Select Specialization",
-    description: "Finalize path: AI/ML Engineer, Data Scientist, AI Security, or Full Stack.",
-    category: "Career",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "Career Roadmaps",
-    resource_link: "https://roadmap.sh/ai",
-    is_project: false,
-    is_output: true,
-    time_estimate: "1 week"
-  },
-  {
     id: "Y4_IP01",
     year: 4,
     name: "DSA: Top 75 Blind",
@@ -700,68 +593,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_project: false,
     is_output: false,
     time_estimate: "8-10 weeks"
-  },
-  {
-    id: "Y4_IP02",
-    year: 4,
-    name: "System Design: HLD/LLD",
-    description: "High Level (Load Balancers, Caching) vs Low Level (Class Diagrams). Design Twitter/Uber.",
-    category: "Interview Prep",
-    priority: "Medium",
-    status: "To Do",
-    role_alignment: ["AI/ML Engineer", "Data Scientist", "Full Stack Developer"],
-    resource_name: "System Design Primer",
-    resource_link: "https://github.com/donnemartin/system-design-primer",
-    is_project: false,
-    is_output: false,
-    time_estimate: "4-6 weeks"
-  },
-  {
-    id: "Y4_IP03",
-    year: 4,
-    name: "Behavioral: STAR Method",
-    description: "Prepare 5 stories for 'Tell me about a time you failed/led/conflicted'. Situation, Task, Action, Result.",
-    category: "Interview Prep",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "The STAR Method",
-    resource_link: "https://www.careereducation.columbia.edu/resources/star-method-behavioral-interviewing",
-    is_project: false,
-    is_output: false,
-    time_estimate: "1-2 weeks"
-  },
-  {
-    id: "Y4_IP04",
-    year: 4,
-    name: "Mock Interviews (P2P)",
-    description: "Do at least 3 mock interviews. Use Pramp or ask a friend.",
-    category: "Interview Prep",
-    priority: "High",
-    status: "To Do",
-    role_alignment: ["All Roles"],
-    resource_name: "Pramp",
-    resource_link: "https://www.pramp.com/",
-    is_project: false,
-    is_output: false,
-    time_estimate: "2 weeks"
-  },
-  
-  // 5. Job Ready Skills (Web specific)
-  {
-    id: "Y4_FS01",
-    year: 4,
-    name: "Advanced Web Concepts",
-    description: "WebSockets (Socket.io), Server Side Rendering (Next.js basics), Testing (Jest).",
-    category: "Web Development",
-    priority: "Medium",
-    status: "To Do",
-    role_alignment: ["Full Stack Developer"],
-    resource_name: "Next.js Docs",
-    resource_link: "https://nextjs.org",
-    is_project: false,
-    is_output: false,
-    time_estimate: "4-5 weeks"
   },
 
   // Soft Skills & Compulsory Items (Recurring/General)
@@ -779,36 +610,6 @@ export const ROADMAP_DATA: RoadmapItem[] = [
     is_project: false,
     is_output: false,
     time_estimate: "Continuous"
-  },
-  {
-    id: "G_SS02",
-    year: 0,
-    name: "Communication",
-    description: "Explain projects clearly. Practice speaking in interviews.",
-    category: "Soft Skills",
-    priority: "High",
-    status: "In Progress",
-    role_alignment: ["All Roles"],
-    resource_name: "Effective Communication",
-    resource_link: "https://www.coursera.org/specializations/communication-skills-engineers",
-    is_project: false,
-    is_output: false,
-    time_estimate: "Continuous"
-  },
-  {
-    id: "G_SS04",
-    year: 0,
-    name: "Build Proof of Work",
-    description: "Courses don't get you hired. GitHub, Kaggle, and Internships do.",
-    category: "Career",
-    priority: "High",
-    status: "In Progress",
-    role_alignment: ["All Roles"],
-    resource_name: "Portfolio Guide",
-    resource_link: "https://www.freecodecamp.org/news/how-to-build-a-portfolio-site/",
-    is_project: false,
-    is_output: false,
-    time_estimate: "Continuous"
   }
 ];
 
@@ -820,39 +621,66 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
       { 
         sNo: 1, code: "MA101BS", title: "Matrices and Calculus", l: 3, t: 1, p: 0, credits: 4,
         units: [
-          { title: "Unit I: Matrices", topics: "Rank of a matrix by Echelon form and Normal form, Inverse of Non-singular matrices by Gauss-Jordan method, System of linear equations, Gauss Seidel Iteration Method." },
-          { title: "Unit II: Eigen values and Eigen vectors", topics: "Linear Transformation and Orthogonal Transformation, Cayley-Hamilton Theorem, Finding inverse and power of a matrix, Quadratic forms, Reduction of Quadratic form to canonical form." },
-          { title: "Unit III: Single Variable Calculus", topics: "Mean value theorems: Rolle’s theorem, Lagrange’s Mean value theorem, Cauchy’s Mean value Theorem, Taylor’s Series, Curve Tracing." },
-          { title: "Unit IV: Multivariable Calculus", topics: "Partial Differentiation: Euler’s Theorem, Total derivative, Jacobian, Functional dependence, Maxima and minima (Lagrange multipliers)." },
-          { title: "Unit V: Multivariable Integration", topics: "Double Integrals, Change of order of integration, Triple Integrals, Applications: Areas and Volumes." }
+          { title: "Unit I: Matrices", topics: "Rank of a matrix by Echelon form and Normal form, Inverse of Non-singular matrices by Gauss-Jordan method, Solving system of Homogeneous and Non-Homogeneous equations, Gauss Seidel Iteration Method." },
+          { title: "Unit II: Eigen values and Eigen vectors", topics: "Linear Transformation and Orthogonal Transformation, Eigen values, Eigen vectors, Diagonalization of a matrix, Cayley-Hamilton Theorem, Quadratic forms, Reduction of Quadratic form to canonical form." },
+          { title: "Unit III: Single Variable Calculus", topics: "Mean value theorems: Rolle’s theorem, Lagrange’s Mean value theorem, Cauchy’s Mean value Theorem, Taylor’s Series, Curve Tracing in cartesian coordinates." },
+          { title: "Unit IV: Multivariable Calculus (Partial Diff)", topics: "Euler’s Theorem, Total derivative, Jacobian, Functional dependence, Maxima and minima using Lagrange multipliers." },
+          { title: "Unit V: Multivariable Calculus (Integration)", topics: "Double Integrals (Cartesian/Polar), Triple Integrals, Change of variables, Areas and Volumes by multiple integrals." }
         ]
       },
       { 
         sNo: 2, code: "PH102BS", title: "Advanced Engineering Physics", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Crystallography & Materials Characterization", topics: "Unit cell, Bravais lattices, Packing factor, Miller indices, Defects in crystals, XRD (Bragg’s law), SEM." },
-          { title: "Unit II: Quantum Mechanics", topics: "de-Broglie hypothesis, Schrodinger’s time independent wave equation, Particle in a 1D box, Kronig-Penney model, Energy bands." },
-          { title: "Unit III: Quantum Computing", topics: "Linear algebra for QC, Dirac’s Bra and Ket notation, Qubits, Entanglement, Quantum gates, Algorithms: Shor, Grover." },
-          { title: "Unit IV: Magnetic and Dielectric Materials", topics: "Magnetic moment, Hysteresis, Weiss domain theory, Ferrimagnetic materials, Polarization, Fe-RAM." },
-          { title: "Unit V: Laser and Fibre Optics", topics: "Einstein coefficients, Population inversion, Ruby/He-Ne/CO2 lasers, Total internal reflection, Numerical aperture, Losses." }
+          { title: "Unit I: Crystallography & Materials Characterization", topics: "Unit cell, Bravais lattices, Miller indices, Point defects, X-ray diffraction (Bragg’s law), SEM block diagram." },
+          { title: "Unit II: Quantum Mechanics", topics: "de-Broglie hypothesis, Schrodinger’s time independent wave equation, Particle in a 1D box, Kronig-Penney model, Discrete energy levels." },
+          { title: "Unit III: Quantum Computing", topics: "Linear algebra for QC, Dirac’s Bra and Ket notation, Qubits, Entanglement, Quantum gates, Shor's and Grover's algorithms." },
+          { title: "Unit IV: Magnetic and Dielectric Materials", topics: "Hysteresis, Weiss domain theory, Ferrimagnetic materials, Polarization, Fe-RAM, Load cell, Fire sensor." },
+          { title: "Unit V: Laser and Fibre Optics", topics: "Einstein coefficients, Population inversion, He-Ne/CO2 laser, Total internal reflection, Numerical aperture, Fiber losses." }
         ]
       },
       { 
         sNo: 3, code: "CS103ES", title: "Programming for Problem Solving", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Overview of C", topics: "Language Elements, Selection Structures (if/switch), Repetition and Loop Statements (while/for/do-while)." },
-          { title: "Unit II: Functions & Pointers", topics: "Top-Down Design, Function Arguments, Scope of Names, Pointers and Indirection Operator, Modular Programming." },
-          { title: "Unit III: Arrays & Strings", topics: "1D/2D Arrays, Array Elements as Arguments, String Basics, Library Functions, Array of Pointers." },
-          { title: "Unit IV: Recursion & Derived Types", topics: "Tracing Recursive Functions, User-Defined Structure Types, Unions, Nested Structures." },
-          { title: "Unit V: Files & Algorithms", topics: "Text and Binary Files, Searching (Linear/Binary), Sorting (Bubble/Insertion/Selection)." }
+          { title: "Unit I: Overview of C", topics: "Data Types, Arithmetic Expressions, Selection Structures (if/switch), Repetition and Loop Statements (while/for/do-while)." },
+          { title: "Unit II: Functions & Pointers", topics: "Building Programs with Functions, Top-Down Design, Indirection Operator, Pointers with Input/Output Parameters." },
+          { title: "Unit III: Arrays & Strings", topics: "1D/2D Arrays, Searching and Sorting an Array, Multidimensional Arrays, String Basics, Array of Pointers." },
+          { title: "Unit IV: Recursion & Derived Types", topics: "Tracing a Recursive Function, Structure and Union Types, User-Defined Structure Types." },
+          { title: "Unit V: Files & Algorithms", topics: "Text and Binary File Pointers, Searching (Linear/Binary), Sorting (Bubble, Insertion, Selection)." }
         ]
       },
-      { sNo: 4, code: "EE104ES", title: "Basic Electrical Engineering", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 5, code: "ME105ES", title: "Engineering Drawing & CAD", l: 2, t: 0, p: 2, credits: 3 },
+      { 
+        sNo: 4, code: "EE104ES", title: "Basic Electrical Engineering", l: 3, t: 0, p: 0, credits: 3,
+        units: [
+          { title: "Unit I: D.C. Circuits", topics: "Electrical elements (R,L,C), KVL/KCL, Superposition, Thevenin and Norton Theorems, Time-domain RL/RC." },
+          { title: "Unit II: A.C. Circuits", topics: "Sinusoidal waveforms, Phasor representation, Power factor, Resonance in series R-L-C, Three-phase balanced circuits." },
+          { title: "Unit III: Transformers", topics: "Ideal and practical transformer, Equivalent circuit, Regulation and efficiency, Auto-transformer." },
+          { title: "Unit IV: Electrical Machines", topics: "DC shunt machine, Rotating magnetic field, Three-phase induction motor, Synchronous generator." },
+          { title: "Unit V: Electrical Installations", topics: "LT Switchgear (SFU, MCB, ELCB), Wires and Cables, Earthing, Battery backup, Power factor improvement." }
+        ]
+      },
+      { 
+        sNo: 5, code: "ME105ES", title: "Engineering Drawing & CAD", l: 2, t: 0, p: 2, credits: 3,
+        units: [
+          { title: "Unit I: Intro to Eng Graphics", topics: "Scales, Plain and Diagonal, Conic Sections, Cycloid, Epicycloid and Hypocycloid." },
+          { title: "Unit II: Orthographic Projections", topics: "Projection of Points and Lines, Plane regular geometric figures, Auxiliary Planes, CAD views/commands." },
+          { title: "Unit III: Projections of Regular Solids", topics: "Prism, Cylinder, Pyramid, Cone, Sectional views." },
+          { title: "Unit IV: Development of Surfaces", topics: "Development of Prism, Cylinder, Pyramid and Cone." },
+          { title: "Unit V: Isometric Projections", topics: "Isometric Scale, Isometric Views of Lines/Planes/Solids, Conversion of Isometric to Orthographic." }
+        ]
+      },
       { sNo: 6, code: "PH106BS", title: "Advanced Engineering Physics Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 7, code: "CS107ES", title: "Programming for Problem Solving Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 8, code: "EE108ES", title: "Basic Electrical Engineering Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 9, code: "CS109ES", title: "IT Workshop", l: 0, t: 0, p: 2, credits: 1 }
+      { 
+        sNo: 9, code: "CS109ES", title: "IT Workshop", l: 0, t: 0, p: 2, credits: 1,
+        units: [
+          { title: "PC Hardware", topics: "Identify peripherals, Disassemble/Assemble PC, Install MS Windows, Install Linux (Dual Boot)." },
+          { title: "Internet & WWW", topics: "Connectivity Boot Camp, Web Browser customization, Search Engines & Netiquette, Cyber Hygiene." },
+          { title: "LaTeX & WORD", topics: "Word Orientation, Formatting Styles, Creating project abstract, Creating a Newsletter." },
+          { title: "Excel", topics: "Creating a Scheduler, Calculating GPA (Formulae), Split cells, Sorting, Boolean operators." },
+          { title: "PowerPoint", topics: "Slide Layouts, Master Layouts, Interactive presentations, Hidden slides." }
+        ]
+      }
     ],
     totalCredits: 20
   },
@@ -863,51 +691,51 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
       { 
         sNo: 1, code: "MA201BS", title: "ODE & Vector Calculus", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: First Order ODE", topics: "Exact differential equations, Bernoulli’s equations, Orthogonal Trajectories, Newton’s law of cooling." },
-          { title: "Unit II: Higher Order ODE", topics: "Linear equations with constant coefficients, Non-Homogeneous terms, Method of variation of parameters." },
-          { title: "Unit III: Laplace Transforms", topics: "Shifting theorems, periodic functions, Inverse Laplace transform, Convolution theorem, Initial value problems." },
-          { title: "Unit IV: Vector Differentiation", topics: "Gradient, Divergence, Curl, Directional derivatives, Scalar potential, Solenoidal and Irrotational vectors." },
+          { title: "Unit I: First Order ODE", topics: "Exact diff eq, Linear and Bernoulli’s, Orthogonal Trajectories, Newton’s law of cooling." },
+          { title: "Unit II: Higher Order ODE", topics: "Linear equations with constant coefficients, Method of variation of parameters." },
+          { title: "Unit III: Laplace Transforms", topics: "Standard functions, Shifting theorems, periodic functions, Inverse Laplace, Convolution theorem." },
+          { title: "Unit IV: Vector Differentiation", topics: "Gradient, Divergence and Curl, Scalar potential, Vector Identities, Solenoidal/Irrotational vectors." },
           { title: "Unit V: Vector Integration", topics: "Line, Surface and Volume Integrals, Theorems of Green, Gauss and Stokes." }
         ]
       },
       { 
         sNo: 2, code: "CH202BS", title: "Engineering Chemistry", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Water and its treatment", topics: "Hardness, Estimation by EDTA, Potable water specs, Disinfection (chlorination), Softening methods, Desalination." },
-          { title: "Unit II: Electrochemistry & Corrosion", topics: "Electrode potential, Nernst equation, EMF, SHE, Calomel electrode, Theories of corrosion, Control methods." },
-          { title: "Unit III: Energy sources", topics: "Batteries (Zn-air, Li-ion), Fuel Cells (DMFC), Calorific value, Petroleum refining, LPG/CNG, Green Hydrogen." },
-          { title: "Unit IV: Polymers", topics: "Tacticity, Addition/Condensation mechanism, Thermoplastics vs Thermosetting, FRP, Conducting polymers, Biodegradable polymers." },
-          { title: "Unit V: Advanced Functional Materials", topics: "Smart materials (Nitinol), Piezoelectric (quartz), Biosensors, Spectroscopic apps (UV-Vis, IR, Raman)." }
+          { title: "Unit I: Water and its treatment", topics: "Hardness estimation by EDTA, Disinfection (chlorination), Softening methods, Reverse osmosis." },
+          { title: "Unit II: Electrochemistry & Corrosion", topics: "EMF of cell, SHE and Calomel electrode, pH determination, Theories of corrosion, Cathodic protection." },
+          { title: "Unit III: Energy sources", topics: "Zn-air and Lithium ion battery, Fuel Cells (DMFC), Petroleum refining, Bio-diesel, Green Hydrogen." },
+          { title: "Unit IV: Polymers", topics: "Addition/Condensation mechanism, Thermoplastics vs Thermosetting, FRP, Biodegradable polymers." },
+          { title: "Unit V: Advanced Functional Materials", topics: "Nitinol, Biosensors, Spectroscopic apps (UV-Vis, IR, Raman)." }
         ]
       },
       { 
         sNo: 3, code: "CS203ES", title: "Data Structures", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Intro to Data Structures", topics: "Classification, Abstract data types, Linear list, Linked lists (Singly/Doubly/Circular), Stacks, Queues." },
-          { title: "Unit II: Trees", topics: "Binary Tree, Traversals, Binary Search Trees (BST), AVL Trees, Red-Black Trees, Splay Trees." },
-          { title: "Unit III: Advanced Trees & Heaps", topics: "Multiway Search Trees (B-Trees, B+ Trees), Heaps (Binary, Binomial, Fibonacci), Interpolation/Jump Search." },
-          { title: "Unit IV: Graphs", topics: "Representation, Bi-connected Components, Traversal Algorithms, Applications of Graphs." },
-          { title: "Unit V: Hashing & Files", topics: "Hash Tables, Collision Resolution (Open Addressing/Chaining), File Attributes, Organization, Indexing." }
+          { title: "Unit I: Intro to DS", topics: "Linear list, singly/doubly/circular linked list, Stack ADT, Queue ADT." },
+          { title: "Unit II: Trees", topics: "Binary Search Trees (BST) Operations, AVL Trees, Red–Black Trees, Splay Trees." },
+          { title: "Unit III: Multiway Search Trees", topics: "B Trees, B+ Trees, Binary Heaps, Fibonacci heaps, Interpolation/Jump search." },
+          { title: "Unit IV: Graphs", topics: "Directed Graphs, Representation, Traversal (BFS/DFS), Sorting (Radix, Heap, Shell)." },
+          { title: "Unit V: Hashing & Files", topics: "Collision Resolution (Open Addressing/Chaining), Data hierarchy, Indexing." }
         ]
       },
       { 
         sNo: 4, code: "EC204ES", title: "Electronic Devices & Circuits", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Diode Characteristics", topics: "PN junction, Diode models, Rectifiers (Half/Full wave), Capacitor filter, Clippers/Clampers, Zener diode." },
-          { title: "Unit II: BJT", topics: "Structure and principle, Current components, Configurations (CB, CE, CC), I/O characteristics, h-parameters." },
-          { title: "Unit III: BJT Biasing", topics: "Need for stabilization, Load line, Operating point, Fixed bias, Collector-to-base, Voltage divider, Thermal runaway." },
-          { title: "Unit IV: Transistor Amplifiers", topics: "Small-signal amplifier, h-parameter equivalent circuit, Analysis of CE/CB/CC, Emitter bypass capacitor." },
-          { title: "Unit V: Special Purpose Diodes & FETs", topics: "SCR, Tunnel Diode, LED, Solar Cell, JFET structure/characteristics, MOSFET (Enhancement/Depletion), FinFETs, CNTFETs." }
+          { title: "Unit I: Diode Characteristics", topics: "PN junction, Diode models, Rectifiers, Zener diode regulation." },
+          { title: "Unit II: BJT", topics: "Structure and principle, CB/CE/CC Configurations, Input/Output characteristics, h-parameters." },
+          { title: "Unit III: BJT Biasing", topics: "Fixed bias, Collector-to-base, Voltage divider, Stability factors." },
+          { title: "Unit IV: Transistor Amplifiers", topics: "Small-signal amplifier, h-parameter equivalent circuit, Emitter bypass capacitor." },
+          { title: "Unit V: Special Diodes & FETs", topics: "Tunnel Diode, Solar Cell, Schottky Diode, JFET/MOSFET, FinFETs, CNTFETs." }
         ]
       },
       { 
         sNo: 5, code: "EN205HS", title: "English for Skill Enhancement", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Perspectives", topics: "Benjamin M. Spock - The Generation Gap, Word Formation (Prefixes/Suffixes), Articles/Prepositions, Skimming/Scanning." },
-          { title: "Unit II: Digital Transformation", topics: "Emerging Technologies, Noun-pronoun agreement, Subject-verb agreement, Paragraph writing, Coherence." },
-          { title: "Unit III: Attitude & Gratitude", topics: "Leisure (William Henry Davies), Misplaced Modifiers, Formal Letter Writing, Email Etiquette." },
-          { title: "Unit IV: Entrepreneurship", topics: "Why a Start-Up Needs to Find its Customers First, Phrasal Verbs, Passive to Active, Prompt Engineering, Note Making." },
-          { title: "Unit V: Integrity & Professionalism", topics: "Professional Ethics, Technical Vocabulary, Direct/Indirect Speech, SQ3R Method, Report Writing." }
+          { title: "Unit I: Perspectives", topics: "Benjamin M. Spock - The Generation Gap, Word Formation (Prefixes/Suffixes), Articles/Prepositions." },
+          { title: "Unit II: Digital Transformation", topics: "Emerging Technologies, Noun-pronoun/Subject-verb agreement, Coherence, Essay Writing." },
+          { title: "Unit III: Attitude & Gratitude", topics: "Leisure (W.H. Davies), Tenses, Formal Letter/Email Etiquette." },
+          { title: "Unit IV: Entrepreneurship", topics: "Why a Start-Up Needs to Find its Customers First, Phrasal Verbs, Passive to Active." },
+          { title: "Unit V: Integrity & Professionalism", topics: "Professional Ethics, One Word Substitutes, Direct/Indirect Speech, Report Writing." }
         ]
       },
       { sNo: 6, code: "CH206BS", title: "Engineering Chemistry Lab", l: 0, t: 0, p: 2, credits: 1 },
@@ -923,59 +751,59 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
     title: "Year 2, Sem 1",
     courses: [
       { 
-        sNo: 1, code: "MA401BS", title: "Math & Statistical Foundations", l: 3, t: 0, p: 0, credits: 3,
+        sNo: 1, code: "MA401BS", title: "Mathematical and Statistical Foundations", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Basics of Number Theory", topics: "GCD, Prime Factorization, Euclidean algorithm, Fermat numbers, Congruences, Linear congruences." },
-          { title: "Unit II: Random Variables & Distros", topics: "Discrete vs Continuous, Mean/Variance, Binomial Distribution, Poisson distribution." },
-          { title: "Unit III: Continuous Distros & Sampling", topics: "Uniform, Normal Distribution, Central Limit Theorem, Important Statistics, Sampling Distribution of Means." },
-          { title: "Unit IV: Tests of Hypotheses", topics: "General Concepts, Single sample tests, Two samples tests (means/proportions), F-distribution." },
-          { title: "Unit V: Applied Statistics", topics: "Least squares, Fitting straight lines, Parabolas, Correlation and Regression, Rank correlation." }
+          { title: "Unit I: Basics of Number Theory", topics: "GCD, Prime Factorization, Euclidean algorithm, Congruences, Linear congruences." },
+          { title: "Unit II: Random Variables", topics: "Discrete/Continuous Probability Distributions, Mean and Variance, Binomial/Poisson distribution." },
+          { title: "Unit III: Continuous Distributions", topics: "Uniform/Normal Distribution, Central Limit Theorem, Sampling Distribution of Means." },
+          { title: "Unit IV: Tests of Hypotheses", topics: "Testing a Statistical Hypothesis, Single sample/Two samples tests, F-distribution." },
+          { title: "Unit V: Applied Statistics", topics: "Least squares, Fitting straight lines, Correlation and Regression, Rank correlation." }
         ]
       },
       { 
-        sNo: 2, code: "CS302PC", title: "Computer Org & Architecture", l: 3, t: 0, p: 0, credits: 3,
+        sNo: 2, code: "CS302PC", title: "Computer Organization and Architecture", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Digital Logic & Representation", topics: "Boolean Algebra, Logic Gates, Data Representation (Fixed/Floating Point), Block diagram of Digital Computer." },
-          { title: "Unit II: Combinational & Sequential", topics: "Adder/Subtractor, Multiplier, Decoders, HDL, Latches, Flip-Flops, Registers, Counters." },
-          { title: "Unit III: RTL & Basic Design", topics: "Register Transfer Language, Bus and Memory transfers, Arithmetic/Logic Micro ops, Instruction cycle, Interrupt." },
-          { title: "Unit IV: Central Processing Unit", topics: "Microprogrammed Control, Addressing modes, General Register Org, Stack Organization, Data Transfer/Manipulation." },
-          { title: "Unit V: Memory & I/O Org", topics: "Hierarchy, Cache Memory, Virtual Memory, Input-Output Interface, Asynchronous data transfer, Modes of Transfer, DMA." }
+          { title: "Unit I: Boolean Algebra & Logic Gates", topics: "Binary codes/Registers, Fixed/Floating Point, Block diagram of Digital Computer." },
+          { title: "Unit II: Combinational & Sequential", topics: "Binary Adder-Subtractor, Multiplier, Decoders, HDL, Latches, Flip-Flops, Counters." },
+          { title: "Unit III: RTL & Basic Design", topics: "Register Transfer language, Arithmetic Micro ops, Instruction cycle, Memory Reference Instructions." },
+          { title: "Unit IV: Central Processing Unit", topics: "Microprogrammed Control, Addressing modes, Data Transfer and Manipulation." },
+          { title: "Unit V: Memory & I/O Org", topics: "Hierarchy, Virtual Memory, Asynchronous data transfer, DMA, Cache Memory." }
         ]
       },
       { 
-        sNo: 3, code: "CS303PC", title: "OOP through Java", l: 3, t: 0, p: 0, credits: 3,
+        sNo: 3, code: "CS303PC", title: "Object Oriented Programming through Java", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Java Basics", topics: "OOP concepts, History, Data types, Control statements, Classes/Objects, Access control, Nested classes, String class." },
-          { title: "Unit II: Inheritance & Packages", topics: "Base class object, Hierarchical abstractions, Substitutability, Polymorphism, Abstract classes, Interfaces, CLASSPATH." },
-          { title: "Unit III: Exception & Multithreading", topics: "Try/Catch/Finally, Built-in vs Custom Exceptions, Thread lifecycle, Priorities, Synchronization, Inter-thread communication." },
-          { title: "Unit IV: Event Handling & Swings", topics: "java.util & java.io packages, Listeners, Delegation model, Adapter classes, Layout managers." },
-          { title: "Unit V: GUI Advanced", topics: "MVC architecture, Components/Containers, JComponent, Tabbed/Scroll Panes, Menus, Popup menus." }
+          { title: "Unit I: Java Basics", topics: "OO concepts, History, Data types, simple java program, Access control, Recursion, String class." },
+          { title: "Unit II: Inheritance & Packages", topics: "Hierarchical abstractions, Substitutability, Polymorphism, Accessing a Package, Interfaces." },
+          { title: "Unit III: Exception & Multithreading", topics: "Try/catch/throw/finally, thread life cycle, priorities, inter thread communication." },
+          { title: "Unit IV: Event Handling & Swings", topics: "java.util/java.io packages, Event sources/Listeners, Delegation model, Layout managers." },
+          { title: "Unit V: Swing Advanced", topics: "MVC architecture, Components/Containers, Scroll Panes, Menus, Popup menus." }
         ]
       },
       { 
         sNo: 4, code: "CS304PC", title: "Software Engineering", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction", topics: "Role of software, Waterfall, Spiral, Incremental, Concurrent models, Agile Development." },
-          { title: "Unit II: Requirements", topics: "Functional/Non-functional, SRD, Elicitation and Analysis, Validation, Management." },
-          { title: "Unit III: Design Engineering", topics: "Process and Quality, Architectural styles/patterns, UML models, Sequence/Activity/Component diagrams." },
-          { title: "Unit IV: Testing Strategies", topics: "Black-box/White-box, Validation/System testing, Debugging, Metrics for Process and Products." },
-          { title: "Unit V: Risk Management", topics: "Reactive vs Proactive, Identification, RMMM, Quality standards (ISO 9000), Statistical QA." }
+          { title: "Unit I: Introduction", topics: "Waterfall, Spiral, Incremental, Concurrent models, Agile Development." },
+          { title: "Unit II: Requirements", topics: "Functional/Non-functional, SRD, Elicitation and analysis, Validation." },
+          { title: "Unit III: Design Engineering", topics: "Process and quality, UML models, case diagrams, sequence diagrams." },
+          { title: "Unit IV: Testing Strategies", topics: "Black-box/White-box, validation testing, system testing, art of debugging." },
+          { title: "Unit V: Risk Management", topics: "Reactive vs proactive, RMMM, ISO 9000 quality standards." }
         ]
       },
       { 
         sNo: 5, code: "CS305PC", title: "Database Management System", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction & Design", topics: "DBMS vs File System, Data Abstraction, Independence, ER Diagrams, Entities, Attributes, Relationships." },
-          { title: "Unit II: Relational Model", topics: "Integrity constraints, Querying relational data, Views, Relational Algebra, Tuple/Domain Calculus." },
-          { title: "Unit III: SQL & Schema Refinement", topics: "UNION/INTERSECT, Nested Queries, Aggregation, Triggers, Normal forms (1NF-5NF), BCNF, Decompositions." },
-          { title: "Unit IV: Transactions & Concurrency", topics: "ACID properties, Serializability, Lock Based Protocols, Deadlocks, Timestamp Based, Multiple Granularity." },
-          { title: "Unit V: Storage & Indexing", topics: "File Org, Cluster Indexes, Hash Based Indexing, Tree based Indexing, ISAM, B+ Trees." }
+          { title: "Unit I: Intro & Design", topics: "DBMS vs File System, ER Diagrams, Entities/Attributes, Conceptual Design." },
+          { title: "Unit II: Relational Model", topics: "Integrity constraints, Querying relational data, Relational Algebra, Calculus." },
+          { title: "Unit III: SQL & Refinement", topics: "UNION/INTERSECT/EXCEPT, Nested Queries, Triggers, Normal forms (1NF-5NF), BCNF." },
+          { title: "Unit IV: Transactions", topics: "ACID properties, Serializability, Isolation, Lock Based/Timestamp Protocols, Recovery." },
+          { title: "Unit V: Storage & Indexing", topics: "File Organization, Hash Based/Tree based Indexing, ISAM, B+ Trees." }
         ]
       },
-      { sNo: 6, code: "MA306PC", title: "Computational Math Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 6, code: "MA306PC", title: "Computational Mathematics Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 7, code: "CS307PC", title: "OOP through Java Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 8, code: "CS308PC", title: "Software Engineering Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 9, code: "CS309PC", title: "DBMS Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "CS309PC", title: "Database Management Systems Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 10, code: "CS310SD", title: "Node JS/React JS/Django", l: 0, t: 0, p: 2, credits: 1 }
     ],
     totalCredits: 20
@@ -987,59 +815,68 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
       { 
         sNo: 1, code: "CS401PC", title: "Discrete Mathematics", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Mathematical Logic", topics: "Statements/Notation, Normal Forms, Theory of Inference, Predicate Calculus." },
-          { title: "Unit II: Set Theory", topics: "Basic Concepts, Relations and Ordering, Functions." },
-          { title: "Unit III: Algebraic Structures", topics: "Semigroups and Monoids, Lattices as Partially Ordered Sets, Boolean Algebra." },
-          { title: "Unit IV: Combinatorics", topics: "Permutations/Combinations, Binomial Coefficient, Multinomial Theorems, Principle of Exclusion." },
-          { title: "Unit V: Graph Theory", topics: "Isomorphism, Spanning Trees, Planar Graphs, Euler’s Formula, Chromatic Numbers, Four-Color Problem." }
+          { title: "Unit I: Mathematical logic", topics: "Statements and Notation, Connectives, Normal Forms, Predicate Calculus." },
+          { title: "Unit II: Set theory", topics: "Basic Concepts, Relations and Ordering, Functions." },
+          { title: "Unit III: Algebraic Structures", topics: "Semi groups and Monoids, Lattices, Boolean Algebra." },
+          { title: "Unit IV: Combinatorics", topics: "Basics of Counting, Binomial Coefficient, Principle of Exclusion." },
+          { title: "Unit V: Graph Theory", topics: "Isomorphism, Spanning Trees, Planar Graphs, Euler’s Formula, Four-Color Problem." }
         ]
       },
       { 
         sNo: 2, code: "CS402PC", title: "Operating Systems", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction", topics: "Structures, System components, System Calls, Process concepts, Scheduling, Threads." },
-          { title: "Unit II: CPU Scheduling & Deadlock", topics: "Criteria, Algorithms, Multiple-Processor, fork/exit/wait, Deadlock Prevention/Avoidance/Recovery." },
-          { title: "Unit III: Process Management", topics: "Critical Section Problem, Semaphores, Monitors, IPC (Pipes, FIFOs, Shared Memory)." },
-          { title: "Unit IV: Memory Management", topics: "Logical vs Physical, Paging, Segmentation, Demand Paging, Page Replacement Algorithms." },
-          { title: "Unit V: File System", topics: "Interface, Structure, Allocation methods, Free-space Management, UNIX system calls." }
+          { title: "Unit I: Introduction", topics: "Simple Batch, Multiprogrammed, Time-shared, System Calls, Process concepts." },
+          { title: "Unit II: CPU Scheduling", topics: "Criteria, Algorithms, fork/exit/wait, Deadlock Prevention and Recovery." },
+          { title: "Unit III: Process Management", topics: "Critical Section Problem, Semaphores, IPC (Pipes, FIFOs, Shared memory)." },
+          { title: "Unit IV: Virtual Memory", topics: "Logical vs Physical, Paging, Segmentation, Page Replacement Algorithms." },
+          { title: "Unit V: File System", topics: "Interface, Structure, Allocation methods, Free-space Management." }
         ]
       },
       { 
-        sNo: 3, code: "CS403PC", title: "Algorithms Design & Analysis", l: 3, t: 0, p: 0, credits: 3,
+        sNo: 3, code: "CS403PC", title: "Algorithms Design and Analysis", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction & Divide-and-Conquer", topics: "Space/Time complexity, Asymptotic Notations, Binary search, Quick/Merge sort, Strassen’s multiplication." },
-          { title: "Unit II: Disjoint Sets & Backtracking", topics: "Set operations, union/find, Heapsort, n-queens, sum of subsets, graph coloring, Hamiltonian cycles." },
-          { title: "Unit III: Dynamic Programming", topics: "Optimal binary search tree, 0/1 knapsack, All pairs shortest path, Traveling salesperson, Reliability design." },
-          { title: "Unit IV: Greedy & Traversal", topics: "Job sequencing, knapsack problem, MST (Kruskal/Prim), Binary Trees, Graphs, Connected components." },
-          { title: "Unit V: Branch and Bound & NP-Hard", topics: "FIFO Branch and Bound, LC Branch and Bound, NP-Hard/NP-Complete classes, Cook’s theorem." }
+          { title: "Unit I: Introduction", topics: "Asymptotic Notations, Binary search, Quick sort, Merge sort, Strassen’s multiplication." },
+          { title: "Unit II: Disjoint Sets", topics: "Set operations, Backtracking (n-queens, sum of subsets, graph coloring)." },
+          { title: "Unit III: Dynamic Programming", topics: "Optimal BST, 0/1 knapsack, Shortest path, Traveling salesperson." },
+          { title: "Unit IV: Greedy method", topics: "Job sequencing, MST (Kruskal/Prim), Single source shortest path." },
+          { title: "Unit V: Branch and Bound", topics: "LC/FIFO solutions, NP-Hard/Complete classes, Cook’s theorem." }
         ]
       },
       { 
         sNo: 4, code: "CS404PC", title: "Computer Networks", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction", topics: "OSI-ISO, TCP/IP, Delay/Loss/Throughput, Network attacks, History of Internet." },
-          { title: "Unit II: Application Layer", topics: "HTTP, FTP, SMTP, DNS, Socket Programming, Peer-to-Peer Applications." },
-          { title: "Unit III: Transport Layer", topics: "UDP, Reliable Data Transfer, Pipelined Protocols, GBN, SR, TCP Connection, Flow Control, Congestion." },
-          { title: "Unit IV: Network Layer", topics: "Data and Control plane, IP, Forwarding/Addressing, ICMP, Routing (LS, DV, OSPF, BGP), Multicasting." },
-          { title: "Unit V: Link Layer", topics: "Error-Detection/Correction, CRC, Hamming code, Multiple Access, CSMA/CD, Ethernet, VLANs, Wireless LAN." }
+          { title: "Unit I: Introduction", topics: "Circuit/Packet Switching, Protocol reference models (ISO-OSI, TCP/IP), Network attacks." },
+          { title: "Unit II: Application Layer", topics: "Web and HTTP, FTP, SMTP, DNS, Socket Programming." },
+          { title: "Unit III: Transport Layer", topics: "UDP, Reliable Data Transfer, Go-Back-N, Selective Repeat, TCP Congestion Control." },
+          { title: "Unit IV: Network Layer", topics: "IP, Forwarding/Addressing, Routing Algorithms (LS, DV), OSPF, BGP, Multicasting." },
+          { title: "Unit V: Link Layer", topics: "Error-Detection/Correction, CRC, Multiple Access, Ethernet, VLANs, Wireless LAN." }
         ]
       },
       { 
         sNo: 5, code: "CS405PC", title: "Machine Learning", l: 3, t: 0, p: 0, credits: 3,
         units: [
-          { title: "Unit I: Introduction & Preparation", topics: "Human learning types, well-posed problem, Machine learning activities, Pre-processing, Underfitting vs Overfitting." },
-          { title: "Unit II: Feature Engineering & Probability", topics: "PCA, SVD, LDA, Subset selection, Bayes rule, Distributions, Central limit theorem, Bayesian belief network." },
-          { title: "Unit III: Supervised Learning", topics: "Linear/Logistic Regression, KNN, Decision tree, SVM, Kernel trick, Random Forest, Bagging/Boosting." },
-          { title: "Unit IV: Unsupervised Learning", topics: "Clustering types, Partitioning (k-Means, K-Medoids), Hierarchical clustering, Density-based (DBSCAN)." },
-          { title: "Unit V: ANN & Deep Learning", topics: "Biological vs Artificial neuron, Activation functions, Perceptron, Backpropagation, Reinforcement learning intro." }
+          { title: "Unit I: Introduction", topics: "Model Preparation, Evaluation (cross-validation), underfitting vs overfitting." },
+          { title: "Unit II: Feature Engineering", topics: "PCA, SVD, LDA, Bayes rule, central limit theorem, Bayesian belief network." },
+          { title: "Unit III: Supervised Learning", topics: "Linear/Logistic Regression, KNN, Decision tree, Support vector machines, Random Forest." },
+          { title: "Unit IV: Unsupervised Learning", topics: "Clustering (k-Means, K-Medoids), Hierarchical, Density-based (DBSCAN)." },
+          { title: "Unit V: Neural Networks", topics: "Perceptron, learning process in ANN, Back propagation, reinforcement learning intro." }
         ]
       },
-      { sNo: 6, code: "MS406HS", title: "Innovation & Entrepreneurship", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 6, code: "MS406HS", title: "Innovation and Entrepreneurship", l: 2, t: 0, p: 0, credits: 2 },
       { sNo: 7, code: "CS407PC", title: "Operating Systems Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 8, code: "CS408PC", title: "Computer Networks Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "CS408PC", title: "Computer Networks lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 9, code: "CS409PC", title: "Machine Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 10, code: "CS410SD", title: "Data Visualization (R/PowerBI)", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 11, code: "VA400HS", title: "Indian Knowledge System", l: 1, t: 0, p: 0, credits: 1 }
+      { sNo: 10, code: "CS410SD", title: "Data Visualization- R Programming/ Power BI", l: 0, t: 0, p: 2, credits: 1 },
+      { 
+        sNo: 11, code: "VA400HS", title: "Indian Knowledge System", l: 1, t: 0, p: 0, credits: 1,
+        units: [
+          { title: "Unit 1: Introduction", topics: "Nature, Scope and Salient Aspects of Bharatiya Jnana Parampara (Vedas, Upanishads)." },
+          { title: "Unit 2: History & Literature", topics: "Gurukul System, Sanskrit in NLP, Vedic Literature, Scientific Treatises." },
+          { title: "Unit 3: Scientific Theories", topics: "Physics, Chemistry and Mathematics in ancient Indian Literature." },
+          { title: "Unit 4: Wellness Systems", topics: "Yoga System, Ayurveda System, Ancient Indian Aesthetics." },
+          { title: "Unit 5: Engineering & Fine Arts", topics: "Silk, Cotton and Ship Building, Temple Architecture, Music and Folk Arts." }
+        ]
+      }
     ],
     totalCredits: 22
   },
@@ -1048,16 +885,16 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
     title: "Year 3, Sem 1",
     courses: [
       { sNo: 1, code: "AI501PC", title: "Artificial Intelligence", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 2, code: "AI502PC", title: "Automata & Compiler Design", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 3, code: "AI503PC", title: "Data Analytics & Visualization", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "AI502PC", title: "Automata theory and Compiler Design", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "AI503PC", title: "Data Analytics and Visualization", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 4, code: "PE1", title: "Professional Elective-I", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 5, code: "OE1", title: "Open Elective-I", l: 2, t: 0, p: 0, credits: 2 },
       { sNo: 6, code: "AI504PC", title: "Artificial Intelligence Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 7, code: "AI505PC", title: "Compiler Design Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 8, code: "AI506PC", title: "Data Analytics Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 8, code: "AI506PC", title: "Data Analytics and Visualization Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 9, code: "AI507PC", title: "Field Based Research Project", l: 0, t: 0, p: 4, credits: 2 },
-      { sNo: 10, code: "AI508SD", title: "UI Design (Flutter/Android)", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 11, code: "VA500HS", title: "Gender/Ethics", l: 1, t: 0, p: 0, credits: 1 }
+      { sNo: 10, code: "AI508SD", title: "UI Design –Flutter/ Android Studio", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 11, code: "VA500HS", title: "Gender Sensitization/Human Values/Ethics", l: 1, t: 0, p: 0, credits: 1 }
     ],
     totalCredits: 21
   },
@@ -1067,13 +904,13 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
     courses: [
       { sNo: 1, code: "AI601PC", title: "Natural Language Processing", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 2, code: "AI602PC", title: "Deep Learning", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 3, code: "MS603HS", title: "Business Economics", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "MS603HS", title: "Business Economics and Financial Analysis", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 4, code: "PE2", title: "Professional Elective-II", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 5, code: "OE2", title: "Open Elective-II", l: 2, t: 0, p: 0, credits: 2 },
-      { sNo: 6, code: "AI604PC", title: "NLP Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 5, code: "OE2", title: "Open Elective – II", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 6, code: "AI604PC", title: "Natural Language Processing Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 7, code: "AI605PC", title: "Deep Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 8, code: "AI606PC", title: "Chatbots Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 9, code: "EN607HS", title: "Employability Skills Lab", l: 0, t: 0, p: 2, credits: 1 },
+      { sNo: 9, code: "EN607HS", title: "English for Employability Skills Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 10, code: "AI608SD", title: "Prompt Engineering", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 11, code: "VA600ES", title: "Environmental Science", l: 1, t: 0, p: 0, credits: 1 }
     ],
@@ -1085,13 +922,13 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
     courses: [
       { sNo: 1, code: "AI701PC", title: "Reinforcement Learning", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 2, code: "AI702PC", title: "Generative AI", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 3, code: "MS703HS", title: "Management Fundamentals", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "MS703HS", title: "Fundamentals of Management for Engineers", l: 3, t: 0, p: 0, credits: 3 },
       { sNo: 4, code: "PE3", title: "Professional Elective-III", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 5, code: "PE4", title: "Professional Elective-IV", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 6, code: "OE3", title: "Open Elective-III", l: 2, t: 0, p: 0, credits: 2 },
+      { sNo: 5, code: "PE4", title: "Professional Elective – IV", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 6, code: "OE3", title: "Open Elective – III", l: 2, t: 0, p: 0, credits: 2 },
       { sNo: 7, code: "AI704PC", title: "Reinforcement Learning Lab", l: 0, t: 0, p: 2, credits: 1 },
       { sNo: 8, code: "AI705PC", title: "Generative AI Lab", l: 0, t: 0, p: 2, credits: 1 },
-      { sNo: 9, code: "AI706PC", title: "Mini Project/Internship", l: 0, t: 0, p: 4, credits: 2 }
+      { sNo: 9, code: "AI706PC", title: "Industry Oriented Mini Project/ Internship", l: 0, t: 0, p: 4, credits: 2 }
     ],
     totalCredits: 21
   },
@@ -1099,9 +936,9 @@ export const ACADEMIC_SYLLABUS: SyllabusSemester[] = [
     id: "4-2",
     title: "Year 4, Sem 2",
     courses: [
-      { sNo: 1, code: "PE5", title: "Professional Elective-V", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 2, code: "PE6", title: "Professional Elective-VI", l: 3, t: 0, p: 0, credits: 3 },
-      { sNo: 3, code: "AI801PC", title: "Project Work", l: 0, t: 0, p: 28, credits: 14 }
+      { sNo: 1, code: "PE5", title: "Professional Elective – V", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 2, code: "PE6", title: "Professional Elective – VI", l: 3, t: 0, p: 0, credits: 3 },
+      { sNo: 3, code: "AI801PC", title: "Project Work", l: 0, t: 0, p: 42, credits: 14 }
     ],
     totalCredits: 20
   }
@@ -1134,8 +971,8 @@ export const ELECTIVES_DATA: ElectiveGroup[] = [
     title: "Professional Elective - III",
     courses: [
       { code: "CS731PE", title: "Computer Vision" },
-      { code: "CS732PE", title: "Cryptography & Network Security" },
-      { code: "CS733PE", title: "Penetration Testing & Incident Response" },
+      { code: "CS732PE", title: "Cryptography and Network Security" },
+      { code: "CS733PE", title: "Penetration Testing and Incident Response" },
       { code: "CS734PE", title: "Data Stream Mining" },
       { code: "CS735PE", title: "Cloud Computing" },
       { code: "CS736PE", title: "Information Retrieval Systems" }
@@ -1175,14 +1012,14 @@ export const ELECTIVES_DATA: ElectiveGroup[] = [
     ]
   },
   {
-    title: "Open Electives",
+    title: "Open Electives (I, II, III)",
     courses: [
-      { code: "AI511OE", title: "Fundamentals of AI (Group I)" },
-      { code: "AI512OE", title: "Machine Learning Basics (Group I)" },
-      { code: "AI621OE", title: "Intro to NLP (Group II)" },
-      { code: "AI622OE", title: "AI Applications (Group II)" },
-      { code: "AI731OE", title: "Chatbots (Group III)" },
-      { code: "AI732OE", title: "Computer Vision with OpenCV (Group III)" }
+      { code: "AI511OE", title: "Fundamentals of AI (I)" },
+      { code: "AI512OE", title: "Machine Learning Basics (I)" },
+      { code: "AI621OE", title: "Introduction to Natural Language Processing (II)" },
+      { code: "AI622OE", title: "AI applications (II)" },
+      { code: "AI731OE", title: "Chatbots (III)" },
+      { code: "AI732OE", title: "Computer Vision with Open CV (III)" }
     ]
   }
 ];

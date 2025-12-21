@@ -503,7 +503,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Daily Challenges (Compact Style) */}
+      {/* Daily Challenges (Optimized Layout) */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -511,12 +511,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
-            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-4 py-1.5 rounded-full tracking-widest uppercase">
-              Question {linguaSession!.currentIndex + 1} of {linguaSession!.tasks.length}
+            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
+              <span className="hidden sm:inline">Question </span>{linguaSession!.currentIndex + 1}/{linguaSession!.tasks.length}
             </span>
           )}
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-5 md:p-8 rounded-3xl shadow-xl relative min-h-[300px] flex flex-col justify-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[260px] md:min-h-[300px] flex flex-col justify-center transition-all overflow-hidden">
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -531,57 +531,63 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
             </div>
           ) : currentTask && (
-            <div className="flex flex-col md:flex-row gap-8">
-               <div className="md:w-32 flex flex-col items-center gap-3 shrink-0">
-                  <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-full shadow-inner"><Star className="text-amber-500" size={32} /></div>
-                  <div className="text-center">
-                    <span className="block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Type</span>
-                    <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">{currentTask.category}</span>
+            <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+               {/* Mobile: Horizontal header / Desktop: Vertical sidebar */}
+               <div className="flex flex-row md:flex-col items-center gap-4 md:gap-3 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 md:pr-8 md:w-32">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
+                    <Star className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
                   </div>
-                  {currentTask.category === "Listening" && <Volume2 className="text-slate-300" size={20} />}
+                  <div className="text-left md:text-center flex-1 md:flex-none">
+                    <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Type</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200 text-sm md:text-sm">{currentTask.category}</span>
+                  </div>
+                  {currentTask.category === "Listening" && <Volume2 className="text-slate-400 md:text-slate-300" size={18} />}
+                  <span className="md:hidden text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded tracking-widest">{currentTask.type}</span>
                </div>
-               <div className="flex-1 space-y-5">
+
+               {/* Content Area */}
+               <div className="flex-1 space-y-4 md:space-y-5">
                   <div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mb-3 inline-block tracking-widest">{currentTask.type}</span>
-                    <h3 className="text-xl md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
+                    <span className="hidden md:inline-block text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mb-3 tracking-widest">{currentTask.type}</span>
+                    <h3 className="text-lg md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
                   </div>
                   {currentTask.category === "Listening" && (
                     <button 
                       onClick={() => playTextToSpeech(currentTask.hiddenContent || "")} 
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-sm active:scale-95 ${isPlayingAudio ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+                      className={`flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl font-bold text-xs transition-all shadow-sm active:scale-95 ${isPlayingAudio ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
                     >
                       <PlayCircle size={16} /> {isPlayingAudio ? "Playing..." : "Play Audio Clip"}
                     </button>
                   )}
                   
-                  <div className="pt-5 border-t border-slate-100 dark:border-white/5">
+                  <div className="pt-2 md:pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (
-                      <form onSubmit={handleCheckAnswer} className="space-y-4">
+                      <form onSubmit={handleCheckAnswer} className="space-y-3 md:space-y-4">
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Answer</label>
                           <textarea 
                             value={userAnswer} 
                             onChange={e => setUserAnswer(e.target.value)} 
                             placeholder="Type response..." 
-                            className="w-full h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/10 rounded-2xl p-4 text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none" 
+                            className="w-full h-24 md:h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/10 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all" 
                           />
                         </div>
                         <div className="flex justify-end">
-                          <button type="submit" disabled={isChecking || !userAnswer.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
+                          <button type="submit" disabled={isChecking || !userAnswer.trim()} className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
                             {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Check Answer"}
                           </button>
                         </div>
                       </form>
                     ) : (
-                      <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-4">
-                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/50 p-5 rounded-2xl shadow-sm">
-                          <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-4">
+                      <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
+                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/50 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
+                          <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">Evaluation</span>
-                            <span className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-black shadow-md">BAND {lastScore}/9</span>
+                            <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md">BAND {lastScore}/9</span>
                           </div>
-                          <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
+                          <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>
-                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                           Next Question <ArrowRight size={16} />
                         </button>
                       </div>

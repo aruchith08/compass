@@ -33,13 +33,38 @@ export const api = {
         const data = userSnap.data() as UserProfile;
         const userItems = data.roadmap || [];
         
-        // SYNC LOGIC: Check for new roadmap items added to the source code
-        const userItemIds = new Set(userItems.map(i => i.id));
-        const newItems = ROADMAP_DATA.filter(defaultItem => !userItemIds.has(defaultItem.id));
-        
-        let finalRoadmap = userItems;
-        if (newItems.length > 0) {
-          finalRoadmap = [...userItems, ...newItems];
+        // SYNC LOGIC: 
+        // 1. Add new items from source
+        // 2. Patch existing items with new metadata (resources, descriptions, etc.) from source
+        // while preserving user status and alignment changes.
+        const userItemsMap = new Map(userItems.map(i => [i.id, i]));
+        let hasChanges = false;
+
+        const finalRoadmap = ROADMAP_DATA.map(defaultItem => {
+          const userItem = userItemsMap.get(defaultItem.id);
+          if (userItem) {
+            // Check if user item needs metadata updates (e.g. newly added resources or descriptions)
+            // We update if the default item has a resource that the user item lacks
+            const needsUpdate = (defaultItem.resource_link && !userItem.resource_link) || 
+                               (defaultItem.resource_name && !userItem.resource_name);
+            
+            if (needsUpdate) {
+              hasChanges = true;
+              return {
+                ...userItem,
+                resource_name: defaultItem.resource_name,
+                resource_link: defaultItem.resource_link,
+                description: defaultItem.description || userItem.description
+              };
+            }
+            return userItem;
+          } else {
+            hasChanges = true;
+            return { ...defaultItem };
+          }
+        });
+
+        if (hasChanges) {
           await updateDoc(userRef, { 
             roadmap: finalRoadmap,
             lastActive: new Date().toISOString()

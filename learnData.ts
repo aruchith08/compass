@@ -1,4 +1,3 @@
-
 import { RoadmapItem } from './types';
 
 export const LEARN_DATA_RESOURCES: RoadmapItem[] = [
@@ -36,5 +35,10 @@ export const LEARN_DATA_RESOURCES: RoadmapItem[] = [
     id: "RES_DL_01", year: 0, name: "Deep Learning Book by Ian Goodfellow", category: "Deep Learning", priority: "High", status: "To Do", role_alignment: ["AI/ML Engineer"],
     description: "The definitive textbook on deep learning.",
     resource_name: "Deep Learning Book", resource_link: "https://www.deeplearningbook.org/", is_project: false, is_output: false
+  },
+  {
+    id: "RES_STAR_01", year: 0, name: "The STAR Method", category: "Interview Prep", priority: "High", status: "To Do", role_alignment: ["All Roles"],
+    description: "Learn how to answer behavioral questions using the Situation, Task, Action, Result framework.",
+    resource_name: "The STAR Method Guide", resource_link: "https://www.careereducation.columbia.edu/resources/star-method-behavioral-interviewing", is_project: false, is_output: false
   }
 ];

@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useRoadmap } from '../RoadmapContext';
-import { Github, FolderGit2, CheckSquare, Code2, Users, Play, Sparkles, BrainCircuit } from 'lucide-react';
+import { Github, FolderGit2, CheckSquare, Code2, Users, Play, Sparkles, BrainCircuit, ExternalLink } from 'lucide-react';
 import TaskCard from './TaskCard';
 import { RoadmapItem } from '../types';
 import TaskDetailModal from './TaskDetailModal';
@@ -48,9 +47,16 @@ const Outputs: React.FC = () => {
                 </div>
                 
                 <div className="mb-4 pr-14">
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider mb-1.5 block">
-                    Year {project.year}
-                  </span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider">
+                      Year {project.year}
+                    </span>
+                    {project.resource_name && (
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                        Resource Available
+                      </span>
+                    )}
+                  </div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
                     {project.name}
                   </h3>
@@ -61,12 +67,25 @@ const Outputs: React.FC = () => {
                 </p>
                 
                 <div className="flex flex-wrap items-center justify-between pt-4 border-t border-slate-100/50 dark:border-white/10 mt-auto gap-3">
-                  <div className="flex gap-2 flex-wrap">
-                     {project.role_alignment.slice(0, 2).map((r, i) => (
-                       <span key={i} className="text-[10px] bg-slate-100/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 px-2 py-1 rounded border border-slate-200/50 dark:border-white/10 font-medium whitespace-nowrap">
-                         {r === "All Roles" ? "Core" : r.split(" ")[0]}
-                       </span>
-                     ))}
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-2 flex-wrap">
+                      {project.role_alignment.slice(0, 2).map((r, i) => (
+                        <span key={i} className="text-[10px] bg-slate-100/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 px-2 py-1 rounded border border-slate-200/50 dark:border-white/10 font-medium whitespace-nowrap">
+                          {r === "All Roles" ? "Core" : r.split(" ")[0]}
+                        </span>
+                      ))}
+                    </div>
+                    {project.resource_link && (
+                      <a 
+                        href={project.resource_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline"
+                      >
+                        Source <ExternalLink size={10} />
+                      </a>
+                    )}
                   </div>
                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide whitespace-nowrap ${
                      project.status === 'Completed' ? 'bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 

@@ -1,4 +1,3 @@
-
 import { RoadmapItem } from './types';
 
 export const ROADMAP_DATA_ITEMS: RoadmapItem[] = [
@@ -165,9 +164,34 @@ export const ROADMAP_DATA_ITEMS: RoadmapItem[] = [
     resource_name: "System Design Primer", resource_link: "https://github.com/donnemartin/system-design-primer", is_project: false, is_output: false, time_estimate: "6 weeks"
   },
   {
-    id: "Y4_IP03", year: 4, name: "Behavioral: STAR Method", category: "Interview Prep", priority: "High", status: "To Do", role_alignment: ["All Roles"],
-    description: "Master HR interview stories using Situation, Task, Action, Result.",
-    is_project: false, is_output: false, time_estimate: "2 weeks"
+    id: "Y4_IP03",
+    year: 4,
+    name: "Behavioral: STAR Method",
+    description: "Prepare 5 stories for 'Tell me about a time you failed/led/conflicted'. Situation, Task, Action, Result.",
+    category: "Interview Prep",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "The STAR Method Guide",
+    resource_link: "https://www.careereducation.columbia.edu/resources/star-method-behavioral-interviewing",
+    is_project: false,
+    is_output: false,
+    time_estimate: "2 weeks"
+  },
+  {
+    id: "Y4_IP04",
+    year: 4,
+    name: "Mock Interviews (P2P)",
+    description: "Do at least 3 mock interviews. Use Pramp or ask a friend.",
+    category: "Interview Prep",
+    priority: "High",
+    status: "To Do",
+    role_alignment: ["All Roles"],
+    resource_name: "Pramp",
+    resource_link: "https://www.pramp.com/",
+    is_project: false,
+    is_output: false,
+    time_estimate: "3 weeks"
   },
   {
     id: "Y4_FS01", year: 4, name: "Advanced Web (Next.js)", category: "Web Development", priority: "Medium", status: "To Do", role_alignment: ["Full Stack Developer"],
@@ -179,11 +203,15 @@ export const ROADMAP_DATA_ITEMS: RoadmapItem[] = [
   {
     id: "G_SS01", year: 0, name: "Discipline Training", category: "Soft Skills", priority: "High", status: "In Progress", role_alignment: ["All Roles"],
     description: "Minimum 1-2 hours of focused study every single day. Consistency over intensity.",
+    resource_name: "James Clear: Atomic Habits", 
+    resource_link: "https://jamesclear.com/atomic-habits", 
     is_project: false, is_output: false
   },
   {
     id: "G_SS02", year: 0, name: "Communication Skills", category: "Soft Skills", priority: "High", status: "In Progress", role_alignment: ["All Roles"],
     description: "Explain projects clearly. Practice speaking in technical and HR interviews.",
+    resource_name: "Wharton: Communication Skills", 
+    resource_link: "https://online.wharton.upenn.edu/blog/effective-communication-skills/", 
     is_project: false, is_output: false
   }
 ];

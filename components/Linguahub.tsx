@@ -607,7 +607,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
               className="group relative bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 transition-all duration-300 text-left flex flex-col h-full shadow-sm hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:-translate-y-1 overflow-hidden"
             >
                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 transition-colors duration-300">
-                 {/* FIX: Ensure skill.icon is a valid element and cast to any to allow className injection in cloneElement */}
                  {React.isValidElement(skill.icon) && React.cloneElement(skill.icon as React.ReactElement<any>, {
                    className: `w-6 h-6 text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300`
                  })}
@@ -622,30 +621,16 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-  {/* Sample Papers */}
-      <section className="bg-slate-900/60 dark:bg-slate-800/60 backdrop-blur-md rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden transition-colors duration-300 border border-white/10">
-        <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+      {/* Mock Tests Box (Compact Layout) */}
+      <section className="bg-slate-800 dark:bg-slate-900/80 p-6 md:p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/5">
+        <div className="absolute top-0 right-0 p-16 bg-white/5 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none"></div>
         <div className="relative z-10">
-          <h2 className="text-xl md:text-2xl font-bold mb-2">
-            Mock Tests & Sample Papers
-          </h2>
-          <p className="text-slate-300 dark:text-slate-400 mb-6 max-w-xl text-sm md:text-base">
-            Simulate exam conditions with free full-length tests from top
-            providers.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 tracking-tight">Mock Tests & Sample Papers</h2>
+          <p className="text-slate-400 text-sm mb-6 max-w-xl leading-relaxed">Simulate exam conditions with free full-length tests from top providers.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             {SAMPLE_PAPERS.map((paper, idx) => (
-              <a
-                key={idx}
-                href={paper.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white hover:text-slate-900 hover:border-white px-4 py-3 md:px-5 md:py-4 rounded-xl transition-all font-medium flex items-center justify-between group text-sm md:text-base"
-              >
-                {paper.name}
-                <ExternalLink
-                  className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity"
-                />
+              <a key={idx} href={paper.url} target="_blank" className="bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white hover:text-slate-900 px-4 py-3 md:px-5 md:py-4 rounded-2xl transition-all font-bold text-xs flex justify-between items-center group shadow-sm">
+                {paper.name} <ExternalLink size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
               </a>
             ))}
           </div>

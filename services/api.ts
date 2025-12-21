@@ -1,5 +1,5 @@
 
-import { RoadmapItem, DailyTask, HomeworkTask } from '../types';
+import { RoadmapItem, DailyTask, HomeworkTask, LinguaSession } from '../types';
 import { ROADMAP_DATA } from '../data';
 import { db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ interface UserProfile {
   roadmap: RoadmapItem[];
   dailyTasks: DailyTask[];
   homeworkTasks: HomeworkTask[];
+  linguaSession?: LinguaSession;
   lastActive: string;
   lastResetDate: string;
 }
@@ -19,7 +20,8 @@ export const api = {
   async login(username: string): Promise<{ 
     roadmap: RoadmapItem[], 
     dailyTasks: DailyTask[], 
-    homeworkTasks: HomeworkTask[] 
+    homeworkTasks: HomeworkTask[],
+    linguaSession: LinguaSession | null
   }> {
     const userId = normalizeUsername(username);
     const userRef = doc(db, "users", userId);
@@ -47,13 +49,14 @@ export const api = {
         return {
           roadmap: finalRoadmap,
           dailyTasks: data.dailyTasks || [],
-          homeworkTasks: data.homeworkTasks || []
+          homeworkTasks: data.homeworkTasks || [],
+          linguaSession: data.linguaSession || null
         };
       } else {
         // New cloud user: Initialize with defaults
         const initialProfile: UserProfile = {
           roadmap: JSON.parse(JSON.stringify(ROADMAP_DATA)),
-          dailyTasks: [], // Will be populated by fixed tasks in App.tsx
+          dailyTasks: [], 
           homeworkTasks: [],
           lastActive: new Date().toISOString(),
           lastResetDate: new Date().toDateString()
@@ -63,7 +66,8 @@ export const api = {
         return {
           roadmap: initialProfile.roadmap,
           dailyTasks: [],
-          homeworkTasks: []
+          homeworkTasks: [],
+          linguaSession: null
         };
       }
     } catch (error: any) {
@@ -87,8 +91,6 @@ export const api = {
       });
     } catch (err: any) {
       console.error("Cloud save failed:", err);
-      // We don't throw here to avoid interrupting the user experience during autosave, 
-      // but we log the permission issue.
     }
   }
 };

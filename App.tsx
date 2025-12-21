@@ -19,7 +19,7 @@ import Outputs from './components/Outputs';
 import Login from './components/Login';
 import Linguahub from './components/Linguahub';
 import SplashScreen from './components/SplashScreen';
-import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType } from './types';
+import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
 
@@ -41,6 +41,7 @@ const App: React.FC = () => {
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
+  const [linguaSession, setLinguaSession] = useState<LinguaSession | null>(null);
   
   const isInitialLoad = useRef(true);
   
@@ -62,10 +63,8 @@ const App: React.FC = () => {
           await handleLogin(savedUser);
         } catch (err) {
           console.error("Auto-login failed:", err);
-          // If auto-login fails, we stay on the login screen
         }
       }
-      // Short delay to ensure state transitions are smooth with the Splash Screen
       setTimeout(() => setIsAuthChecking(false), 500);
     };
 
@@ -89,12 +88,10 @@ const App: React.FC = () => {
         isFixed: true
       }));
 
-      // Merge Cloud Daily Tasks with Fixed Tasks
       let finalDaily = profile.dailyTasks;
       if (finalDaily.length === 0) {
         finalDaily = fixedTasks;
       } else {
-        // Ensure fixed tasks are present
         const existingTexts = new Set(finalDaily.map(t => t.text));
         FIXED_DAILY_TASKS.forEach((text, idx) => {
           if (!existingTexts.has(text)) {
@@ -106,12 +103,13 @@ const App: React.FC = () => {
       setItems(profile.roadmap);
       setDailyTasks(finalDaily);
       setHomeworkTasks(profile.homeworkTasks);
+      setLinguaSession(profile.linguaSession || null);
       setUser({ username });
       localStorage.setItem('roadmap_user_session', username);
       isInitialLoad.current = false;
     } catch (error) {
       console.error("Login failed", error);
-      throw error; // Propagate to Login component for error handling
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +120,7 @@ const App: React.FC = () => {
     setItems([]);
     setDailyTasks([]);
     setHomeworkTasks([]);
+    setLinguaSession(null);
     localStorage.removeItem('roadmap_user_session');
     setActiveTab('dashboard');
   };
@@ -133,12 +132,13 @@ const App: React.FC = () => {
         api.saveProfile(user.username, {
           roadmap: items,
           dailyTasks: dailyTasks,
-          homeworkTasks: homeworkTasks
+          homeworkTasks: homeworkTasks,
+          linguaSession: linguaSession || undefined
         });
       }, 2000);
       return () => clearTimeout(timeout);
     }
-  }, [items, dailyTasks, homeworkTasks, user]);
+  }, [items, dailyTasks, homeworkTasks, linguaSession, user]);
 
   const toggleTheme = () => {
     setTheme(prev => {
@@ -191,12 +191,17 @@ const App: React.FC = () => {
     setHomeworkTasks(prev => prev.filter(t => t.id !== id));
   };
 
+  const updateLinguaSession = (session: LinguaSession) => {
+    setLinguaSession(session);
+  };
+
   const contextValue: RoadmapContextType = useMemo(() => ({
     items, user, theme, login: handleLogin, logout: handleLogout,
     toggleTheme, toggleStatus, getCompletionPercentage,
     dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask,
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
-  }), [items, user, theme, dailyTasks, homeworkTasks]);
+    linguaSession, updateLinguaSession
+  }), [items, user, theme, dailyTasks, homeworkTasks, linguaSession]);
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
@@ -221,14 +226,12 @@ const App: React.FC = () => {
     <>
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       
-      {/* If we are still checking the session and splash is over, show a subtle sync screen */}
       {isAuthChecking && !showSplash ? (
         <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center z-[50]">
           <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
           <p className="text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Synchronizing Cloud Session...</p>
         </div>
       ) : !user ? (
-        /* Only show Login if the auth check finished and no user was found */
         !isAuthChecking && <Login onLogin={handleLogin} isLoading={isLoading} />
       ) : (
         <RoadmapContext.Provider value={contextValue}>

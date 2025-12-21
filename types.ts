@@ -40,6 +40,39 @@ export interface HomeworkTask {
   completed: boolean;
 }
 
+export type ChallengeCategory =
+  | "Grammar"
+  | "Vocabulary"
+  | "Idiom"
+  | "Listening"
+  | "Reading"
+  | "Writing"
+  | "Speaking";
+
+export enum SkillType {
+  LISTENING = "Listening",
+  READING = "Reading",
+  WRITING = "Writing",
+  SPEAKING = "Speaking",
+}
+
+export interface DailyChallenge {
+  id: string;
+  category: ChallengeCategory;
+  type: string;
+  content: string;
+  hiddenContent?: string;
+  requiresInput?: boolean;
+  options?: string[];
+}
+
+export interface LinguaSession {
+  date: string;
+  tasks: DailyChallenge[];
+  currentIndex: number;
+  isComplete: boolean;
+}
+
 export interface RoadmapContextType {
   items: RoadmapItem[];
   user: User | null;
@@ -59,6 +92,10 @@ export interface RoadmapContextType {
   toggleHomeworkTask: (id: string) => void;
   addHomeworkTask: (text: string) => void;
   deleteHomeworkTask: (id: string) => void;
+
+  // Lingua (AI Daily Sync)
+  linguaSession: LinguaSession | null;
+  updateLinguaSession: (session: LinguaSession) => void;
 }
 
 // Syllabus Types

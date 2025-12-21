@@ -24,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
       delay: `${Math.random() * 15}s`,
       duration: `${8 + Math.random() * 12}s`,
       size: `${1 + Math.random() * 3}px`,
-      opacity: 0.1 + Math.random() * 0.5,
+      opacity: 0.2 + Math.random() * 0.5,
       driftDelay: `${Math.random() * 5}s`
     }));
   }, []);
@@ -53,12 +53,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-500/10 dark:bg-indigo-600/5 rounded-full blur-[120px] animate-blob" style={{ animationDelay: '3s' }}></div>
         <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-teal-400/10 dark:bg-teal-500/5 rounded-full blur-[100px] animate-blob" style={{ animationDelay: '6s' }}></div>
         
-        {/* Digital Snow Layer */}
+        {/* Digital Snow Layer - Adjusted for Visibility in Light Mode */}
         <div className="absolute inset-0 z-0">
            {snowParticles.map((particle) => (
              <div 
                key={particle.id}
-               className="absolute rounded-full bg-white dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)] animate-snowfall"
+               className="absolute rounded-full bg-emerald-500/40 dark:bg-emerald-400 shadow-[0_0_4px_rgba(16,185,129,0.2)] dark:shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-snowfall"
                style={{
                  left: particle.left,
                  width: particle.size,
@@ -80,7 +80,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
            {[...Array(15)].map((_, i) => (
              <div 
                key={i}
-               className="absolute w-1 h-1 bg-emerald-400 rounded-full animate-pulse"
+               className="absolute w-1 h-1 bg-emerald-500/40 dark:bg-emerald-400 rounded-full animate-pulse"
                style={{
                  top: `${Math.random() * 100}%`,
                  left: `${Math.random() * 100}%`,

@@ -7,25 +7,21 @@ import {
   Star,
   ArrowRight,
   Layers,
-  CheckCircle2,
   Loader2,
-  PlayCircle,
-  Volume2,
   X,
   ExternalLink,
   MessageSquare,
   Send,
-  AlertCircle,
   CalendarCheck,
   Languages,
   Sparkles,
   SpellCheck,
   Zap,
-  RefreshCw,
-  Hash
+  Hash,
+  Type as TypeIcon
 } from "lucide-react";
 import { Type } from "@google/genai";
-import { User, SkillType, DailyChallenge, LinguaSession, ChallengeCategory } from "../types";
+import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
 import { runGenAI } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
 
@@ -152,7 +148,10 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string) => {
   return runGenAI(async (ai) => {
     const contextStr = hiddenContext ? `\nContext: "${hiddenContext}"` : "";
-    const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response. Task: "${challenge}"${contextStr} Candidate Answer: "${userAnswer}". Return Band Score and detailed feedback. Format exactly like this: Score: [X]/9 Feedback: [Your text]`;
+    const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response based on IELTS standards. 
+    Question: "${challenge}"${contextStr} 
+    Candidate Answer: "${userAnswer}". 
+    Return Band Score (1.0-9.0) and detailed feedback. Format: Score: [X]/9 Feedback: [Your text]`;
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -212,8 +211,17 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         required: ["id", "category", "type", "content", "requiresInput"],
       },
     };
-    // Prompt updated to remove 'Listening' and ensure all tasks are text-based.
-    const prompt = "Generate exactly 5 high-quality, text-based IELTS preparation challenges. One each for Reading, Writing, Speaking, Grammar, and Vocabulary. Band 7.0-8.0 difficulty. Strictly avoid any audio-dependent tasks.";
+    // UPDATED PROMPT: Strictly text-based, no Speaking or Listening tasks for the Daily Challenge section.
+    const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges. 
+    Strictly avoid ANY tasks involving audio, listening, speaking, or recording. 
+    Focus on these categories:
+    1. Reading (Text comprehension or inference)
+    2. Writing (Sentence restructuring or data description)
+    3. Grammar (Complex structures or error correction)
+    4. Vocabulary (Synonyms or context usage)
+    5. Idioms & Collocations (Natural English expressions)
+    Target Band: 7.0-8.5. Ensure tasks are intellectually stimulating and text-only.`;
+    
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -349,7 +357,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       }
 
-      // CLOUD SYNC
+      // CLOUD SYNC: Only generate if cloud session is missing or date is old
       if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
         setIsLoadingTasks(false);
       } else {
@@ -494,7 +502,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Daily Challenges (Mobile Optimized & Audio-Free) */}
+      {/* Daily Challenges (Audio-Free & Mobile Optimized) */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -518,17 +526,18 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
-               <h3 className="text-2xl font-bold dark:text-white mb-2">Mission Complete</h3>
-               <p className="text-slate-500 text-sm">Session completed and synced.</p>
+               <h3 className="text-2xl font-bold dark:text-white mb-2">Daily Mission Complete</h3>
+               <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-               {/* Mobile: Horizontal header / Desktop: Vertical sidebar */}
+               {/* Simplified Challenge Header */}
                <div className="flex flex-row md:flex-col items-center gap-4 md:gap-3 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 md:pr-8 md:w-32">
                   <div className="bg-amber-50 dark:bg-amber-900/20 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
                     <Hash className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div className="text-left md:text-center flex-1 md:flex-none">
+                    <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Task</span>
                     <span className="font-bold text-slate-700 dark:text-slate-200 text-sm md:text-sm">{currentTask.category}</span>
                   </div>
                   <span className="md:hidden text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded tracking-widest">{currentTask.type}</span>
@@ -580,11 +589,11 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Skills Resources Grid */}
+      {/* Focused Skills Grid (Full 4-skill grid) */}
       <section>
         <div className="flex items-center gap-2 mb-6">
           <Layers className="text-emerald-700 dark:text-emerald-500" size={18} />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Skills Resources</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Focused Skills</h2>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {SKILL_DATA.map(skill => (
@@ -608,16 +617,22 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Mock Tests Box (Compact Layout) */}
-      <section className="bg-slate-800 dark:bg-slate-900/80 p-6 md:p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/5">
+      {/* Mock Tests Box (Updated to match requested blue-gray style) */}
+      <section className="bg-slate-600 dark:bg-slate-900/80 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden border border-white/10">
         <div className="absolute top-0 right-0 p-16 bg-white/5 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none"></div>
         <div className="relative z-10">
           <h2 className="text-xl md:text-2xl font-bold mb-2 tracking-tight">Mock Tests & Sample Papers</h2>
-          <p className="text-slate-400 text-sm mb-6 max-w-xl leading-relaxed">Simulate exam conditions with free full-length tests from top providers.</p>
+          <p className="text-slate-300 text-sm mb-6 max-w-xl leading-relaxed opacity-90">Simulate exam conditions with free full-length tests from top providers.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             {SAMPLE_PAPERS.map((paper, idx) => (
-              <a key={idx} href={paper.url} target="_blank" className="bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white hover:text-slate-900 px-4 py-3 md:px-5 md:py-4 rounded-2xl transition-all font-bold text-xs flex justify-between items-center group shadow-sm">
-                {paper.name} <ExternalLink size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+              <a 
+                key={idx} 
+                href={paper.url} 
+                target="_blank" 
+                className="bg-slate-800/40 backdrop-blur-md border border-slate-500/30 hover:bg-slate-800/60 transition-all font-bold text-sm flex justify-between items-center px-5 py-4 rounded-2xl group shadow-sm"
+              >
+                {paper.name} 
+                <ExternalLink size={16} className="opacity-40 group-hover:opacity-100 transition-opacity" />
               </a>
             ))}
           </div>

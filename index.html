@@ -60,6 +60,9 @@
               'radar-spin': 'radar-spin 3s linear infinite',
               'confetti-burst': 'confettiBurst 4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards',
               'sparkle': 'sparkle 1.5s ease-in-out infinite',
+              'float': 'float 3s ease-in-out infinite',
+              'snowfall': 'snowfall 10s linear infinite',
+              'drift': 'drift 4s ease-in-out infinite',
             },
             keyframes: {
               fadeIn: {
@@ -87,6 +90,20 @@
                 '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                 '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                 '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-12px)' },
+              },
+              snowfall: {
+                '0%': { transform: 'translateY(-10vh) translateX(0)', opacity: '0' },
+                '10%': { opacity: '0.8' },
+                '90%': { opacity: '0.8' },
+                '100%': { transform: 'translateY(110vh) translateX(20px)', opacity: '0' },
+              },
+              drift: {
+                '0%, 100%': { transform: 'translateX(0)' },
+                '50%': { transform: 'translateX(15px)' },
               },
               'radar-spin': {
                 'from': { transform: 'rotate(0deg)' },

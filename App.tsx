@@ -9,7 +9,8 @@ import {
   LogOut,
   Sun,
   Moon,
-  Languages
+  Languages,
+  Loader2
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -36,11 +37,11 @@ const App: React.FC = () => {
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   
-  const dateRef = useRef(new Date().toDateString());
   const isInitialLoad = useRef(true);
   
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -52,9 +53,23 @@ const App: React.FC = () => {
     return 'light';
   });
 
+  // Initial Session Check
   useEffect(() => {
-    const savedUser = localStorage.getItem('roadmap_user_session');
-    if (savedUser) handleLogin(savedUser);
+    const checkSession = async () => {
+      const savedUser = localStorage.getItem('roadmap_user_session');
+      if (savedUser) {
+        try {
+          await handleLogin(savedUser);
+        } catch (err) {
+          console.error("Auto-login failed:", err);
+          // If auto-login fails, we stay on the login screen
+        }
+      }
+      // Short delay to ensure state transitions are smooth with the Splash Screen
+      setTimeout(() => setIsAuthChecking(false), 500);
+    };
+
+    checkSession();
   }, []);
 
   useEffect(() => {
@@ -67,7 +82,6 @@ const App: React.FC = () => {
     try {
       const profile = await api.login(username);
       
-      const todayStr = new Date().toDateString();
       const fixedTasks: DailyTask[] = FIXED_DAILY_TASKS.map((text, idx) => ({
         id: `fixed_${idx}`,
         text,
@@ -97,6 +111,7 @@ const App: React.FC = () => {
       isInitialLoad.current = false;
     } catch (error) {
       console.error("Login failed", error);
+      throw error; // Propagate to Login component for error handling
     } finally {
       setIsLoading(false);
     }
@@ -205,8 +220,16 @@ const App: React.FC = () => {
   return (
     <>
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
-      {!user ? (
-        <Login onLogin={handleLogin} isLoading={isLoading} />
+      
+      {/* If we are still checking the session and splash is over, show a subtle sync screen */}
+      {isAuthChecking && !showSplash ? (
+        <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center z-[50]">
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
+          <p className="text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Synchronizing Cloud Session...</p>
+        </div>
+      ) : !user ? (
+        /* Only show Login if the auth check finished and no user was found */
+        !isAuthChecking && <Login onLogin={handleLogin} isLoading={isLoading} />
       ) : (
         <RoadmapContext.Provider value={contextValue}>
           <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-emerald-500/30">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   Headphones,
@@ -416,14 +415,14 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-6 animate-fade-in pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
             <Languages className="text-emerald-500" /> Lingua <span className="text-emerald-600 dark:text-emerald-400">Hub</span>
           </h2>
-          <p className="text-slate-500 dark:text-slate-400">Your IELTS AI Training Partner.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Your IELTS AI Training Partner.</p>
         </div>
       </div>
 
@@ -486,30 +485,30 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           <Zap className="text-blue-500" size={18} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Language Power-Ups</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <a href="https://www.merriam-webster.com/games/spell-it" target="_blank" className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <a href="https://www.merriam-webster.com/games/spell-it" target="_blank" className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
             <div className="flex items-center gap-5">
               <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl transition-transform group-hover:scale-105"><SpellCheck className="text-indigo-600 dark:text-indigo-400" size={32} /></div>
-              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Spelling Mastery (Games)</h3><p className="text-xs text-slate-500 mt-0.5">Practice your spelling with challenging word sets.</p></div>
+              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Spelling Mastery (Games)</h3><p className="text-xs text-slate-500 mt-0.5">Practice with word sets.</p></div>
             </div>
             <ArrowRight size={24} className="text-slate-200 group-hover:text-indigo-500 group-hover:translate-x-2 transition-all" />
           </a>
-          <a href="https://www.merriam-webster.com/" target="_blank" className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+          <a href="https://www.merriam-webster.com/" target="_blank" className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
             <div className="flex items-center gap-5">
               <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl transition-transform group-hover:scale-105"><BookOpen className="text-blue-600 dark:text-blue-400" size={32} /></div>
-              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Advanced Dictionary</h3><p className="text-xs text-slate-500 mt-0.5">Look up advanced definitions and usage notes.</p></div>
+              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Advanced Dictionary</h3><p className="text-xs text-slate-500 mt-0.5">Academic definitions.</p></div>
             </div>
             <ArrowRight size={24} className="text-slate-200 group-hover:text-blue-500 group-hover:translate-x-2 transition-all" />
           </a>
         </div>
       </section>
 
-      {/* Daily Challenges (Cloud Synced) */}
+      {/* Daily Challenges (Compact Style) */}
       <section>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Star className="text-amber-500 fill-amber-500" size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily IELTS Challenges</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-4 py-1.5 rounded-full tracking-widest uppercase">
@@ -517,73 +516,73 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             </span>
           )}
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-8 md:p-12 rounded-[2.5rem] shadow-xl relative min-h-[400px] flex flex-col justify-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-5 md:p-8 rounded-3xl shadow-xl relative min-h-[300px] flex flex-col justify-center">
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
-              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Generating Session...</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating Session...</p>
             </div>
           ) : linguaSession?.isComplete ? (
-            <div className="text-center py-12 animate-fade-in">
-               <div className="bg-emerald-50 dark:bg-emerald-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                 <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={48} />
+            <div className="text-center py-8 animate-fade-in">
+               <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                 <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
-               <h3 className="text-3xl font-bold dark:text-white mb-2">Daily Mission Complete</h3>
-               <p className="text-slate-500 text-base">You've cleared today's challenges. See you tomorrow!</p>
+               <h3 className="text-2xl font-bold dark:text-white mb-2">Daily Mission Complete</h3>
+               <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
             </div>
           ) : currentTask && (
-            <div className="flex flex-col md:flex-row gap-12">
-               <div className="md:w-32 flex flex-col items-center gap-4 shrink-0">
-                  <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-full shadow-inner"><Star className="text-amber-500" size={40} /></div>
+            <div className="flex flex-col md:flex-row gap-8">
+               <div className="md:w-32 flex flex-col items-center gap-3 shrink-0">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-full shadow-inner"><Star className="text-amber-500" size={32} /></div>
                   <div className="text-center">
-                    <span className="block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Type</span>
-                    <span className="font-bold text-slate-700 dark:text-slate-200 text-lg">{currentTask.category}</span>
+                    <span className="block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Type</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">{currentTask.category}</span>
                   </div>
-                  {currentTask.category === "Listening" && <Volume2 className="text-slate-300 animate-pulse" size={24} />}
+                  {currentTask.category === "Listening" && <Volume2 className="text-slate-300" size={20} />}
                </div>
-               <div className="flex-1 space-y-8">
+               <div className="flex-1 space-y-5">
                   <div>
-                    <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg mb-4 inline-block tracking-widest">{currentTask.type}</span>
-                    <h3 className="text-2xl md:text-3xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
+                    <span className="text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mb-3 inline-block tracking-widest">{currentTask.type}</span>
+                    <h3 className="text-xl md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
                   </div>
                   {currentTask.category === "Listening" && (
                     <button 
                       onClick={() => playTextToSpeech(currentTask.hiddenContent || "")} 
-                      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-md active:scale-95 ${isPlayingAudio ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-sm active:scale-95 ${isPlayingAudio ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
                     >
-                      <PlayCircle size={20} /> {isPlayingAudio ? "Playing Transcript..." : "Play Audio Clip"}
+                      <PlayCircle size={16} /> {isPlayingAudio ? "Playing..." : "Play Audio Clip"}
                     </button>
                   )}
                   
-                  <div className="pt-8 border-t border-slate-100 dark:border-white/5">
+                  <div className="pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (
-                      <form onSubmit={handleCheckAnswer} className="space-y-5">
-                        <div className="flex flex-col gap-3">
+                      <form onSubmit={handleCheckAnswer} className="space-y-4">
+                        <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Answer</label>
                           <textarea 
                             value={userAnswer} 
                             onChange={e => setUserAnswer(e.target.value)} 
-                            placeholder="Type your response here..." 
-                            className="w-full h-40 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/10 rounded-3xl p-6 text-lg focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-inner resize-none" 
+                            placeholder="Type response..." 
+                            className="w-full h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/10 rounded-2xl p-4 text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none" 
                           />
                         </div>
                         <div className="flex justify-end">
-                          <button type="submit" disabled={isChecking || !userAnswer.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20 active:scale-95">
-                            {isChecking ? <Loader2 className="animate-spin" size={20} /> : "Check Answer"}
+                          <button type="submit" disabled={isChecking || !userAnswer.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
+                            {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Check Answer"}
                           </button>
                         </div>
                       </form>
                     ) : (
-                      <div className="animate-in slide-in-from-bottom-4 duration-500 space-y-6">
-                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/50 p-6 md:p-8 rounded-[2rem] shadow-sm">
-                          <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-4 mb-6">
-                            <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">Examiner Evaluation</span>
-                            <span className="bg-emerald-500 text-white px-5 py-1.5 rounded-full text-sm font-black shadow-lg shadow-emerald-500/30">BAND {lastScore}/9</span>
+                      <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-4">
+                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/50 p-5 rounded-2xl shadow-sm">
+                          <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-4">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">Evaluation</span>
+                            <span className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-black shadow-md">BAND {lastScore}/9</span>
                           </div>
-                          <p className="text-slate-700 dark:text-slate-300 text-lg whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
+                          <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>
-                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all hover:opacity-90 active:scale-[0.98] shadow-xl">
-                          Next Question <ArrowRight size={20} />
+                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                          Next Question <ArrowRight size={16} />
                         </button>
                       </div>
                     )}
@@ -594,27 +593,28 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Skills Resources Grid (Updated Visual Style & Mobile Optimization) */}
+      {/* Skills Resources Grid */}
       <section>
         <div className="flex items-center gap-2 mb-6">
           <Layers className="text-emerald-700 dark:text-emerald-500" size={18} />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">IELTS Skills Resources</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Skills Resources</h2>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {SKILL_DATA.map(skill => (
             <button 
               key={skill.id} 
               onClick={() => setSelectedSkill(skill)} 
-              className="group relative bg-white dark:bg-slate-900 p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all duration-300 text-left flex flex-col h-full shadow-sm hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:-translate-y-2 overflow-hidden"
+              className="group relative bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 transition-all duration-300 text-left flex flex-col h-full shadow-sm hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:-translate-y-1 overflow-hidden"
             >
-               <div className="w-10 h-10 md:w-14 md:h-14 bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 rounded-lg md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 transition-colors duration-300">
-                 {React.cloneElement(skill.icon as React.ReactElement, {
-                   className: `w-6 h-6 md:w-8 md:h-8 text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300`
+               <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 transition-colors duration-300">
+                 {/* FIX: Ensure skill.icon is a valid element and cast to any to allow className injection in cloneElement */}
+                 {React.isValidElement(skill.icon) && React.cloneElement(skill.icon as React.ReactElement<any>, {
+                   className: `w-6 h-6 text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300`
                  })}
                </div>
-               <h3 className="font-bold text-base md:text-xl mb-1 md:mb-3 text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">{skill.title}</h3>
-               <p className="text-[10px] md:text-sm text-slate-500 dark:text-slate-400 mb-4 md:mb-8 flex-1 leading-relaxed line-clamp-2 md:line-clamp-none">{skill.description}</p>
-               <div className="flex items-center text-emerald-600 dark:text-emerald-400 text-[10px] md:text-sm font-bold">
+               <h3 className="font-bold text-sm md:text-base mb-1 text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">{skill.title}</h3>
+               <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mb-6 flex-1 leading-relaxed line-clamp-2 md:line-clamp-none">{skill.description}</p>
+               <div className="flex items-center text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
                  View Resources <ArrowRight size={14} className="ml-1 md:ml-1.5 transition-transform group-hover:translate-x-1.5" />
                </div>
             </button>
@@ -622,16 +622,30 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Mock Tests Box */}
-      <section className="bg-slate-800 dark:bg-slate-900/80 p-10 md:p-12 rounded-[3rem] text-white shadow-2xl relative overflow-hidden border border-white/5">
-        <div className="absolute top-0 right-0 p-24 bg-white/5 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
+  {/* Sample Papers */}
+      <section className="bg-slate-900/60 dark:bg-slate-800/60 backdrop-blur-md rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden transition-colors duration-300 border border-white/10">
+        <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-4 tracking-tight">Mock Tests & Sample Papers</h2>
-          <p className="text-slate-400 text-lg mb-10 max-w-2xl leading-relaxed">Simulate exam conditions with full-length timed tests from the world's leading IELTS preparation providers.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <h2 className="text-xl md:text-2xl font-bold mb-2">
+            Mock Tests & Sample Papers
+          </h2>
+          <p className="text-slate-300 dark:text-slate-400 mb-6 max-w-xl text-sm md:text-base">
+            Simulate exam conditions with free full-length tests from top
+            providers.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             {SAMPLE_PAPERS.map((paper, idx) => (
-              <a key={idx} href={paper.url} target="_blank" className="bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white hover:text-slate-900 px-6 py-5 rounded-2xl transition-all font-bold text-base flex justify-between items-center group shadow-sm">
-                {paper.name} <ExternalLink size={16} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+              <a
+                key={idx}
+                href={paper.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white hover:text-slate-900 hover:border-white px-4 py-3 md:px-5 md:py-4 rounded-xl transition-all font-medium flex items-center justify-between group text-sm md:text-base"
+              >
+                {paper.name}
+                <ExternalLink
+                  className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity"
+                />
               </a>
             ))}
           </div>

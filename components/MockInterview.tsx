@@ -58,12 +58,8 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
           contents: [{ role: "user", parts: [{ text: aiPrompt }] }],
         });
 
-        const text =
-          response.candidates
-            ?.flatMap((c: any) => c.content?.parts ?? [])
-            .map((p: any) => p.text ?? "")
-            .join("")
-            .trim() || "";
+        /* FIX: Directly use .text property to get generated content as per guidelines */
+        const text = response.text?.trim() || "";
 
         setQuestion(
           text || "Tell me about a project that didn't go as planned."
@@ -119,11 +115,8 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
           contents: [{ role: "user", parts: [{ text: aiPrompt }] }],
         });
 
-        const text =
-          response.candidates
-            ?.flatMap((c: any) => c.content?.parts ?? [])
-            .map((p: any) => p.text ?? "")
-            .join("") || "";
+        /* FIX: Directly use .text property to get generated content as per guidelines */
+        const text = response.text || "";
 
         const scoreMatch = text.match(/Score:\s*(\d+)/i);
         setScore(scoreMatch ? parseInt(scoreMatch[1], 10) : 5);

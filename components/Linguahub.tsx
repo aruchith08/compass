@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Headphones,
@@ -25,35 +26,6 @@ import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
 import { runGenAI } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
 
-// --- TYPES ---
-
-export interface ResourceLink {
-  name: string;
-  url: string;
-}
-
-export interface SkillCategory {
-  id: SkillType;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  resources: ResourceLink[];
-}
-
-export interface ChatMessage {
-  role: "user" | "model";
-  text: string;
-  isError?: boolean;
-}
-
-export interface VocabularyWord {
-  word: string;
-  phonetic: string;
-  partOfSpeech: string;
-  definition: string;
-  example: string;
-}
-
 // --- Robust JSON Parsing Helper ---
 const parseAIJSON = (text: string) => {
   try {
@@ -73,6 +45,10 @@ const parseAIJSON = (text: string) => {
 };
 
 // --- CONSTANTS ---
+export interface ResourceLink { name: string; url: string; }
+export interface SkillCategory { id: SkillType; title: string; description: string; icon: React.ReactNode; resources: ResourceLink[]; }
+export interface ChatMessage { role: "user" | "model"; text: string; isError?: boolean; }
+export interface VocabularyWord { word: string; phonetic: string; partOfSpeech: string; definition: string; example: string; }
 
 export const SKILL_DATA: SkillCategory[] = [
   {
@@ -211,16 +187,10 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         required: ["id", "category", "type", "content", "requiresInput"],
       },
     };
-    // UPDATED PROMPT: Strictly text-based, no Speaking or Listening tasks for the Daily Challenge section.
     const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges. 
     Strictly avoid ANY tasks involving audio, listening, speaking, or recording. 
-    Focus on these categories:
-    1. Reading (Text comprehension or inference)
-    2. Writing (Sentence restructuring or data description)
-    3. Grammar (Complex structures or error correction)
-    4. Vocabulary (Synonyms or context usage)
-    5. Idioms & Collocations (Natural English expressions)
-    Target Band: 7.0-8.5. Ensure tasks are intellectually stimulating and text-only.`;
+    Focus on these categories: 1. Reading 2. Writing 3. Grammar 4. Vocabulary 5. Idioms.
+    Target Band: 7.0-8.5. Ensure tasks are text-only.`;
     
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -237,7 +207,7 @@ const SkillModal = ({ isOpen, onClose, skill }: { isOpen: boolean; onClose: () =
   if (!isOpen || !skill) return null;
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-white/10" onClick={e => e.stopPropagation()}>
         <div className="bg-emerald-600 dark:bg-slate-950 p-6 flex justify-between items-center text-white">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-2 rounded-lg">{skill.icon}</div>
@@ -246,7 +216,7 @@ const SkillModal = ({ isOpen, onClose, skill }: { isOpen: boolean; onClose: () =
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full transition-colors"><X size={24} /></button>
         </div>
         <div className="p-6 space-y-4">
-          <p className="text-slate-600 dark:text-slate-300 text-sm">Select a trusted source to practice {skill.title.toLowerCase()}:</p>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">Select a trusted source to practice {skill.title.toLowerCase()}:</p>
           <div className="grid gap-3">
             {skill.resources.map((res, index) => (
               <a key={index} href={res.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent hover:bg-emerald-50 dark:hover:bg-slate-800 hover:border-emerald-500 transition-all group">
@@ -295,7 +265,7 @@ const ChatWidget = () => {
             <h3 className="font-semibold">IELTS AI Tutor</h3>
             <button onClick={() => setIsOpen(false)}><X size={20} /></button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/30">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/40 backdrop-blur-md">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${m.role === "user" ? "bg-emerald-600 text-white" : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-100 border border-slate-100 dark:border-slate-700"}`}>
@@ -357,7 +327,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       }
 
-      // CLOUD SYNC: Only generate if cloud session is missing or date is old
+      // CLOUD SYNC
       if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
         setIsLoadingTasks(false);
       } else {
@@ -383,7 +353,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       setFeedback(result.text);
       setLastScore(result.score);
     } catch (error) {
-      setFeedback("Sorry, I couldn't evaluate that right now.");
+      setFeedback("Evaluation failed.");
     } finally {
       setIsChecking(false);
     }
@@ -397,7 +367,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       const result = await checkVocabularyUsage(vocabWord.word, vocabInput);
       setVocabFeedback(result);
     } catch (error) {
-      setVocabFeedback("Sorry, I couldn't evaluate your vocabulary usage.");
+      setVocabFeedback("Feedback unavailable.");
     } finally {
       setIsVocabChecking(false);
     }
@@ -431,16 +401,16 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           <Sparkles className="text-purple-500" size={18} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Word of the Day</h2>
         </div>
-        <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-md border border-slate-100 dark:border-white/10 p-6 md:p-8 rounded-3xl shadow-xl relative overflow-hidden">
+        <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-6 md:p-8 rounded-3xl shadow-xl overflow-hidden">
           {isVocabLoading ? (
             <div className="py-12 flex flex-col items-center gap-2 text-slate-400"><Loader2 className="animate-spin text-purple-500" /> <p className="text-xs">Finding advanced vocabulary...</p></div>
           ) : vocabWord && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <h3 className="text-5xl font-serif font-bold text-slate-900 dark:text-white">{vocabWord.word}</h3>
+                  <h3 className="text-5xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">{vocabWord.word}</h3>
                   <span className="text-slate-400 font-mono text-sm tracking-widest">// {vocabWord.phonetic} //</span>
-                  <span className="px-3 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase tracking-widest">
+                  <span className="px-3 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase tracking-widest">
                     {vocabWord.partOfSpeech}
                   </span>
                 </div>
@@ -450,7 +420,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                   <p className="italic text-slate-500 dark:text-slate-400 font-serif text-xl leading-relaxed">"{vocabWord.example}"</p>
                 </div>
               </div>
-              <div className="bg-slate-50/80 dark:bg-slate-800/40 rounded-3xl p-6 border border-slate-100 dark:border-white/5 flex flex-col shadow-inner">
+              <div className="bg-slate-50/80 dark:bg-slate-950/40 rounded-3xl p-6 border border-slate-100 dark:border-white/5 flex flex-col shadow-inner">
                 <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
                   <PenTool size={16} className="text-slate-500" /> Try it yourself
                 </h4>
@@ -460,16 +430,16 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       value={vocabInput} 
                       onChange={e => setVocabInput(e.target.value)} 
                       placeholder={`Write a sentence using "${vocabWord.word}"...`}
-                      className="w-full p-4 text-sm border border-slate-200 dark:border-slate-700 rounded-2xl outline-none bg-white dark:bg-slate-950 text-slate-900 dark:text-white resize-none h-32 shadow-sm focus:ring-2 focus:ring-purple-500/20 transition-all" 
+                      className="w-full p-4 text-sm border border-slate-200 dark:border-slate-800 rounded-2xl outline-none bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white resize-none h-32 shadow-sm focus:ring-2 focus:ring-purple-500/20 transition-all" 
                     />
-                    <button type="submit" disabled={isVocabChecking || !vocabInput.trim()} className="mt-auto w-full bg-purple-300 hover:bg-purple-400 text-purple-900 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-md active:scale-95">
+                    <button type="submit" disabled={isVocabChecking || !vocabInput.trim()} className="mt-auto w-full bg-purple-400 hover:bg-purple-500 text-white py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-md active:scale-95">
                       {isVocabChecking ? <Loader2 size={16} className="animate-spin mx-auto" /> : "Check Usage"}
                     </button>
                   </form>
                 ) : (
                   <div className="flex-1 flex flex-col">
                     <div className="text-sm text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 mb-4 shadow-sm flex-1 leading-relaxed">{vocabFeedback}</div>
-                    <button onClick={() => { setVocabFeedback(null); setVocabInput(""); }} className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">Try Another</button>
+                    <button onClick={() => { setVocabFeedback(null); setVocabInput(""); }} className="w-full bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">Try Another</button>
                   </div>
                 )}
               </div>
@@ -485,24 +455,24 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Language Power-Ups</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <a href="https://www.merriam-webster.com/games/spell-it" target="_blank" className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+          <a href="https://www.merriam-webster.com/games/spell-it" target="_blank" className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
             <div className="flex items-center gap-5">
               <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl transition-transform group-hover:scale-105"><SpellCheck className="text-indigo-600 dark:text-indigo-400" size={32} /></div>
-              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Spelling Mastery (Games)</h3><p className="text-xs text-slate-500 mt-0.5">Practice with word sets.</p></div>
+              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Spelling Mastery</h3><p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Practice with word sets.</p></div>
             </div>
             <ArrowRight size={24} className="text-slate-200 group-hover:text-indigo-500 group-hover:translate-x-2 transition-all" />
           </a>
-          <a href="https://www.merriam-webster.com/" target="_blank" className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-[2rem] border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+          <a href="https://www.merriam-webster.com/" target="_blank" className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center justify-between group shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
             <div className="flex items-center gap-5">
               <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl transition-transform group-hover:scale-105"><BookOpen className="text-blue-600 dark:text-blue-400" size={32} /></div>
-              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Advanced Dictionary</h3><p className="text-xs text-slate-500 mt-0.5">Academic definitions.</p></div>
+              <div><h3 className="font-bold text-slate-900 dark:text-white text-lg">Advanced Dictionary</h3><p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Academic definitions.</p></div>
             </div>
             <ArrowRight size={24} className="text-slate-200 group-hover:text-blue-500 group-hover:translate-x-2 transition-all" />
           </a>
         </div>
       </section>
 
-      {/* Daily Challenges (Audio-Free & Mobile Optimized) */}
+      {/* Daily Challenges */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -510,12 +480,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
-            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
+            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
               {linguaSession!.currentIndex + 1}/{linguaSession!.tasks.length}
             </span>
           )}
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[200px] flex flex-col justify-center transition-all overflow-hidden">
+        <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[200px] flex flex-col justify-center transition-all overflow-hidden">
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -523,45 +493,36 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             </div>
           ) : linguaSession?.isComplete ? (
             <div className="text-center py-8 animate-fade-in">
-               <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+               <div className="bg-emerald-50 dark:bg-emerald-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
-               <h3 className="text-2xl font-bold dark:text-white mb-2">Daily Mission Complete</h3>
+               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Daily Mission Complete</h3>
                <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-               {/* Simplified Challenge Header */}
                <div className="flex flex-row md:flex-col items-center gap-4 md:gap-3 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 md:pr-8 md:w-32">
-                  <div className="bg-amber-50 dark:bg-amber-900/20 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
+                  <div className="bg-amber-50 dark:bg-amber-500/10 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
                     <Hash className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div className="text-left md:text-center flex-1 md:flex-none">
                     <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Task</span>
                     <span className="font-bold text-slate-700 dark:text-slate-200 text-sm md:text-sm">{currentTask.category}</span>
                   </div>
-                  <span className="md:hidden text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded tracking-widest">{currentTask.type}</span>
                </div>
 
-               {/* Content Area */}
                <div className="flex-1 space-y-4 md:space-y-5">
-                  <div>
-                    <span className="hidden md:inline-block text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mb-3 tracking-widest">{currentTask.type}</span>
-                    <h3 className="text-lg md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
-                  </div>
+                  <h3 className="text-lg md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed tracking-wide">"{currentTask.content}"</h3>
                   
                   <div className="pt-2 md:pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (
                       <form onSubmit={handleCheckAnswer} className="space-y-3 md:space-y-4">
-                        <div className="flex flex-col gap-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Answer</label>
-                          <textarea 
-                            value={userAnswer} 
-                            onChange={e => setUserAnswer(e.target.value)} 
-                            placeholder="Type response..." 
-                            className="w-full h-24 md:h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/10 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all" 
-                          />
-                        </div>
+                        <textarea 
+                          value={userAnswer} 
+                          onChange={e => setUserAnswer(e.target.value)} 
+                          placeholder="Type response..." 
+                          className="w-full h-24 md:h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all dark:text-white" 
+                        />
                         <div className="flex justify-end">
                           <button type="submit" disabled={isChecking || !userAnswer.trim()} className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
                             {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Check Answer"}
@@ -570,14 +531,14 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       </form>
                     ) : (
                       <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
-                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/50 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
+                        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
                           <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">Evaluation</span>
-                            <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md">BAND {lastScore}/9</span>
+                            <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
                           </div>
                           <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>
-                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                           Next Question <ArrowRight size={16} />
                         </button>
                       </div>
@@ -589,7 +550,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Focused Skills Grid (Full 4-skill grid) */}
+      {/* Focused Skills Grid */}
       <section>
         <div className="flex items-center gap-2 mb-6">
           <Layers className="text-emerald-700 dark:text-emerald-500" size={18} />
@@ -600,7 +561,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <button 
               key={skill.id} 
               onClick={() => setSelectedSkill(skill)} 
-              className="group relative bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 transition-all duration-300 text-left flex flex-col h-full shadow-sm hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:-translate-y-1 overflow-hidden"
+              className="group relative bg-white/80 dark:bg-slate-900/40 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-slate-100 dark:border-white/5 transition-all duration-300 text-left flex flex-col h-full shadow-sm hover:shadow-xl dark:hover:shadow-emerald-500/5 hover:border-emerald-500/50 dark:hover:border-emerald-500/30 hover:-translate-y-1 overflow-hidden"
             >
                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 transition-colors duration-300">
                  {React.isValidElement(skill.icon) && React.cloneElement(skill.icon as React.ReactElement<any>, {
@@ -608,7 +569,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                  })}
                </div>
                <h3 className="font-bold text-sm md:text-base mb-1 text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">{skill.title}</h3>
-               <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mb-6 flex-1 leading-relaxed line-clamp-2 md:line-clamp-none">{skill.description}</p>
+               <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mb-6 flex-1 leading-relaxed line-clamp-2">{skill.description}</p>
                <div className="flex items-center text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
                  View Resources <ArrowRight size={14} className="ml-1 md:ml-1.5 transition-transform group-hover:translate-x-1.5" />
                </div>
@@ -617,8 +578,8 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Mock Tests Box (Updated to match requested blue-gray style) */}
-      <section className="bg-slate-600 dark:bg-slate-900/80 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden border border-white/10">
+      {/* Mock Tests Box */}
+      <section className="bg-slate-600 dark:bg-slate-900/80 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden border border-white/5">
         <div className="absolute top-0 right-0 p-16 bg-white/5 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none"></div>
         <div className="relative z-10">
           <h2 className="text-xl md:text-2xl font-bold mb-2 tracking-tight">Mock Tests & Sample Papers</h2>
@@ -629,7 +590,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                 key={idx} 
                 href={paper.url} 
                 target="_blank" 
-                className="bg-slate-800/40 backdrop-blur-md border border-slate-500/30 hover:bg-slate-800/60 transition-all font-bold text-sm flex justify-between items-center px-5 py-4 rounded-2xl group shadow-sm"
+                className="bg-slate-800/40 backdrop-blur-xl border border-slate-500/30 hover:bg-slate-800/60 transition-all font-bold text-sm flex justify-between items-center px-5 py-4 rounded-2xl group shadow-sm"
               >
                 {paper.name} 
                 <ExternalLink size={16} className="opacity-40 group-hover:opacity-100 transition-opacity" />

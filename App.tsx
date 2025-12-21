@@ -236,13 +236,14 @@ const App: React.FC = () => {
       ) : (
         <RoadmapContext.Provider value={contextValue}>
           <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-emerald-500/30">
-            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/40 dark:opacity-0 pointer-events-none"></div>
+            {/* Dark Mode Ambient Blobs */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/40 dark:from-slate-900 dark:via-slate-950 dark:to-black dark:opacity-100 pointer-events-none transition-colors duration-700"></div>
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-400/30 dark:bg-emerald-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow"></div>
-               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400/30 dark:bg-teal-500/20 rounded-full blur-[120px] opacity-70 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-400/30 dark:bg-emerald-500/10 rounded-full blur-[120px] opacity-70 dark:opacity-40 animate-pulse-slow"></div>
+               <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400/30 dark:bg-teal-500/10 rounded-full blur-[120px] opacity-70 dark:opacity-40 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
             </div>
 
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-white/10 z-[60] flex items-center justify-between px-4">
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-white/20 dark:border-white/5 z-[60] flex items-center justify-between px-4">
                <div className="flex items-center gap-2">
                  <div className="p-1.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-sm">
                     <Compass className="text-white" size={18} />
@@ -250,7 +251,7 @@ const App: React.FC = () => {
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
                </div>
                <div className="flex items-center gap-2">
-                  <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300">
+                  <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-300">
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                   </button>
                   <button onClick={handleLogout} className="p-2 rounded-full text-rose-500 hover:bg-rose-50/50 dark:hover:bg-red-900/20">
@@ -259,8 +260,8 @@ const App: React.FC = () => {
                </div>
             </header>
 
-            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 flex-col shadow-xl">
-              <div className="p-6 border-b border-slate-100 dark:border-white/10 flex items-center space-x-3">
+            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/30 backdrop-blur-3xl border-r border-white/40 dark:border-white/5 flex-col shadow-xl">
+              <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg">
                   <Compass className="text-white" size={24} />
                 </div>
@@ -270,12 +271,12 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 dark:border-white/10">
+              <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
                  <div className="flex flex-col min-w-0">
                     <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Cloud Sync Active</span>
                     <span className="text-sm font-semibold truncate text-slate-800 dark:text-white">{user.username}</span>
                  </div>
-                 <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400">
+                 <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
               </div>
@@ -287,7 +288,7 @@ const App: React.FC = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
                       activeTab === item.id 
-                        ? 'bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-white/10 shadow-sm' 
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm' 
                         : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-slate-700'
                     }`}
                   >
@@ -297,8 +298,8 @@ const App: React.FC = () => {
                 ))}
               </nav>
 
-              <div className="p-4 border-t border-slate-100 dark:border-white/10">
-                 <button onClick={handleLogout} className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-rose-100 dark:border-red-900/30 text-rose-600 dark:text-red-400 hover:bg-rose-50 transition-colors text-sm font-medium">
+              <div className="p-4 border-t border-slate-100 dark:border-white/5">
+                 <button onClick={handleLogout} className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-rose-100 dark:border-red-900/30 text-rose-600 dark:text-red-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-sm font-medium">
                     <LogOut size={16} />
                     <span>Sign Out</span>
                  </button>
@@ -311,7 +312,7 @@ const App: React.FC = () => {
               </div>
             </main>
 
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-white/10 z-[60] flex items-center justify-around pb-safe">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 z-[60] flex items-center justify-around pb-safe">
                {navItems.map(item => (
                  <button
                    key={item.id}

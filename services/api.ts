@@ -1,78 +1,94 @@
 
-import { RoadmapItem } from '../types';
+import { RoadmapItem, DailyTask, HomeworkTask } from '../types';
 import { ROADMAP_DATA } from '../data';
+import { db } from './firebase';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
-const STORAGE_KEY = 'roadmap_local_data_v1';
-
-interface CloudData {
-  users: {
-    [username: string]: {
-      items: RoadmapItem[];
-      lastActive: string;
-    }
-  }
+interface UserProfile {
+  roadmap: RoadmapItem[];
+  dailyTasks: DailyTask[];
+  homeworkTasks: HomeworkTask[];
+  lastActive: string;
+  lastResetDate: string;
 }
 
-const getCloudData = (): CloudData => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : { users: {} };
-};
-
-const saveCloudData = (data: CloudData) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-};
+const normalizeUsername = (username: string) => username.toLowerCase().trim().replace(/\s+/g, '_');
 
 export const api = {
-  // Login or Sign Up (Auto-detect)
-  async login(username: string): Promise<RoadmapItem[]> {
-    // No delay needed for local storage
-    const db = getCloudData();
-    const normalizedUser = username.toLowerCase().trim();
+  // Login or Sign Up (Firestore)
+  async login(username: string): Promise<{ 
+    roadmap: RoadmapItem[], 
+    dailyTasks: DailyTask[], 
+    homeworkTasks: HomeworkTask[] 
+  }> {
+    const userId = normalizeUsername(username);
+    const userRef = doc(db, "users", userId);
+    
+    try {
+      const userSnap = await getDoc(userRef);
 
-    if (db.users[normalizedUser]) {
-      // User exists
-      const userItems = db.users[normalizedUser].items;
-      
-      // SYNC LOGIC: Check if there are new items in the source code (ROADMAP_DATA) 
-      // that are missing from the user's local storage data.
-      // This ensures that when we add new tasks (like Behavioral/HR), existing users receive them.
-      const userItemIds = new Set(userItems.map(i => i.id));
-      const newItems = ROADMAP_DATA.filter(defaultItem => !userItemIds.has(defaultItem.id));
-      
-      if (newItems.length > 0) {
-        console.log(`Syncing ${newItems.length} new items to user profile...`);
-        // Append new items to the user's existing list
-        const updatedItems = [...userItems, ...newItems];
+      if (userSnap.exists()) {
+        const data = userSnap.data() as UserProfile;
+        const userItems = data.roadmap || [];
         
-        // Update DB
-        db.users[normalizedUser].items = updatedItems;
-        db.users[normalizedUser].lastActive = new Date().toISOString();
-        saveCloudData(db);
+        // SYNC LOGIC: Check for new roadmap items added to the source code
+        const userItemIds = new Set(userItems.map(i => i.id));
+        const newItems = ROADMAP_DATA.filter(defaultItem => !userItemIds.has(defaultItem.id));
         
-        return updatedItems;
+        let finalRoadmap = userItems;
+        if (newItems.length > 0) {
+          finalRoadmap = [...userItems, ...newItems];
+          await updateDoc(userRef, { 
+            roadmap: finalRoadmap,
+            lastActive: new Date().toISOString()
+          });
+        }
+
+        return {
+          roadmap: finalRoadmap,
+          dailyTasks: data.dailyTasks || [],
+          homeworkTasks: data.homeworkTasks || []
+        };
+      } else {
+        // New cloud user: Initialize with defaults
+        const initialProfile: UserProfile = {
+          roadmap: JSON.parse(JSON.stringify(ROADMAP_DATA)),
+          dailyTasks: [], // Will be populated by fixed tasks in App.tsx
+          homeworkTasks: [],
+          lastActive: new Date().toISOString(),
+          lastResetDate: new Date().toDateString()
+        };
+        
+        await setDoc(userRef, initialProfile);
+        return {
+          roadmap: initialProfile.roadmap,
+          dailyTasks: [],
+          homeworkTasks: []
+        };
       }
-
-      return userItems;
-    } else {
-      // New user, initialize with default data
-      db.users[normalizedUser] = {
-        items: JSON.parse(JSON.stringify(ROADMAP_DATA)), // Deep copy default data
-        lastActive: new Date().toISOString()
-      };
-      saveCloudData(db);
-      return db.users[normalizedUser].items;
+    } catch (error: any) {
+      console.error("Firestore error details:", error);
+      if (error.code === 'permission-denied') {
+        throw new Error("PERMISSION_DENIED: Please check your Firestore Security Rules in Firebase Console. Ensure 'users' collection allows read/write.");
+      }
+      throw error;
     }
   },
 
-  // Save progress
-  async saveProgress(username: string, items: RoadmapItem[]): Promise<void> {
-    const db = getCloudData();
-    const normalizedUser = username.toLowerCase().trim();
+  // Save full profile progress
+  async saveProfile(username: string, data: Partial<UserProfile>): Promise<void> {
+    const userId = normalizeUsername(username);
+    const userRef = doc(db, "users", userId);
     
-    if (db.users[normalizedUser]) {
-      db.users[normalizedUser].items = items;
-      db.users[normalizedUser].lastActive = new Date().toISOString();
-      saveCloudData(db);
+    try {
+      await updateDoc(userRef, {
+        ...data,
+        lastActive: new Date().toISOString()
+      });
+    } catch (err: any) {
+      console.error("Cloud save failed:", err);
+      // We don't throw here to avoid interrupting the user experience during autosave, 
+      // but we log the permission issue.
     }
   }
 };

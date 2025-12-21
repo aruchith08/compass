@@ -109,9 +109,16 @@ export const api = {
     const userId = normalizeUsername(username);
     const userRef = doc(db, "users", userId);
     
+    // Sanitize: Firestore doesn't like 'undefined'.
+    // We filter out any keys where the value is undefined. 
+    // Null is accepted by Firestore and represents a cleared field.
+    const sanitizedData = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined)
+    );
+
     try {
       await updateDoc(userRef, {
-        ...data,
+        ...sanitizedData,
         lastActive: new Date().toISOString()
       });
     } catch (err: any) {

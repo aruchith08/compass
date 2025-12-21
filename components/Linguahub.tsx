@@ -21,7 +21,8 @@ import {
   Sparkles,
   SpellCheck,
   Zap,
-  RefreshCw
+  RefreshCw,
+  Hash
 } from "lucide-react";
 import { Type } from "@google/genai";
 import { User, SkillType, DailyChallenge, LinguaSession, ChallengeCategory } from "../types";
@@ -211,7 +212,8 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         required: ["id", "category", "type", "content", "requiresInput"],
       },
     };
-    const prompt = "Generate exactly 5 high-quality, exam-style IELTS preparation challenges. One each for Listening, Reading, Speaking, Writing, and Grammar. Band 7.0-8.0 difficulty.";
+    // Prompt updated to remove 'Listening' and ensure all tasks are text-based.
+    const prompt = "Generate exactly 5 high-quality, text-based IELTS preparation challenges. One each for Reading, Writing, Speaking, Grammar, and Vocabulary. Band 7.0-8.0 difficulty. Strictly avoid any audio-dependent tasks.";
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -325,7 +327,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const todayStr = new Date().toDateString();
 
@@ -348,7 +349,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       }
 
-      // CLOUD SYNC: Only generate if cloud session is missing or date is old
+      // CLOUD SYNC
       if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
         setIsLoadingTasks(false);
       } else {
@@ -402,16 +403,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const nextIdx = linguaSession.currentIndex + 1;
     const complete = nextIdx >= linguaSession.tasks.length;
     updateLinguaSession({ ...linguaSession, currentIndex: complete ? linguaSession.currentIndex : nextIdx, isComplete: complete });
-  };
-
-  const playTextToSpeech = (text: string) => {
-    if (!window.speechSynthesis) return;
-    if (isPlayingAudio) { window.speechSynthesis.cancel(); setIsPlayingAudio(false); return; }
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.9;
-    utt.onend = () => setIsPlayingAudio(false);
-    setIsPlayingAudio(true);
-    window.speechSynthesis.speak(utt);
   };
 
   return (
@@ -503,7 +494,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* Daily Challenges (Optimized Layout) */}
+      {/* Daily Challenges (Mobile Optimized & Audio-Free) */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -512,11 +503,11 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
-              <span className="hidden sm:inline">Question </span>{linguaSession!.currentIndex + 1}/{linguaSession!.tasks.length}
+              {linguaSession!.currentIndex + 1}/{linguaSession!.tasks.length}
             </span>
           )}
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[260px] md:min-h-[300px] flex flex-col justify-center transition-all overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[200px] flex flex-col justify-center transition-all overflow-hidden">
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -527,21 +518,19 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
-               <h3 className="text-2xl font-bold dark:text-white mb-2">Daily Mission Complete</h3>
-               <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
+               <h3 className="text-2xl font-bold dark:text-white mb-2">Mission Complete</h3>
+               <p className="text-slate-500 text-sm">Session completed and synced.</p>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
                {/* Mobile: Horizontal header / Desktop: Vertical sidebar */}
                <div className="flex flex-row md:flex-col items-center gap-4 md:gap-3 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 md:pr-8 md:w-32">
                   <div className="bg-amber-50 dark:bg-amber-900/20 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
-                    <Star className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
+                    <Hash className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div className="text-left md:text-center flex-1 md:flex-none">
-                    <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Type</span>
                     <span className="font-bold text-slate-700 dark:text-slate-200 text-sm md:text-sm">{currentTask.category}</span>
                   </div>
-                  {currentTask.category === "Listening" && <Volume2 className="text-slate-400 md:text-slate-300" size={18} />}
                   <span className="md:hidden text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded tracking-widest">{currentTask.type}</span>
                </div>
 
@@ -551,14 +540,6 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <span className="hidden md:inline-block text-[9px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mb-3 tracking-widest">{currentTask.type}</span>
                     <h3 className="text-lg md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed">"{currentTask.content}"</h3>
                   </div>
-                  {currentTask.category === "Listening" && (
-                    <button 
-                      onClick={() => playTextToSpeech(currentTask.hiddenContent || "")} 
-                      className={`flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl font-bold text-xs transition-all shadow-sm active:scale-95 ${isPlayingAudio ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
-                    >
-                      <PlayCircle size={16} /> {isPlayingAudio ? "Playing..." : "Play Audio Clip"}
-                    </button>
-                  )}
                   
                   <div className="pt-2 md:pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (

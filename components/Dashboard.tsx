@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip, Cell } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot } from 'lucide-react';
 import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
 import TimetableModal from './TimetableModal';
@@ -39,7 +39,7 @@ const ConfettiEffect: React.FC<{ active: boolean }> = ({ active }) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { items, getCompletionPercentage, user, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, } = useRoadmap();
+  const { items, getCompletionPercentage, user, logout, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, } = useRoadmap();
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
   const [showTimetable, setShowTimetable] = useState(false);
@@ -82,10 +82,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-12 w-full max-w-full overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '0ms' }}>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">System <span className="text-emerald-600 dark:text-emerald-400">Initialized</span></h2>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Monitoring career trajectory for {user?.username}.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Strategic overview for your professional development.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
            <div className="flex gap-2">

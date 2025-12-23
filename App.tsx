@@ -20,7 +20,8 @@ import {
   AlertCircle,
   CheckCircle2,
   Settings2,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  User as UserIcon
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -173,7 +174,6 @@ const App: React.FC = () => {
     return 'light';
   });
 
-  // Check AI connection status frequently
   useEffect(() => {
     const checkAi = async () => {
       const key = await getApiKey();
@@ -196,7 +196,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Initial Session Check
   useEffect(() => {
     const checkSession = async () => {
       const savedUser = localStorage.getItem('roadmap_user_session');
@@ -336,7 +335,6 @@ const App: React.FC = () => {
     setLinguaSession(session);
   };
 
-  // --- Sidebar Autohide Helpers ---
   const showSidebar = () => {
     if (hideTimeoutRef.current) {
       window.clearTimeout(hideTimeoutRef.current);
@@ -346,10 +344,7 @@ const App: React.FC = () => {
   };
 
   const hideSidebar = () => {
-    // Clear existing timeout to prevent multi-scheduling
     if (hideTimeoutRef.current) window.clearTimeout(hideTimeoutRef.current);
-    
-    // Set a small delay before hiding to prevent flickering when mouse passes boundaries
     hideTimeoutRef.current = window.setTimeout(() => {
       setIsSidebarVisible(false);
       hideTimeoutRef.current = null;
@@ -397,7 +392,6 @@ const App: React.FC = () => {
       ) : (
         <RoadmapContext.Provider value={contextValue}>
           <div className="flex h-[100dvh] bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300 relative selection:bg-emerald-500/30">
-            {/* Dark Mode Ambient Blobs */}
             <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-50/40 via-white to-emerald-50/40 dark:from-slate-900 dark:via-slate-950 dark:to-black dark:opacity-100 pointer-events-none transition-colors duration-700"></div>
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-400/30 dark:bg-emerald-500/10 rounded-full blur-[120px] opacity-70 dark:opacity-40 animate-pulse-slow"></div>
@@ -411,7 +405,7 @@ const App: React.FC = () => {
                  </div>
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
                </div>
-               <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1 sm:gap-2">
                   <button 
                     onClick={handleConnectAI} 
                     className={`p-2 rounded-full transition-colors ${aiConnected ? 'text-emerald-500' : 'text-rose-500 animate-pulse'}`}
@@ -422,10 +416,13 @@ const App: React.FC = () => {
                   <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-300">
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                   </button>
+                  {/* Mobile-only Extreme Right Logout */}
+                  <button onClick={handleLogout} className="p-2 rounded-full hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-500 transition-colors" title="Logout">
+                    <LogOut size={20} />
+                  </button>
                </div>
             </header>
 
-            {/* Desktop Autohide Trigger Area (Extreme Left Edge) */}
             <div 
               onMouseEnter={showSidebar}
               className="hidden lg:block fixed left-0 top-0 bottom-0 w-3 z-[90]"
@@ -511,7 +508,6 @@ const App: React.FC = () => {
               </div>
             </aside>
 
-            {/* Sidebar Hover Prompt for Desktop */}
             <div 
                className={`hidden lg:flex fixed left-0 top-1/2 -translate-y-1/2 z-[85] bg-emerald-500 text-white p-1 rounded-r-lg shadow-lg cursor-pointer transition-transform duration-500 ${isSidebarVisible ? '-translate-x-full' : 'translate-x-0'}`}
                onMouseEnter={showSidebar}

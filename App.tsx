@@ -16,7 +16,9 @@ import {
   Zap,
   ShieldCheck,
   Key,
-  X
+  X,
+  AlertCircle,
+  CheckCircle2
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -28,7 +30,7 @@ import SplashScreen from './components/SplashScreen';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
-import { ensureKeySelected, getApiKey, saveManualKey } from './services/ai';
+import { ensureKeySelected, getApiKey, saveManualKey, validateApiKey } from './services/ai';
 
 const FIXED_DAILY_TASKS = [
   "Note down the topics discussed in class today",
@@ -40,32 +42,85 @@ const FIXED_DAILY_TASKS = [
 
 const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (key: string) => void }) => {
   const [val, setVal] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'error' | 'success'>('idle');
+
+  const handleVerify = async () => {
+    if (!val.trim()) return;
+    setIsVerifying(true);
+    setStatus('idle');
+    const isValid = await validateApiKey(val.trim());
+    if (isValid) {
+      setStatus('success');
+      setTimeout(() => {
+        onSave(val.trim());
+        onClose();
+        setIsVerifying(false);
+      }, 800);
+    } else {
+      setStatus('error');
+      setIsVerifying(false);
+    }
+  };
+
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
       <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-8 border border-white/10 shadow-2xl animate-scale-in">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500"><Key size={20} /></div>
-            <h3 className="text-lg font-bold">API Key Setup</h3>
+            <h3 className="text-lg font-bold">Connect Gemini AI</h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200"><X size={20} /></button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors"><X size={20} /></button>
         </div>
-        <p className="text-sm text-slate-500 mb-6">Enter your Google Gemini API Key to enable real-time AI evaluations and task generation.</p>
-        <input 
-          type="password" 
-          value={val} 
-          onChange={e => setVal(e.target.value)}
-          placeholder="Enter API Key string..."
-          className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-emerald-500 outline-none mb-6"
-        />
-        <button 
-          onClick={() => { if(val.trim()) { onSave(val); onClose(); } }}
-          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20"
-        >
-          Initialize AI
-        </button>
+        
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Enter your Gemini API key to initialize AI tasks and evaluations.</p>
+        
+        <div className="space-y-4">
+          <div className="relative">
+            <input 
+              type="password" 
+              value={val} 
+              onChange={e => { setVal(e.target.value); setStatus('idle'); }}
+              placeholder="Paste API Key here..."
+              className={`w-full bg-slate-100 dark:bg-slate-800 border-2 rounded-2xl px-5 py-4 text-sm outline-none transition-all ${
+                status === 'error' ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/10' : 
+                status === 'success' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : 'border-transparent focus:border-indigo-500'
+              }`}
+            />
+            {status === 'error' && <AlertCircle className="absolute right-4 top-1/2 -translate-y-1/2 text-rose-500" size={18} />}
+            {status === 'success' && <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />}
+          </div>
+
+          {status === 'error' && (
+            <div className="flex items-start gap-2 p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl animate-shake">
+              <AlertCircle className="text-rose-500 shrink-0 mt-0.5" size={14} />
+              <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold leading-tight">
+                Wrong API key entered. Enter valid API key to initialize tasks.
+              </p>
+            </div>
+          )}
+
+          <button 
+            onClick={handleVerify}
+            disabled={isVerifying || !val.trim()}
+            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
+          >
+            {isVerifying ? <Loader2 className="animate-spin" size={20} /> : status === 'success' ? 'Validated!' : 'Validate & Initialize'}
+          </button>
+          
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" className="block text-center text-[10px] text-slate-400 hover:text-indigo-500 underline uppercase tracking-widest font-black">Get API Key from Google</a>
+        </div>
       </div>
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+      `}</style>
     </div>
   );
 };
@@ -117,6 +172,10 @@ const App: React.FC = () => {
   const handleSaveKey = (key: string) => {
     saveManualKey(key);
     setAiConnected(true);
+    // Explicitly clear fallback cache to force AI refresh
+    if (user) {
+      localStorage.removeItem(`lingua_vocab_${user.username}_${new Date().toDateString()}`);
+    }
   };
 
   // Initial Session Check

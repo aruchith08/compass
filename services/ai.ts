@@ -1,4 +1,5 @@
 
+// DO NOT use or import GoogleGenerativeAI from @google/genai as it is deprecated.
 import { GoogleGenAI } from "@google/genai";
 
 declare global {
@@ -15,18 +16,31 @@ declare global {
 const LOCAL_KEY_NAME = "compass_manual_api_key";
 
 /**
- * Gets the current effective API key from LocalStorage or Environment.
- * Prioritizes manually entered keys for local development/testing.
+ * Ensures an API key is selected in AI Studio environments.
+ * This fixes the missing export error in App.tsx.
+ */
+export const ensureKeySelected = async (): Promise<void> => {
+  if (window.aistudio) {
+    const hasKey = await window.aistudio.hasSelectedApiKey();
+    if (!hasKey) {
+      await window.aistudio.openSelectKey();
+      // Guidelines: MUST assume key selection was successful after triggering openSelectKey().
+    }
+  }
+};
+
+/**
+ * Gets the current effective API key. 
+ * Manual user entry overrides environment variables.
  */
 export const getApiKey = async (): Promise<string | undefined> => {
-  // 1. Check local storage first (user manual entry)
+  // 1. Priority 1: User's manual input
   const localKey = localStorage.getItem(LOCAL_KEY_NAME);
-  if (localKey && localKey.trim().length > 5) {
+  if (localKey && localKey.trim().length > 10) {
     return localKey.trim();
   }
 
-  // 2. Check process.env (system injection)
-  // We ignore strings like "undefined" or generic placeholders
+  // 2. Priority 2: System provided key from process.env.API_KEY
   const envKey = process.env.API_KEY;
   if (envKey && envKey !== "undefined" && envKey.length > 10) {
     return envKey;
@@ -35,71 +49,75 @@ export const getApiKey = async (): Promise<string | undefined> => {
   return undefined;
 };
 
-/**
- * Saves a manual API key to local storage.
- */
 export const saveManualKey = (key: string) => {
-  localStorage.setItem(LOCAL_KEY_NAME, key);
+  localStorage.setItem(LOCAL_KEY_NAME, key.trim());
 };
 
-/**
- * Removes the manual API key.
- */
 export const removeManualKey = () => {
   localStorage.removeItem(LOCAL_KEY_NAME);
 };
 
 /**
- * Ensures an API key has been selected or provided.
+ * Tests if a key is valid by making a tiny request.
  */
-export const ensureKeySelected = async (): Promise<boolean> => {
-  if (window.aistudio) {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      await window.aistudio.openSelectKey();
-    }
-    return true;
+export const validateApiKey = async (key: string): Promise<boolean> => {
+  if (!key || key.trim().length < 10) return false;
+  try {
+    const ai = new GoogleGenAI({ apiKey: key.trim() });
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: "Return the word 'VALID' in JSON format.",
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+    // Check text property directly (not a method).
+    return !!response.text && response.text.includes("VALID");
+  } catch (e) {
+    console.error("API Key Validation Failed:", e);
+    return false;
   }
-  
-  const existing = await getApiKey();
-  return !!existing;
 };
 
 /**
- * Executes a GenAI operation with a fresh instance of GoogleGenAI.
+ * Executes a GenAI operation with a fresh instance.
+ * Handles key selection in AI Studio and "Requested entity not found" errors.
  */
 export const runGenAI = async <T>(
   operation: (ai: GoogleGenAI) => Promise<T>
 ): Promise<T> => {
-  const key = await getApiKey();
+  let key = await getApiKey();
   
   if (!key) {
     if (window.aistudio) {
       await window.aistudio.openSelectKey();
-      const retryKey = await getApiKey();
-      if (!retryKey) throw new Error("API Key required");
+      // Guidelines: assume key selection was successful after triggering openSelectKey()
+      key = process.env.API_KEY;
     } else {
-      throw new Error("API Key required. Please connect AI in the dashboard.");
+      throw new Error("No API Key detected. Please connect via Dashboard.");
     }
   }
 
+  // Guidelines: Create a new GoogleGenAI instance right before making an API call.
+  // ALWAYS use new GoogleGenAI({apiKey: process.env.API_KEY}).
+  const ai = new GoogleGenAI({ apiKey: key || "" });
+  
   try {
-    const ai = new GoogleGenAI({ apiKey: key! });
     return await operation(ai);
   } catch (error: any) {
-    console.error("[GenAI] Request failed:", error);
+    // Guidelines: Handle "Requested entity was not found." by re-prompting for key selection.
+    if (error?.message?.includes("Requested entity was not found.") && window.aistudio) {
+      await window.aistudio.openSelectKey();
+      const retryKey = await getApiKey();
+      const retryAi = new GoogleGenAI({ apiKey: retryKey || "" });
+      return await operation(retryAi);
+    }
     
-    // If the key is invalid, we clear it so the user can re-enter
-    if (error.message?.includes("API key not valid") || error.message?.includes("invalid")) {
-       removeManualKey();
+    // If key is clearly invalid, we might want to flag it here for the UI
+    if (error?.message?.includes("API key not valid") || error?.status === 403 || error?.status === 401) {
+       console.error("API Key flagged as invalid by remote server.");
     }
 
-    if (error.message?.includes("Requested entity was not found")) {
-      if (window.aistudio) {
-        await window.aistudio.openSelectKey();
-      }
-    }
-    
     throw error;
   }
 };

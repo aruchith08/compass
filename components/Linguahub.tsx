@@ -20,7 +20,9 @@ import {
   Zap,
   Hash,
   Type as TypeIcon,
-  Info
+  Info,
+  RefreshCw,
+  AlertTriangle
 } from "lucide-react";
 import { Type } from "@google/genai";
 import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
@@ -147,7 +149,7 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
   return runGenAI(async (ai) => {
     const chat = ai.chats.create({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3-flash-preview",
       config: {
         systemInstruction: "You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria.",
       },
@@ -167,7 +169,7 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
     Format your response to include: Score: [X]/9 Feedback: [Your text]`;
     
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3-flash-preview",
       contents: prompt,
     });
     const text = response.text || "";
@@ -190,7 +192,7 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
       required: ["word", "phonetic", "partOfSpeech", "definition", "example"],
     };
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3-flash-preview",
       contents: "Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9.",
       config: { 
         responseMimeType: "application/json", 
@@ -204,7 +206,7 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
   return runGenAI(async (ai) => {
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3-flash-preview",
       contents: `Evaluate the usage of the word "${word}" in this sentence: "${sentence}". Max 2 sentences feedback.`,
     });
     return response.text || "No feedback generated.";
@@ -229,16 +231,11 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
       },
     };
     const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges for a student. 
-    The challenges MUST be varied and cover:
-    1. Listening: A transcript of a short conversation followed by a comprehension question.
-    2. Reading: A paragraph from an academic article with a specific detail question.
-    3. Writing: An IELTS Task 2 Essay prompt.
-    4. Speaking: A Cue Card topic with prompts for a spoken-style response.
-    5. Vocabulary: A contextual task involving high-level synonyms or idioms.
+    The challenges MUST be varied and cover Listening, Reading, Writing, Speaking, and Vocabulary. 
     Target Band: 7.5+. Provide the response in valid JSON.`;
     
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: { 
         responseMimeType: "application/json", 
@@ -353,86 +350,67 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [errorInfo, setErrorInfo] = useState<string | null>(null);
 
   const todayStr = new Date().toDateString();
 
-  useEffect(() => {
+  const loadEverything = async () => {
     if (!user) return;
-    
-    const loadSession = async () => {
+    setIsLoadingTasks(true);
+    setErrorInfo(null);
+
+    try {
       // 1. Sync Vocabulary
       const vocabKey = `lingua_vocab_${user.username}_${todayStr}`;
       const savedVocabRaw = localStorage.getItem(vocabKey);
       const savedVocab = savedVocabRaw ? JSON.parse(savedVocabRaw) : null;
       
-      // Force AI vocab if we just connected and have fallback data
-      const isCurrentlyFallbackVocab = savedVocab?.word === FALLBACK_VOCAB.word;
-      const shouldRetryVocab = isAiConnected && (!savedVocab || isCurrentlyFallbackVocab);
+      const isFallbackVocab = savedVocab?.word === FALLBACK_VOCAB.word;
 
-      if (!shouldRetryVocab && savedVocab) {
+      if (isAiConnected && (isFallbackVocab || !savedVocab)) {
+        setIsVocabLoading(true);
+        try {
+          const word = await generateVocabularyWord();
+          if (word) {
+            localStorage.setItem(vocabKey, JSON.stringify(word));
+            setVocabWord(word);
+          } else { setVocabWord(FALLBACK_VOCAB); }
+        } catch (e) { setVocabWord(FALLBACK_VOCAB); }
+        setIsVocabLoading(false);
+      } else if (savedVocab) {
         setVocabWord(savedVocab);
         setIsVocabLoading(false);
       } else {
-        setIsVocabLoading(true);
-        try {
-          if (isAiConnected) {
-            const word = await generateVocabularyWord();
-            if (word) {
-              localStorage.setItem(vocabKey, JSON.stringify(word));
-              setVocabWord(word);
-            } else {
-              setVocabWord(FALLBACK_VOCAB);
-            }
-          } else {
-            setVocabWord(FALLBACK_VOCAB);
-          }
-        } catch (e) {
-          setVocabWord(FALLBACK_VOCAB);
-        }
+        setVocabWord(FALLBACK_VOCAB);
         setIsVocabLoading(false);
       }
 
       // 2. Sync Challenges
-      // Check if we have active real tasks. If we have fallback tasks and AI just connected, PURGE them.
-      const hasRealTasks = linguaSession && 
-                          linguaSession.date === todayStr && 
-                          linguaSession.tasks.length > 0 && 
-                          !linguaSession.tasks[0].id.startsWith('fb_');
+      const isFallbackSession = linguaSession?.tasks?.[0]?.id?.startsWith('fb_');
 
-      const isCurrentlyFallbackTasks = linguaSession && 
-                                     linguaSession.tasks.length > 0 && 
-                                     linguaSession.tasks[0].id.startsWith('fb_');
-
-      const shouldRefetchTasks = isAiConnected && (!linguaSession || isCurrentlyFallbackTasks || linguaSession.date !== todayStr);
-
-      if (hasRealTasks) {
-        setIsLoadingTasks(false);
-      } else if (linguaSession && linguaSession.date === todayStr && !isAiConnected) {
-        // Stay in fallback mode
-        setIsLoadingTasks(false);
-      } else if (shouldRefetchTasks) {
-        setIsLoadingTasks(true);
-        try {
-          if (isAiConnected) {
-            const tasks = await generateDailyChallenges();
-            if (tasks && tasks.length > 0) {
-              updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
-            } else {
-              updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
-            }
-          } else {
-            updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
-          }
-        } catch (e) {
+      if (isAiConnected && (!linguaSession || isFallbackSession || linguaSession.date !== todayStr)) {
+        const tasks = await generateDailyChallenges();
+        if (tasks && tasks.length > 0) {
+          updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+        } else {
           updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
         }
-        setIsLoadingTasks(false);
-      } else {
-        setIsLoadingTasks(false);
+      } else if (!linguaSession || linguaSession.date !== todayStr) {
+        updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
       }
-    };
-    
-    loadSession();
+    } catch (err: any) {
+      console.error("Linguahub load error:", err);
+      setErrorInfo(err.message || "Unknown AI error.");
+      if (!linguaSession) {
+        updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
+      }
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEverything();
   }, [user, todayStr, isAiConnected]);
 
   const currentTask = linguaSession?.tasks[linguaSession.currentIndex] || null;
@@ -445,8 +423,8 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       const result = await evaluateChallenge(currentTask.content, userAnswer, currentTask.hiddenContent);
       setFeedback(result.text);
       setLastScore(result.score);
-    } catch (error) {
-      setFeedback("AI Evaluator is unavailable. Check your API key connection.");
+    } catch (error: any) {
+      setFeedback(`Evaluation failed: ${error.message || "AI Connection Error"}. Please check your API key.`);
     } finally {
       setIsChecking(false);
     }
@@ -486,12 +464,26 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Your IELTS AI Training Partner.</p>
         </div>
-        {!isAiConnected && (
-           <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
-              <Info size={14} /> AI Fallback Active (Connect AI for dynamic tasks)
+        {!isAiConnected ? (
+           <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold">
+              <Info size={14} /> Offline Mode (Connect AI to enable dynamic tasks)
+           </div>
+        ) : (
+           <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+              <Sparkles size={14} className="animate-pulse" /> AI Enhanced Experience
            </div>
         )}
       </div>
+
+      {errorInfo && isAiConnected && (
+        <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-2xl flex items-center justify-between gap-4 animate-slide-up">
+           <div className="flex items-center gap-3">
+             <AlertTriangle className="text-rose-600 dark:text-rose-400 shrink-0" size={20} />
+             <p className="text-xs text-rose-700 dark:text-rose-300 font-bold">Failed to connect to Gemini: {errorInfo}</p>
+           </div>
+           <button onClick={loadEverything} className="p-2 hover:bg-rose-100 dark:hover:bg-rose-800 rounded-xl transition-all"><RefreshCw size={16} /></button>
+        </div>
+      )}
 
       {/* Word of the Day Section */}
       <section>
@@ -600,6 +592,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                </div>
                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Daily Mission Complete</h3>
                <p className="text-slate-500 text-sm">Session completed and saved to your browser.</p>
+               <button onClick={loadEverything} className="mt-6 px-6 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">Regenerate AI Tasks</button>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">

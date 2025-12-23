@@ -125,11 +125,13 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
   return runGenAI(async (ai) => {
     const contextStr = hiddenContext ? `\nContext: "${hiddenContext}"` : "";
     const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response based on IELTS standards. 
-    Question: "${challenge}"${contextStr} 
+    Question/Prompt: "${challenge}"${contextStr} 
     Candidate Answer: "${userAnswer}". 
-    Return Band Score (1.0-9.0) and detailed feedback. Format: Score: [X]/9 Feedback: [Your text]`;
+    Return Band Score (1.0-9.0) and detailed feedback including grammar, vocabulary, and task response. Format: Score: [X]/9 Feedback: [Your text]`;
+    
+    // Using Pro for evaluation to ensure high-quality Band scoring
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3-pro-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
     const text = response.text || "";
@@ -187,10 +189,14 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         required: ["id", "category", "type", "content", "requiresInput"],
       },
     };
-    const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges. 
-    Strictly avoid ANY tasks involving audio, listening, speaking, or recording. 
-    Focus on these categories: 1. Reading 2. Writing 3. Grammar 4. Vocabulary 5. Idioms.
-    Target Band: 7.0-8.5. Ensure tasks are text-only.`;
+    const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges for a student. 
+    The challenges MUST be varied and cover:
+    1. Listening: A transcript of a short conversation followed by a comprehension question.
+    2. Reading: A paragraph from an academic article with a specific detail question.
+    3. Writing: An IELTS Task 2 Essay prompt.
+    4. Speaking: A Cue Card topic with prompts for a spoken-style response.
+    5. Vocabulary: A contextual task involving high-level synonyms or idioms.
+    Target Band: 7.5+. Provide the response in valid JSON.`;
     
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -327,7 +333,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       }
 
-      // CLOUD SYNC
+      // Check current session
       if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
         setIsLoadingTasks(false);
       } else {
@@ -340,7 +346,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       }
     };
     loadSession();
-  }, [user, linguaSession?.date]);
+  }, [user, todayStr]);
 
   const currentTask = linguaSession?.tasks[linguaSession.currentIndex] || null;
 
@@ -353,7 +359,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       setFeedback(result.text);
       setLastScore(result.score);
     } catch (error) {
-      setFeedback("Evaluation failed.");
+      setFeedback("Evaluation failed. Please try again.");
     } finally {
       setIsChecking(false);
     }
@@ -401,11 +407,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           <Sparkles className="text-purple-500" size={18} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Word of the Day</h2>
         </div>
-        <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-6 md:p-8 rounded-3xl shadow-xl overflow-hidden">
+        <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-6 md:p-8 rounded-3xl shadow-xl overflow-hidden relative group">
+          <div className="absolute top-0 right-0 p-12 bg-purple-500/5 rounded-full blur-3xl -mr-8 -mt-8 pointer-events-none"></div>
           {isVocabLoading ? (
             <div className="py-12 flex flex-col items-center gap-2 text-slate-400"><Loader2 className="animate-spin text-purple-500" /> <p className="text-xs">Finding advanced vocabulary...</p></div>
           ) : vocabWord && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 relative z-10">
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex flex-wrap items-baseline gap-3">
                   <h3 className="text-5xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">{vocabWord.word}</h3>
@@ -432,7 +439,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       placeholder={`Write a sentence using "${vocabWord.word}"...`}
                       className="w-full p-4 text-sm border border-slate-200 dark:border-slate-800 rounded-2xl outline-none bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white resize-none h-32 shadow-sm focus:ring-2 focus:ring-purple-500/20 transition-all" 
                     />
-                    <button type="submit" disabled={isVocabChecking || !vocabInput.trim()} className="mt-auto w-full bg-purple-400 hover:bg-purple-500 text-white py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-md active:scale-95">
+                    <button type="submit" disabled={isVocabChecking || !vocabInput.trim()} className="mt-auto w-full bg-purple-500 hover:bg-purple-600 text-white py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-md active:scale-95">
                       {isVocabChecking ? <Loader2 size={16} className="animate-spin mx-auto" /> : "Check Usage"}
                     </button>
                   </form>
@@ -477,7 +484,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Star className="text-amber-500 fill-amber-500" size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges (Pro Evaluated)</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
@@ -489,7 +496,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating Session...</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating High-Quality IELTS Session...</p>
             </div>
           ) : linguaSession?.isComplete ? (
             <div className="text-center py-8 animate-fade-in">
@@ -497,7 +504,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Daily Mission Complete</h3>
-               <p className="text-slate-500 text-sm">Session completed and synced to cloud.</p>
+               <p className="text-slate-500 text-sm">Session completed and saved to your browser.</p>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
@@ -506,13 +513,17 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                     <Hash className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div className="text-left md:text-center flex-1 md:flex-none">
-                    <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">Task</span>
+                    <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">IELTS</span>
                     <span className="font-bold text-slate-700 dark:text-slate-200 text-sm md:text-sm">{currentTask.category}</span>
                   </div>
                </div>
 
                <div className="flex-1 space-y-4 md:space-y-5">
-                  <h3 className="text-lg md:text-2xl font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed tracking-wide">"{currentTask.content}"</h3>
+                  <div className="prose dark:prose-invert max-w-none">
+                    <h3 className="text-lg md:text-xl font-serif text-slate-800 dark:text-slate-100 leading-relaxed tracking-wide whitespace-pre-wrap">
+                      {currentTask.content}
+                    </h3>
+                  </div>
                   
                   <div className="pt-2 md:pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (
@@ -520,12 +531,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         <textarea 
                           value={userAnswer} 
                           onChange={e => setUserAnswer(e.target.value)} 
-                          placeholder="Type response..." 
-                          className="w-full h-24 md:h-28 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all dark:text-white" 
+                          placeholder="Type your response or analysis..." 
+                          className="w-full h-24 md:h-32 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all dark:text-white" 
                         />
                         <div className="flex justify-end">
                           <button type="submit" disabled={isChecking || !userAnswer.trim()} className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
-                            {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Check Answer"}
+                            {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Submit for Evaluation"}
                           </button>
                         </div>
                       </form>
@@ -533,13 +544,13 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
                         <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
                           <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">Evaluation</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Band Analysis (Gemini Pro)</span>
                             <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
                           </div>
                           <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>
                         <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-                          Next Question <ArrowRight size={16} />
+                          Proceed to Next Task <ArrowRight size={16} />
                         </button>
                       </div>
                     )}

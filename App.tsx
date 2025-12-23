@@ -10,7 +10,8 @@ import {
   Sun,
   Moon,
   Languages,
-  Loader2
+  Loader2,
+  HardDrive
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -125,7 +126,7 @@ const App: React.FC = () => {
     setActiveTab('dashboard');
   };
 
-  // Cloud Auto-save Sync
+  // Browser Auto-save Sync
   useEffect(() => {
     if (user && !isInitialLoad.current) {
       const timeout = setTimeout(() => {
@@ -135,7 +136,7 @@ const App: React.FC = () => {
           homeworkTasks: homeworkTasks,
           linguaSession: linguaSession || undefined
         });
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(timeout);
     }
   }, [items, dailyTasks, homeworkTasks, linguaSession, user]);
@@ -229,7 +230,7 @@ const App: React.FC = () => {
       {isAuthChecking && !showSplash ? (
         <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center z-[50]">
           <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Synchronizing Cloud Session...</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Initializing Environment...</p>
         </div>
       ) : !user ? (
         !isAuthChecking && <Login onLogin={handleLogin} isLoading={isLoading} />
@@ -273,7 +274,9 @@ const App: React.FC = () => {
 
               <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
                  <div className="flex flex-col min-w-0">
-                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Cloud Sync Active</span>
+                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider flex items-center gap-1">
+                      <HardDrive size={10} /> Local Session Active
+                    </span>
                     <span className="text-sm font-semibold truncate text-slate-800 dark:text-white">{user.username}</span>
                  </div>
                  <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -301,7 +304,7 @@ const App: React.FC = () => {
               <div className="p-4 border-t border-slate-100 dark:border-white/5">
                  <button onClick={handleLogout} className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-rose-100 dark:border-red-900/30 text-rose-600 dark:text-red-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-sm font-medium">
                     <LogOut size={16} />
-                    <span>Sign Out</span>
+                    <span>Switch User</span>
                  </button>
               </div>
             </aside>

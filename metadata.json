@@ -1,5 +1,7 @@
 {
   "name": "Compass - Navigate Your Future",
   "description": "A comprehensive 4-year tracking application for CSE students specializing in AIML, Data Science, and AI Security.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

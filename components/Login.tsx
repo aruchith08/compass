@@ -173,7 +173,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
               
               <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">
                 <Cloud size={12} className="text-emerald-500" />
-                <span>Encrypted Cloud Architecture</span>
+                <span>browser save Architecture</span>
               </div>
             </div>
           </form>

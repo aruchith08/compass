@@ -7,21 +7,21 @@ export const PORTFOLIO_DATA_ITEMS: RoadmapItem[] = [
     id: "Y1_PR01", year: 1, name: "Python Calculator", category: "Projects", priority: "Medium", status: "To Do", role_alignment: ["All Roles"],
     description: "Build a functional calculator with basic arithmetic and error handling. Push to GitHub.",
     resource_name: "Real Python: Simple Calculator",
-    resource_link: "https://realpython.com/python-simple-calculator/",
+    resource_link: "https://www.geeksforgeeks.org/python/make-simple-calculator-using-python/",
     is_project: true, is_output: true, time_estimate: "1 week"
   },
   {
     id: "Y1_PR_FS1", year: 1, name: "Personal Portfolio Site", category: "Projects", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
     description: "Responsive portfolio website using HTML, CSS, and Vanilla JS to showcase your identity.",
     resource_name: "web.dev: Build a Portfolio",
-    resource_link: "https://web.dev/articles/build-a-portfolio",
+    resource_link: "https://www.w3schools.com/howto/howto_website_create_portfolio.asp",
     is_project: true, is_output: true, time_estimate: "2 weeks"
   },
   {
     id: "Y1_PR02", year: 1, name: "Student Management System", category: "Projects", priority: "High", status: "To Do", role_alignment: ["AI/ML Engineer", "Full Stack Developer"],
     description: "A Python/C based CRUD app to manage student records and handle data persistence.",
     resource_name: "GFG: Student Mgmt Project",
-    resource_link: "https://www.geeksforgeeks.org/student-management-system-project-in-python/",
+    resource_link: "https://www.geeksforgeeks.org/python/student-management-system-in-python/",
     is_project: true, is_output: true, time_estimate: "2 weeks"
   },
 
@@ -30,7 +30,7 @@ export const PORTFOLIO_DATA_ITEMS: RoadmapItem[] = [
     id: "Y2_PR01", year: 2, name: "Sales Data Analysis", category: "Projects", priority: "High", status: "To Do", role_alignment: ["Data Analyst", "Data Scientist"],
     description: "End-to-end EDA and visualization on a real sales dataset. Clean messy data using Pandas.",
     resource_name: "Kaggle: Sales Data Analysis",
-    resource_link: "https://www.kaggle.com/code/ekrembayar/sales-data-analysis-and-visualization",
+    resource_link: "https://www.kaggle.com/code/atanaskanev/sales-analysis-and-visualization",
     is_project: true, is_output: true, time_estimate: "2 weeks"
   },
   {
@@ -44,7 +44,7 @@ export const PORTFOLIO_DATA_ITEMS: RoadmapItem[] = [
     id: "Y2_PR_FS01", year: 2, name: "E-Commerce Frontend", category: "Projects", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
     description: "A React-based storefront with shopping cart, filtering, and routing capabilities.",
     resource_name: "FCC: Build React E-comm",
-    resource_link: "https://www.freecodecamp.org/news/build-an-ecommerce-site-with-react/",
+    resource_link: "https://www.freecodecamp.org/news/how-to-build-a-shopping-cart-with-react-and-typescript/",
     is_project: true, is_output: true, time_estimate: "4 weeks"
   },
 
@@ -83,7 +83,7 @@ export const PORTFOLIO_DATA_ITEMS: RoadmapItem[] = [
     id: "Y4_MP01", year: 4, name: "Major Capstone Project", category: "Projects", priority: "High", status: "To Do", role_alignment: ["All Roles"],
     description: "Your final undergraduate degree project. Must solve a complex real-world problem.",
     resource_name: "IEEE: Project Publications",
-    resource_link: "https://ieeexplore.ieee.org/browse/periodicals/",
+    resource_link: "https://www.ieeexpert.com/ieee-python-projects-2021-2022-machine_learning-project-titles/",
     is_project: true, is_output: true, time_estimate: "16 weeks"
   },
   {

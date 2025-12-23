@@ -299,7 +299,7 @@ const ChatWidget = () => {
       const response = await sendMessageToGemini(msg, messages);
       setMessages(prev => [...prev, { role: "model", text: response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: "model", text: "AI is currently unavailable. Please connect your API key in the dashboard.", isError: true }]);
+      setMessages(prev => [...prev, { role: "model", text: "AI is currently unavailable. Please check your API key in the dashboard.", isError: true }]);
     } finally {
       setIsLoading(false);
     }
@@ -362,13 +362,15 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     const loadSession = async () => {
       // 1. Sync Vocabulary
       const vocabKey = `lingua_vocab_${user.username}_${todayStr}`;
-      const savedVocab = localStorage.getItem(vocabKey);
+      const savedVocabRaw = localStorage.getItem(vocabKey);
+      const savedVocab = savedVocabRaw ? JSON.parse(savedVocabRaw) : null;
       
-      // If we are connected now but were using fallback, retry AI vocab
-      const needsAiVocab = !savedVocab || (savedVocab && JSON.parse(savedVocab).word === FALLBACK_VOCAB.word && isAiConnected);
+      // Force AI vocab if we just connected and have fallback data
+      const isCurrentlyFallbackVocab = savedVocab?.word === FALLBACK_VOCAB.word;
+      const shouldRetryVocab = isAiConnected && (!savedVocab || isCurrentlyFallbackVocab);
 
-      if (!needsAiVocab && savedVocab) {
-        setVocabWord(JSON.parse(savedVocab));
+      if (!shouldRetryVocab && savedVocab) {
+        setVocabWord(savedVocab);
         setIsVocabLoading(false);
       } else {
         setIsVocabLoading(true);
@@ -391,15 +393,24 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       }
 
       // 2. Sync Challenges
-      // If we already have real AI tasks, don't re-generate
-      const hasRealTasks = linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0 && !linguaSession.tasks[0].id.startsWith('fb_');
+      // Check if we have active real tasks. If we have fallback tasks and AI just connected, PURGE them.
+      const hasRealTasks = linguaSession && 
+                          linguaSession.date === todayStr && 
+                          linguaSession.tasks.length > 0 && 
+                          !linguaSession.tasks[0].id.startsWith('fb_');
+
+      const isCurrentlyFallbackTasks = linguaSession && 
+                                     linguaSession.tasks.length > 0 && 
+                                     linguaSession.tasks[0].id.startsWith('fb_');
+
+      const shouldRefetchTasks = isAiConnected && (!linguaSession || isCurrentlyFallbackTasks || linguaSession.date !== todayStr);
 
       if (hasRealTasks) {
         setIsLoadingTasks(false);
       } else if (linguaSession && linguaSession.date === todayStr && !isAiConnected) {
-        // Just show current fallback
+        // Stay in fallback mode
         setIsLoadingTasks(false);
-      } else {
+      } else if (shouldRefetchTasks) {
         setIsLoadingTasks(true);
         try {
           if (isAiConnected) {
@@ -415,6 +426,8 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         } catch (e) {
           updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
         }
+        setIsLoadingTasks(false);
+      } else {
         setIsLoadingTasks(false);
       }
     };
@@ -475,7 +488,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
         {!isAiConnected && (
            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
-              <Info size={14} /> AI Fallback Active (Missing API Key)
+              <Info size={14} /> AI Fallback Active (Connect AI for dynamic tasks)
            </div>
         )}
       </div>
@@ -489,7 +502,10 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-6 md:p-8 rounded-3xl shadow-xl overflow-hidden relative group">
           <div className="absolute top-0 right-0 p-12 bg-purple-500/5 rounded-full blur-3xl -mr-8 -mt-8 pointer-events-none"></div>
           {isVocabLoading ? (
-            <div className="py-12 flex flex-col items-center gap-2 text-slate-400"><Loader2 className="animate-spin text-purple-500" /> <p className="text-xs">Finding advanced vocabulary...</p></div>
+            <div className="py-12 flex flex-col items-center justify-center h-full gap-2 text-slate-400">
+               <Loader2 className="animate-spin text-purple-500" /> 
+               <p className="text-xs font-bold uppercase tracking-widest">Searching Archives...</p>
+            </div>
           ) : vocabWord && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 relative z-10">
               <div className="lg:col-span-2 space-y-6">
@@ -565,9 +581,9 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             <Star className="text-amber-500 fill-amber-500" size={18} />
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges (AI Evaluated)</h2>
           </div>
-          {!isLoadingTasks && !linguaSession?.isComplete && (
+          {!isLoadingTasks && !linguaSession?.isComplete && linguaSession && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
-              {linguaSession!.currentIndex + 1}/{linguaSession!.tasks.length}
+              {linguaSession.currentIndex + 1}/{linguaSession.tasks.length}
             </span>
           )}
         </div>

@@ -19,7 +19,8 @@ import {
   X,
   AlertCircle,
   CheckCircle2,
-  Settings2
+  Settings2,
+  ChevronRight as ChevronRightIcon
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -154,12 +155,14 @@ const App: React.FC = () => {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [aiConnected, setAiConnected] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   const [linguaSession, setLinguaSession] = useState<LinguaSession | null>(null);
   
   const isInitialLoad = useRef(true);
+  const hideTimeoutRef = useRef<number | null>(null);
   
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
@@ -188,7 +191,6 @@ const App: React.FC = () => {
   const handleSaveKey = (key: string) => {
     saveManualKey(key);
     setAiConnected(true);
-    // Explicitly clear fallback cache to force AI refresh
     if (user) {
       localStorage.removeItem(`lingua_vocab_${user.username}_${new Date().toDateString()}`);
     }
@@ -265,7 +267,6 @@ const App: React.FC = () => {
     setActiveTab('dashboard');
   };
 
-  // Browser Auto-save Sync
   useEffect(() => {
     if (user && !isInitialLoad.current) {
       const timeout = setTimeout(() => {
@@ -333,6 +334,26 @@ const App: React.FC = () => {
 
   const updateLinguaSession = (session: LinguaSession) => {
     setLinguaSession(session);
+  };
+
+  // --- Sidebar Autohide Helpers ---
+  const showSidebar = () => {
+    if (hideTimeoutRef.current) {
+      window.clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setIsSidebarVisible(true);
+  };
+
+  const hideSidebar = () => {
+    // Clear existing timeout to prevent multi-scheduling
+    if (hideTimeoutRef.current) window.clearTimeout(hideTimeoutRef.current);
+    
+    // Set a small delay before hiding to prevent flickering when mouse passes boundaries
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setIsSidebarVisible(false);
+      hideTimeoutRef.current = null;
+    }, 400); 
   };
 
   const contextValue: RoadmapContextType = useMemo(() => ({
@@ -404,7 +425,17 @@ const App: React.FC = () => {
                </div>
             </header>
 
-            <aside className="hidden lg:flex relative z-[40] h-full w-72 bg-white/70 dark:bg-slate-900/30 backdrop-blur-3xl border-r border-white/40 dark:border-white/5 flex-col shadow-xl">
+            {/* Desktop Autohide Trigger Area (Extreme Left Edge) */}
+            <div 
+              onMouseEnter={showSidebar}
+              className="hidden lg:block fixed left-0 top-0 bottom-0 w-3 z-[90]"
+            ></div>
+
+            <aside 
+              onMouseEnter={showSidebar}
+              onMouseLeave={hideSidebar}
+              className={`hidden lg:flex fixed left-0 top-0 bottom-0 z-[110] h-full w-72 bg-white/80 dark:bg-slate-900/60 backdrop-blur-3xl border-r border-white/40 dark:border-white/5 flex-col shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarVisible ? 'translate-x-0' : '-translate-x-full opacity-0'}`}
+            >
               <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg">
                   <Compass className="text-white" size={24} />
@@ -420,14 +451,13 @@ const App: React.FC = () => {
                     <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider flex items-center gap-1">
                       <HardDrive size={10} /> Local Session Active
                     </span>
-                    <span className="text-sm font-semibold truncate text-slate-800 dark:text-white">{user.username}</span>
+                    <span className="text-sm font-semibold truncate text-slate-800 dark:text-white">{user?.username}</span>
                  </div>
                  <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
               </div>
 
-              {/* AI Status Panel */}
               <div className="px-4 py-3 mx-4 mt-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-white/5 group/ai relative">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">AI Status</span>
@@ -457,7 +487,10 @@ const App: React.FC = () => {
                 {navItems.map(item => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsSidebarVisible(false);
+                    }}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
                       activeTab === item.id 
                         ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm' 
@@ -477,6 +510,14 @@ const App: React.FC = () => {
                  </button>
               </div>
             </aside>
+
+            {/* Sidebar Hover Prompt for Desktop */}
+            <div 
+               className={`hidden lg:flex fixed left-0 top-1/2 -translate-y-1/2 z-[85] bg-emerald-500 text-white p-1 rounded-r-lg shadow-lg cursor-pointer transition-transform duration-500 ${isSidebarVisible ? '-translate-x-full' : 'translate-x-0'}`}
+               onMouseEnter={showSidebar}
+            >
+               <ChevronRightIcon size={16} className="animate-pulse" />
+            </div>
 
             <main className="flex-1 h-full overflow-y-auto relative scroll-smooth z-10 pt-16 pb-24 lg:pt-0 lg:pb-0 scrollbar-hide">
               <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-10 min-h-full">

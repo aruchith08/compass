@@ -19,11 +19,12 @@ import {
   SpellCheck,
   Zap,
   Hash,
-  Type as TypeIcon
+  Type as TypeIcon,
+  Info
 } from "lucide-react";
 import { Type } from "@google/genai";
 import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
-import { runGenAI } from "../services/ai";
+import { runGenAI, getApiKey } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
 
 // --- Robust JSON Parsing Helper ---
@@ -42,6 +43,41 @@ const parseAIJSON = (text: string | undefined) => {
     console.error("AI JSON Parse Error:", e, text);
     return null;
   }
+};
+
+// --- STATIC FALLBACK DATA ---
+const FALLBACK_CHALLENGES: DailyChallenge[] = [
+  {
+    id: "fb_1",
+    category: "Listening",
+    type: "Comprehension",
+    content: "Script: 'I think the lecture on renewable energy was quite insightful, though the section on tidal power was a bit dense.'\n\nQuestion: What part of the lecture did the speaker find difficult?",
+    requiresInput: true,
+    hiddenContent: "The section on tidal power."
+  },
+  {
+    id: "fb_2",
+    category: "Reading",
+    type: "Detail",
+    content: "Text: 'Urbanization has led to a significant increase in noise pollution, affecting avian migration patterns in metropolitan areas.'\n\nQuestion: What specific group of animals is being affected by noise pollution in cities?",
+    requiresInput: true,
+    hiddenContent: "Birds / Avian species."
+  },
+  {
+    id: "fb_3",
+    category: "Writing",
+    type: "Task 2",
+    content: "Some people believe that artificial intelligence will eventually replace human teachers. To what extent do you agree or disagree?",
+    requiresInput: true
+  }
+];
+
+const FALLBACK_VOCAB: VocabularyWord = {
+  word: "Resilient",
+  phonetic: "rɪˈzɪl.jənt",
+  partOfSpeech: "Adjective",
+  definition: "Able to withstand or recover quickly from difficult conditions.",
+  example: "The global economy proved remarkably resilient despite the recent challenges."
 };
 
 // --- CONSTANTS ---
@@ -263,7 +299,7 @@ const ChatWidget = () => {
       const response = await sendMessageToGemini(msg, messages);
       setMessages(prev => [...prev, { role: "model", text: response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: "model", text: "I'm having trouble connecting right now. Please try again later.", isError: true }]);
+      setMessages(prev => [...prev, { role: "model", text: "AI is currently unavailable. Please connect your API key in the dashboard.", isError: true }]);
     } finally {
       setIsLoading(false);
     }
@@ -317,13 +353,18 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   const todayStr = new Date().toDateString();
 
   useEffect(() => {
     if (!user) return;
     const loadSession = async () => {
-      // Sync Vocabulary
+      // 1. Check API Key
+      const key = await getApiKey();
+      if (!key) setIsOffline(true);
+
+      // 2. Sync Vocabulary
       const vocabKey = `lingua_vocab_${user.username}_${todayStr}`;
       const savedVocab = localStorage.getItem(vocabKey);
       if (savedVocab) {
@@ -336,25 +377,29 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           if (word) {
             localStorage.setItem(vocabKey, JSON.stringify(word));
             setVocabWord(word);
+          } else {
+            setVocabWord(FALLBACK_VOCAB);
           }
         } catch (e) {
-          console.error("Failed to load vocabulary word");
+          setVocabWord(FALLBACK_VOCAB);
         }
         setIsVocabLoading(false);
       }
 
-      // Check current session
+      // 3. Check current session
       if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
         setIsLoadingTasks(false);
       } else {
         setIsLoadingTasks(true);
         try {
           const tasks = await generateDailyChallenges();
-          if (tasks.length > 0) {
+          if (tasks && tasks.length > 0) {
             updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+          } else {
+            updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
           }
         } catch (e) {
-          console.error("Failed to generate daily challenges");
+          updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
         }
         setIsLoadingTasks(false);
       }
@@ -373,7 +418,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       setFeedback(result.text);
       setLastScore(result.score);
     } catch (error) {
-      setFeedback("Evaluation failed. Please try again.");
+      setFeedback("AI Evaluator is unavailable. Please connect your API key to get scores.");
     } finally {
       setIsChecking(false);
     }
@@ -387,7 +432,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       const result = await checkVocabularyUsage(vocabWord.word, vocabInput);
       setVocabFeedback(result);
     } catch (error) {
-      setVocabFeedback("Feedback unavailable.");
+      setVocabFeedback("AI feedback requires an active connection.");
     } finally {
       setIsVocabChecking(false);
     }
@@ -413,6 +458,11 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Your IELTS AI Training Partner.</p>
         </div>
+        {isOffline && (
+           <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold">
+              <Info size={14} /> AI Features Disabled (No API Key)
+           </div>
+        )}
       </div>
 
       {/* Word of the Day Section */}
@@ -512,7 +562,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
               <Loader2 className="animate-spin text-emerald-500" size={32} />
               <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating High-Quality IELTS Session...</p>
             </div>
-          ) : linguaSession?.isComplete ? (
+          ) : (linguaSession?.isComplete || (linguaSession && linguaSession.tasks.length === 0)) ? (
             <div className="text-center py-8 animate-fade-in">
                <div className="bg-emerald-50 dark:bg-emerald-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
@@ -558,8 +608,10 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
                         <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
                           <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Band Analysis</span>
-                            <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Analysis</span>
+                            {lastScore !== null && lastScore > 0 && (
+                              <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
+                            )}
                           </div>
                           <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>

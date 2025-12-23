@@ -14,7 +14,9 @@ import {
   HardDrive,
   Cpu,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Key,
+  X
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -26,7 +28,7 @@ import SplashScreen from './components/SplashScreen';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
-import { ensureKeySelected } from './services/ai';
+import { ensureKeySelected, getApiKey, saveManualKey } from './services/ai';
 
 const FIXED_DAILY_TASKS = [
   "Note down the topics discussed in class today",
@@ -36,6 +38,38 @@ const FIXED_DAILY_TASKS = [
   "Complete given homeworks"
 ];
 
+const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (key: string) => void }) => {
+  const [val, setVal] = useState("");
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-8 border border-white/10 shadow-2xl animate-scale-in">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500"><Key size={20} /></div>
+            <h3 className="text-lg font-bold">API Key Setup</h3>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200"><X size={20} /></button>
+        </div>
+        <p className="text-sm text-slate-500 mb-6">Enter your Google Gemini API Key to enable real-time AI evaluations and task generation.</p>
+        <input 
+          type="password" 
+          value={val} 
+          onChange={e => setVal(e.target.value)}
+          placeholder="Enter API Key string..."
+          className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-emerald-500 outline-none mb-6"
+        />
+        <button 
+          onClick={() => { onSave(val); onClose(); }}
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20"
+        >
+          Initialize AI
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -44,6 +78,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [aiConnected, setAiConnected] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
@@ -63,20 +98,24 @@ const App: React.FC = () => {
   // Check AI connection status
   useEffect(() => {
     const checkAi = async () => {
-      if (window.aistudio) {
-        const hasKey = await window.aistudio.hasSelectedApiKey();
-        setAiConnected(hasKey);
-      } else {
-        setAiConnected(!!process.env.API_KEY);
-      }
+      const key = await getApiKey();
+      setAiConnected(!!key);
     };
     checkAi();
-    const interval = setInterval(checkAi, 5000);
+    const interval = setInterval(checkAi, 3000);
     return () => clearInterval(interval);
   }, []);
 
   const handleConnectAI = async () => {
-    await ensureKeySelected();
+    if (window.aistudio) {
+      await ensureKeySelected();
+    } else {
+      setShowKeyModal(true);
+    }
+  };
+
+  const handleSaveKey = (key: string) => {
+    saveManualKey(key);
     setAiConnected(true);
   };
 
@@ -376,6 +415,7 @@ const App: React.FC = () => {
                  </button>
                ))}
             </nav>
+            <KeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} onSave={handleSaveKey} />
           </div>
         </RoadmapContext.Provider>
       )}

@@ -2,53 +2,89 @@
 import { GoogleGenAI } from "@google/genai";
 
 declare global {
-  // Define AIStudio interface to match the global type expected by the environment.
   interface AIStudio {
     hasSelectedApiKey: () => Promise<boolean>;
     openSelectKey: () => Promise<void>;
   }
 
   interface Window {
-    // Redeclare aistudio using the named interface 'AIStudio' as suggested by the compiler.
-    // Marking as optional to match typical global environment extensions and existing usage patterns.
     aistudio?: AIStudio;
   }
 }
 
+const LOCAL_KEY_NAME = "compass_manual_api_key";
+
 /**
- * Ensures an API key has been selected in the AI Studio environment.
+ * Gets the current effective API key from environment, AI Studio, or LocalStorage.
+ */
+export const getApiKey = async (): Promise<string | undefined> => {
+  // 1. Check process.env
+  if (process.env.API_KEY && process.env.API_KEY !== "undefined") {
+    return process.env.API_KEY;
+  }
+
+  // 2. Check local storage
+  const localKey = localStorage.getItem(LOCAL_KEY_NAME);
+  if (localKey) return localKey;
+
+  return undefined;
+};
+
+/**
+ * Saves a manual API key to local storage.
+ */
+export const saveManualKey = (key: string) => {
+  localStorage.setItem(LOCAL_KEY_NAME, key);
+};
+
+/**
+ * Removes the manual API key.
+ */
+export const removeManualKey = () => {
+  localStorage.removeItem(LOCAL_KEY_NAME);
+};
+
+/**
+ * Ensures an API key has been selected or provided.
  */
 export const ensureKeySelected = async (): Promise<boolean> => {
-  // Type guard for optional aistudio property.
-  if (!window.aistudio) return true; // Fallback for standard environments
-  
-  const hasKey = await window.aistudio.hasSelectedApiKey();
-  if (!hasKey) {
-    await window.aistudio.openSelectKey();
-    return true; // Assume success after trigger per guidelines to avoid race conditions.
+  if (window.aistudio) {
+    const hasKey = await window.aistudio.hasSelectedApiKey();
+    if (!hasKey) {
+      await window.aistudio.openSelectKey();
+    }
+    return true;
   }
-  return true;
+  
+  const existing = await getApiKey();
+  return !!existing;
 };
 
 /**
  * Executes a GenAI operation with a fresh instance of GoogleGenAI.
- * Ensures the most up-to-date API key is used.
  */
 export const runGenAI = async <T>(
   operation: (ai: GoogleGenAI) => Promise<T>
 ): Promise<T> => {
   try {
-    // Verify key selection before making the call
-    await ensureKeySelected();
+    const key = await getApiKey();
     
-    // Create a new instance right before making an API call to ensure it always uses 
-    // the most up-to-date API key from the environment.
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!key) {
+      // If we are in AI Studio, try to trigger the picker
+      if (window.aistudio) {
+        await window.aistudio.openSelectKey();
+        const retryKey = await getApiKey();
+        if (!retryKey) throw new Error("API Key required");
+      } else {
+        throw new Error("API Key required. Please connect AI in the dashboard.");
+      }
+    }
+
+    const ai = new GoogleGenAI({ apiKey: key || process.env.API_KEY });
     return await operation(ai);
   } catch (error: any) {
     console.error("[GenAI] Request failed:", error);
     
-    // If the request fails with a "Requested entity was not found" error, reset the key selection state.
     if (error.message?.includes("Requested entity was not found")) {
       if (window.aistudio) {
         await window.aistudio.openSelectKey();

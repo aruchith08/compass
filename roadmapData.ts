@@ -8,7 +8,7 @@ export const ROADMAP_DATA_ITEMS: RoadmapItem[] = [
     resource_name: "Python for Everybody", resource_link: "https://www.py4e.com/", is_project: false, is_output: false, time_estimate: "4-6 weeks"
   },
     {
-    id: "Y1_P01", year: 1, name: "Full Stack", category: "Programming", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
+    id: "Y1_P01", year: 1, name: "Odin Project Full Stack", category: "Programming", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
     description: "Basics to Advanced Full Stack everything at one place.",
     resource_name: "The Odin Project", resource_link: "https://www.theodinproject.com/paths", is_project: false, is_output: false, time_estimate: "24-36 weeks"
   },

@@ -13,8 +13,10 @@ import {
   ShieldCheck,
   MessageSquareQuote,
   ArrowRight,
+  Info
 } from "lucide-react";
 import { runGenAI } from "../services/ai";
+import { useRoadmap } from "../RoadmapContext";
 
 type InterviewType = "Technical" | "Behavioral" | "System Design";
 
@@ -24,6 +26,7 @@ interface MockInterviewProps {
 }
 
 const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
+  const { isAiConnected } = useRoadmap();
   const [type, setType] = useState<InterviewType>("Behavioral");
   const [question, setQuestion] = useState<string>("");
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -35,6 +38,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const generateQuestion = async () => {
+    if (!isAiConnected) return;
     setIsGenerating(true);
     setFeedback(null);
     setScore(null);
@@ -76,10 +80,10 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
-    if (isOpen && !question) {
+    if (isOpen && !question && isAiConnected) {
       generateQuestion();
     }
-  }, [isOpen, type]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, type, isAiConnected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async () => {
     if (!userAnswer.trim()) return;
@@ -161,12 +165,12 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 AI Interview Coach
-                <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black">
-                  Active
+                <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black ${isAiConnected ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'}`}>
+                  {isAiConnected ? 'Active' : 'Offline'}
                 </span>
               </h2>
               <p className="text-xs text-slate-500 flex items-center gap-1 font-medium">
-                <Zap size={12} className="text-amber-500" /> Powered by Gemini
+                <Zap size={12} className="text-amber-500" /> {isAiConnected ? 'Powered by Gemini' : 'Connection Required'}
               </p>
             </div>
           </div>
@@ -179,157 +183,175 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-          <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5">
-            {(["Behavioral", "Technical", "System Design"] as InterviewType[]).map(
-              (t) => (
-                <button
-                  key={t}
-                  onClick={() => {
-                    setType(t);
-                    setQuestion("");
-                    setFeedback(null);
-                    setUserAnswer("");
-                  }}
-                  className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all uppercase tracking-wider ${
-                    type === t
-                      ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-md"
-                      : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                  }`}
-                >
-                  {t}
-                </button>
-              )
-            )}
-          </div>
-
-          <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-800/50 dark:to-slate-900 border border-indigo-100 dark:border-white/10 rounded-2xl p-6 shadow-sm relative group">
-            <div className="flex items-center justify-between mb-4">
-              <span className="flex items-center gap-2 text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">
-                <MessageSquareQuote size={14} /> Current Task
-              </span>
-              <button
-                onClick={generateQuestion}
-                disabled={isGenerating}
-                className="p-2 bg-white dark:bg-slate-800 rounded-xl hover:text-indigo-500 shadow-sm border border-slate-100 dark:border-white/5 transition-all active:scale-90"
-                title="Skip / New Question"
-              >
-                <RefreshCw size={16} className={isGenerating ? "animate-spin" : ""} />
-              </button>
-            </div>
-
-            <div className="min-h-[60px]">
-              {isGenerating ? (
-                <div className="space-y-2">
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4 animate-pulse"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2 animate-pulse"></div>
-                </div>
-              ) : (
-                <h3 className="text-lg md:text-xl font-serif text-slate-800 dark:text-slate-100 leading-relaxed font-semibold italic">
-                  "{question}"
-                </h3>
-              )}
-            </div>
-          </div>
-
-          {!feedback ? (
-            <div className="space-y-4 animate-slide-up">
-              <div className="relative">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                  Your Response
-                </label>
-                <textarea
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder={
-                    type === "Behavioral"
-                      ? "Use the STAR method: Situation, Task, Action, Result..."
-                      : "Be specific and technical..."
-                  }
-                  className="w-full h-48 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none placeholder:text-slate-400 shadow-inner transition-all text-base leading-relaxed"
-                />
-                {userAnswer.length > 0 && (
-                  <span className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-400">
-                    {userAnswer.length} chars
-                  </span>
-                )}
+          {!isAiConnected ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+              <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-full">
+                <Info size={40} className="text-amber-600 dark:text-amber-400" />
               </div>
-              <button
-                onClick={handleSubmit}
-                disabled={isEvaluating || !userAnswer.trim()}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed group"
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">AI Connection Required</h3>
+              <p className="text-slate-500 max-w-xs text-sm">Please connect your Gemini API Key in the dashboard to start simulated interviews.</p>
+              <button 
+                onClick={handleInternalClose}
+                className="px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm"
               >
-                {isEvaluating ? (
-                  <>
-                    <Loader2 className="animate-spin" size={20} />
-                    Analyzing your performance...
-                  </>
-                ) : (
-                  <>
-                    <Send
-                      size={20}
-                      className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-                    />
-                    Submit for Evaluation
-                  </>
-                )}
+                Go to Dashboard
               </button>
             </div>
           ) : (
-            <div className="space-y-6 animate-slide-up">
-              <div className="bg-white dark:bg-slate-800 border-2 border-indigo-100 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl">
-                <div className="bg-indigo-600 p-4 flex items-center justify-between">
-                  <h3 className="font-bold text-white flex items-center gap-2">
-                    <Award size={20} /> AI Feedback
-                  </h3>
-                  {score !== null && (
-                    <div className="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-white font-black text-sm border border-white/30">
-                      SCORE: {score}/10
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="prose dark:prose-invert max-w-none text-sm md:text-base leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-300 font-medium">
-                    {feedback}
-                  </div>
+            <>
+              <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5">
+                {(["Behavioral", "Technical", "System Design"] as InterviewType[]).map(
+                  (t) => (
+                    <button
+                      key={t}
+                      onClick={() => {
+                        setType(t);
+                        setQuestion("");
+                        setFeedback(null);
+                        setUserAnswer("");
+                      }}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all uppercase tracking-wider ${
+                        type === t
+                          ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-md"
+                          : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  )
+                )}
+              </div>
 
-                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800/50 rounded-xl flex items-start gap-3">
-                      <ShieldCheck className="text-emerald-500 shrink-0" size={18} />
-                      <div>
-                        <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase mb-1">
-                          Pass Criteria
-                        </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          Aim for a score above 7 for Tier-1 readiness.
-                        </p>
-                      </div>
+              <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-800/50 dark:to-slate-900 border border-indigo-100 dark:border-white/10 rounded-2xl p-6 shadow-sm relative group">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="flex items-center gap-2 text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">
+                    <MessageSquareQuote size={14} /> Current Task
+                  </span>
+                  <button
+                    onClick={generateQuestion}
+                    disabled={isGenerating}
+                    className="p-2 bg-white dark:bg-slate-800 rounded-xl hover:text-indigo-500 shadow-sm border border-slate-100 dark:border-white/5 transition-all active:scale-90"
+                    title="Skip / New Question"
+                  >
+                    <RefreshCw size={16} className={isGenerating ? "animate-spin" : ""} />
+                  </button>
+                </div>
+
+                <div className="min-h-[60px]">
+                  {isGenerating ? (
+                    <div className="space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4 animate-pulse"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2 animate-pulse"></div>
                     </div>
-                    <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800/50 rounded-xl flex items-start gap-3">
-                      <Star className="text-amber-500 shrink-0" size={18} />
-                      <div>
-                        <h4 className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase mb-1">
-                          Growth Mindset
-                        </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          Apply the tips and retry to build muscle memory.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  ) : (
+                    <h3 className="text-lg md:text-xl font-serif text-slate-800 dark:text-slate-100 leading-relaxed font-semibold italic">
+                      "{question}"
+                    </h3>
+                  )}
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  setFeedback(null);
-                  setUserAnswer("");
-                  generateQuestion();
-                }}
-                className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg active:scale-95"
-              >
-                Next Interview Round <ArrowRight size={20} />
-              </button>
-            </div>
+              {!feedback ? (
+                <div className="space-y-4 animate-slide-up">
+                  <div className="relative">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                      Your Response
+                    </label>
+                    <textarea
+                      value={userAnswer}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      placeholder={
+                        type === "Behavioral"
+                          ? "Use the STAR method: Situation, Task, Action, Result..."
+                          : "Be specific and technical..."
+                      }
+                      className="w-full h-48 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none placeholder:text-slate-400 shadow-inner transition-all text-base leading-relaxed"
+                    />
+                    {userAnswer.length > 0 && (
+                      <span className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-400">
+                        {userAnswer.length} chars
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isEvaluating || !userAnswer.trim()}
+                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed group"
+                  >
+                    {isEvaluating ? (
+                      <>
+                        <Loader2 className="animate-spin" size={20} />
+                        Analyzing your performance...
+                      </>
+                    ) : (
+                      <>
+                        <Send
+                          size={20}
+                          className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                        />
+                        Submit for Evaluation
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6 animate-slide-up">
+                  <div className="bg-white dark:bg-slate-800 border-2 border-indigo-100 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl">
+                    <div className="bg-indigo-600 p-4 flex items-center justify-between">
+                      <h3 className="font-bold text-white flex items-center gap-2">
+                        <Award size={20} /> AI Feedback
+                      </h3>
+                      {score !== null && (
+                        <div className="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-white font-black text-sm border border-white/30">
+                          SCORE: {score}/10
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <div className="prose dark:prose-invert max-w-none text-sm md:text-base leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-300 font-medium">
+                        {feedback}
+                      </div>
+
+                      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800/50 rounded-xl flex items-start gap-3">
+                          <ShieldCheck className="text-emerald-500 shrink-0" size={18} />
+                          <div>
+                            <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase mb-1">
+                              Pass Criteria
+                            </h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Aim for a score above 7 for Tier-1 readiness.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800/50 rounded-xl flex items-start gap-3">
+                          <Star className="text-amber-500 shrink-0" size={18} />
+                          <div>
+                            <h4 className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase mb-1">
+                              Growth Mindset
+                            </h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Apply the tips and retry to build muscle memory.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setFeedback(null);
+                      setUserAnswer("");
+                      generateQuestion();
+                    }}
+                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg active:scale-95"
+                  >
+                    Next Interview Round <ArrowRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

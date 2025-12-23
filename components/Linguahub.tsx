@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Type } from "@google/genai";
 import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
-import { runGenAI, getApiKey } from "../services/ai";
+import { runGenAI } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
 
 // --- Robust JSON Parsing Helper ---
@@ -341,7 +341,7 @@ const ChatWidget = () => {
 // --- MAIN COMPONENT ---
 
 const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
-  const { linguaSession, updateLinguaSession } = useRoadmap();
+  const { linguaSession, updateLinguaSession, isAiConnected } = useRoadmap();
   const [selectedSkill, setSelectedSkill] = useState<SkillCategory | null>(null);
   const [isLoadingTasks, setIsLoadingTasks] = useState(true);
   const [vocabWord, setVocabWord] = useState<VocabularyWord | null>(null);
@@ -353,30 +353,34 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const [isOffline, setIsOffline] = useState(false);
 
   const todayStr = new Date().toDateString();
 
   useEffect(() => {
     if (!user) return;
+    
     const loadSession = async () => {
-      // 1. Check API Key
-      const key = await getApiKey();
-      if (!key) setIsOffline(true);
-
-      // 2. Sync Vocabulary
+      // 1. Sync Vocabulary
       const vocabKey = `lingua_vocab_${user.username}_${todayStr}`;
       const savedVocab = localStorage.getItem(vocabKey);
-      if (savedVocab) {
+      
+      // If we are connected now but were using fallback, retry AI vocab
+      const needsAiVocab = !savedVocab || (savedVocab && JSON.parse(savedVocab).word === FALLBACK_VOCAB.word && isAiConnected);
+
+      if (!needsAiVocab && savedVocab) {
         setVocabWord(JSON.parse(savedVocab));
         setIsVocabLoading(false);
       } else {
         setIsVocabLoading(true);
         try {
-          const word = await generateVocabularyWord();
-          if (word) {
-            localStorage.setItem(vocabKey, JSON.stringify(word));
-            setVocabWord(word);
+          if (isAiConnected) {
+            const word = await generateVocabularyWord();
+            if (word) {
+              localStorage.setItem(vocabKey, JSON.stringify(word));
+              setVocabWord(word);
+            } else {
+              setVocabWord(FALLBACK_VOCAB);
+            }
           } else {
             setVocabWord(FALLBACK_VOCAB);
           }
@@ -386,15 +390,25 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       }
 
-      // 3. Check current session
-      if (linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0) {
+      // 2. Sync Challenges
+      // If we already have real AI tasks, don't re-generate
+      const hasRealTasks = linguaSession && linguaSession.date === todayStr && linguaSession.tasks.length > 0 && !linguaSession.tasks[0].id.startsWith('fb_');
+
+      if (hasRealTasks) {
+        setIsLoadingTasks(false);
+      } else if (linguaSession && linguaSession.date === todayStr && !isAiConnected) {
+        // Just show current fallback
         setIsLoadingTasks(false);
       } else {
         setIsLoadingTasks(true);
         try {
-          const tasks = await generateDailyChallenges();
-          if (tasks && tasks.length > 0) {
-            updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+          if (isAiConnected) {
+            const tasks = await generateDailyChallenges();
+            if (tasks && tasks.length > 0) {
+              updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+            } else {
+              updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
+            }
           } else {
             updateLinguaSession({ date: todayStr, tasks: FALLBACK_CHALLENGES, currentIndex: 0, isComplete: false });
           }
@@ -404,8 +418,9 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsLoadingTasks(false);
       }
     };
+    
     loadSession();
-  }, [user, todayStr]);
+  }, [user, todayStr, isAiConnected]);
 
   const currentTask = linguaSession?.tasks[linguaSession.currentIndex] || null;
 
@@ -418,7 +433,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
       setFeedback(result.text);
       setLastScore(result.score);
     } catch (error) {
-      setFeedback("AI Evaluator is unavailable. Please connect your API key to get scores.");
+      setFeedback("AI Evaluator is unavailable. Check your API key connection.");
     } finally {
       setIsChecking(false);
     }
@@ -458,9 +473,9 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Your IELTS AI Training Partner.</p>
         </div>
-        {isOffline && (
-           <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold">
-              <Info size={14} /> AI Features Disabled (No API Key)
+        {!isAiConnected && (
+           <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
+              <Info size={14} /> AI Fallback Active (Missing API Key)
            </div>
         )}
       </div>

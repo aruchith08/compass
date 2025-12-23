@@ -60,7 +60,7 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
           className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-emerald-500 outline-none mb-6"
         />
         <button 
-          onClick={() => { onSave(val); onClose(); }}
+          onClick={() => { if(val.trim()) { onSave(val); onClose(); } }}
           className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20"
         >
           Initialize AI
@@ -95,14 +95,14 @@ const App: React.FC = () => {
     return 'light';
   });
 
-  // Check AI connection status
+  // Check AI connection status frequently
   useEffect(() => {
     const checkAi = async () => {
       const key = await getApiKey();
       setAiConnected(!!key);
     };
     checkAi();
-    const interval = setInterval(checkAi, 3000);
+    const interval = setInterval(checkAi, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -261,12 +261,12 @@ const App: React.FC = () => {
   };
 
   const contextValue: RoadmapContextType = useMemo(() => ({
-    items, user, theme, login: handleLogin, logout: handleLogout,
+    items, user, theme, isAiConnected: aiConnected, login: handleLogin, logout: handleLogout,
     toggleTheme, toggleStatus, getCompletionPercentage,
     dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask,
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
     linguaSession, updateLinguaSession
-  }), [items, user, theme, dailyTasks, homeworkTasks, linguaSession]);
+  }), [items, user, theme, aiConnected, dailyTasks, homeworkTasks, linguaSession]);
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },

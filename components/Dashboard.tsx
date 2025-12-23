@@ -215,17 +215,26 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quote Section - Redesigned for Light Mode Friendliness */}
-      <div className="bg-emerald-50/60 dark:bg-slate-900/40 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden shadow-xl dark:shadow-2xl animate-slide-up border border-emerald-100 dark:border-white/5" style={{ animationDelay: '300ms' }}>
-        <div className="absolute top-0 right-0 p-24 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[100px] -mr-16 -mt-16 pointer-events-none animate-pulse-slow"></div>
+      {/* Quote Section - Vibrant in both Light and Dark mode */}
+      <div className="bg-gradient-to-br from-emerald-100/80 via-white/90 to-teal-50/80 dark:from-emerald-950/80 dark:via-slate-900/95 dark:to-teal-950/80 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden shadow-xl shadow-emerald-200/40 dark:shadow-2xl dark:shadow-emerald-900/40 animate-slide-up border border-emerald-200/60 dark:border-emerald-500/20" style={{ animationDelay: '300ms' }}>
+        <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 dark:bg-emerald-400/15 rounded-full blur-[100px] -mr-16 -mt-16 pointer-events-none animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 p-32 bg-teal-500/5 dark:bg-teal-400/10 rounded-full blur-[100px] -ml-16 -mb-16 pointer-events-none animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1">
-            <Quote className="text-emerald-500/10 dark:text-emerald-500/20 mb-4" size={48} />
-            <p className="text-xl md:text-2xl font-serif italic leading-relaxed text-slate-800 dark:text-slate-100">"The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."</p>
-            <p className="mt-4 text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-[0.3em]">— Brian Herbert</p>
+            <Quote className="text-emerald-600/20 dark:text-emerald-400/30 mb-4" size={56} />
+            <p className="text-xl md:text-3xl font-serif italic leading-relaxed text-slate-800 dark:text-slate-50">
+              "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."
+            </p>
+            <div className="flex items-center gap-3 mt-6">
+              <div className="h-0.5 w-10 bg-emerald-500/50 dark:bg-emerald-400/50"></div>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-[0.4em]">
+                Brian Herbert
+              </p>
+            </div>
           </div>
           <div className="hidden md:flex flex-col gap-4">
-            <button onClick={handlePerplexityClick} className="bg-emerald-600 dark:bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-500 dark:hover:bg-emerald-400 hover:scale-105 transition-all shadow-lg shadow-emerald-600/20 dark:shadow-emerald-500/20 flex items-center gap-3 active:scale-95 group">
+            <button onClick={handlePerplexityClick} className="bg-emerald-600 dark:bg-emerald-500 text-white px-8 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 dark:hover:bg-emerald-400 hover:scale-105 transition-all shadow-xl shadow-emerald-600/30 dark:shadow-emerald-500/40 flex items-center gap-3 active:scale-95 group">
               <Search size={18} /> Deep Context Search <ExternalLink size={14} className="opacity-50 group-hover:opacity-100 transition-opacity" />
             </button>
           </div>

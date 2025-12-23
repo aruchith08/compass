@@ -8,12 +8,12 @@ export const ROADMAP_DATA_ITEMS: RoadmapItem[] = [
     resource_name: "Python for Everybody", resource_link: "https://www.py4e.com/", is_project: false, is_output: false, time_estimate: "4-6 weeks"
   },
     {
-    id: "Y1_P02", year: 1, name: "Odin Project Full Stack", category: "Programming", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
+    id: "Y1_P03", year: 1, name: "Odin Project Full Stack", category: "Programming", priority: "High", status: "To Do", role_alignment: ["Full Stack Developer"],
     description: "Basics to Advanced Full Stack everything at one place.",
     resource_name: "The Odin Project", resource_link: "https://www.theodinproject.com/paths", is_project: false, is_output: false, time_estimate: "24-36 weeks"
   },
   {
-    id: "Y1_P03", year: 1, name: "Python OOP & Error Handling", category: "Programming", priority: "High", status: "To Do", role_alignment: ["AI/ML Engineer", "Data Scientist", "Full Stack Developer"],
+    id: "Y1_P02", year: 1, name: "Python OOP & Error Handling", category: "Programming", priority: "High", status: "To Do", role_alignment: ["AI/ML Engineer", "Data Scientist", "Full Stack Developer"],
     description: "Object-Oriented Programming (Classes, Objects, Methods, Attributes) and Try/Except blocks.",
     resource_name: "Programming with Mosh", resource_link: "https://www.youtube.com/watch?v=_uQrJ0TkZlc", is_project: false, is_output: false, time_estimate: "2-3 weeks"
   },

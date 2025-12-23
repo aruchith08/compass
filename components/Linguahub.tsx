@@ -22,12 +22,48 @@ import {
   Type as TypeIcon,
   Info,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Play,
+  Volume2,
+  Square,
+  Circle,
+  CheckCircle,
+  FileText
 } from "lucide-react";
-import { Type } from "@google/genai";
+import { Type, Modality } from "@google/genai";
 import { User, SkillType, DailyChallenge, LinguaSession } from "../types";
 import { runGenAI } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
+
+// --- Utility Functions for Audio ---
+function decodeBase64(base64: string) {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function decodeAudioData(
+  data: Uint8Array,
+  ctx: AudioContext,
+  sampleRate: number,
+  numChannels: number,
+): Promise<AudioBuffer> {
+  const dataInt16 = new Int16Array(data.buffer);
+  const frameCount = dataInt16.length / numChannels;
+  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+
+  for (let channel = 0; channel < numChannels; channel++) {
+    const channelData = buffer.getChannelData(channel);
+    for (let i = 0; i < frameCount; i++) {
+      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+    }
+  }
+  return buffer;
+}
 
 // --- Robust JSON Parsing Helper ---
 const parseAIJSON = (text: string | undefined) => {
@@ -64,13 +100,6 @@ const FALLBACK_CHALLENGES: DailyChallenge[] = [
     content: "Text: 'Urbanization has led to a significant increase in noise pollution, affecting avian migration patterns in metropolitan areas.'\n\nQuestion: What specific group of animals is being affected by noise pollution in cities?",
     requiresInput: true,
     hiddenContent: "Birds / Avian species."
-  },
-  {
-    id: "fb_3",
-    category: "Writing",
-    type: "Task 2",
-    content: "Some people believe that artificial intelligence will eventually replace human teachers. To what extent do you agree or disagree?",
-    requiresInput: true
   }
 ];
 
@@ -161,16 +190,26 @@ const sendMessageToGemini = async (message: string, history: ChatMessage[]): Pro
 
 const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenContext?: string) => {
   return runGenAI(async (ai) => {
-    const contextStr = hiddenContext ? `\nContext: "${hiddenContext}"` : "";
-    const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response based on IELTS standards. 
-    Question/Prompt: "${challenge}"${contextStr} 
-    Candidate Answer: "${userAnswer}". 
-    Return Band Score (1.0-9.0) and detailed feedback including grammar, vocabulary, and task response. 
-    Format your response to include: Score: [X]/9 Feedback: [Your text]`;
+    const contextStr = hiddenContext ? `\nContext/Script: "${hiddenContext}"` : "";
     
+    const contents = {
+        parts: [{
+            text: `You are a certified IELTS Examiner. 
+            Task: Evaluate the candidate's WRITTEN response based on IELTS standards (Grammar, Vocabulary, Coherence, Task Response).
+            Question/Prompt: "${challenge}"
+            ${contextStr} 
+            Candidate Answer: "${userAnswer}"
+            
+            Return a Band Score (1.0-9.0) and constructive feedback.
+            Format:
+            Score: [X]/9
+            Feedback: [Detailed feedback]`
+        }]
+    };
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: prompt,
+      contents: contents,
     });
     const text = response.text || "";
     const scoreMatch = text.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
@@ -230,9 +269,16 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
         required: ["id", "category", "type", "content", "requiresInput"],
       },
     };
-    const prompt = `Generate exactly 5 high-quality, text-based IELTS preparation challenges for a student. 
-    The challenges MUST be varied and cover Listening, Reading, Writing, Speaking, and Vocabulary. 
-    Target Band: 7.5+. Provide the response in valid JSON.`;
+    const prompt = `Generate exactly 6 high-quality IELTS preparation challenges (TEXT-ONLY responses required, no Speaking tasks). 
+    Categories MUST include: 
+    1. Listening (provide a script in hiddenContent and a question in content)
+    2. Reading (provide a text snippet and a question)
+    3. Writing (provide an essay or report prompt)
+    4. Vocabulary (focus on high-level word choice)
+    5. Grammar & Structure (advanced sentence forms)
+    6. Collocations & Phrasal Verbs (natural English expressions).
+    
+    Target Band: 7.5+. Return valid JSON. Do not include 'Speaking' type tasks.`;
     
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -244,6 +290,29 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
     });
     return parseAIJSON(response.text) || [];
   });
+};
+
+const generateSpeechFromText = async (text: string): Promise<string | null> => {
+    return runGenAI(async (ai) => {
+        try {
+            const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash-preview-tts",
+                contents: [{ parts: [{ text: `Read this IELTS listening prompt clearly and naturally: ${text}` }] }],
+                config: {
+                    responseModalities: [Modality.AUDIO],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: 'Kore' },
+                        },
+                    },
+                },
+            });
+            return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || null;
+        } catch (e) {
+            console.error("TTS Error:", e);
+            return null;
+        }
+    });
 };
 
 // --- SUB-COMPONENTS ---
@@ -352,6 +421,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
   const [isChecking, setIsChecking] = useState(false);
   const [errorInfo, setErrorInfo] = useState<string | null>(null);
 
+  // Audio State
+  const [prefetchedAudio, setPrefetchedAudio] = useState<string | null>(null);
+  const [isPreFetchingAudio, setIsPreFetchingAudio] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+
   const todayStr = new Date().toDateString();
 
   const loadEverything = async () => {
@@ -415,6 +490,28 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
 
   const currentTask = linguaSession?.tasks[linguaSession.currentIndex] || null;
 
+  // --- Audio Pre-fetching Effect ---
+  useEffect(() => {
+    const prefetch = async () => {
+        if (currentTask?.category === 'Listening' && isAiConnected) {
+            setPrefetchedAudio(null);
+            setIsPreFetchingAudio(true);
+            try {
+                const data = await generateSpeechFromText(currentTask.hiddenContent || currentTask.content);
+                setPrefetchedAudio(data);
+            } catch (err) {
+                console.error("Failed to pre-fetch audio:", err);
+            } finally {
+                setIsPreFetchingAudio(false);
+            }
+        } else {
+            setPrefetchedAudio(null);
+            setIsPreFetchingAudio(false);
+        }
+    };
+    prefetch();
+  }, [currentTask, isAiConnected]);
+
   const handleCheckAnswer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTask || !userAnswer.trim()) return;
@@ -449,9 +546,45 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
     setUserAnswer("");
     setFeedback(null);
     setLastScore(null);
+    setPrefetchedAudio(null); // Reset audio for next round
     const nextIdx = linguaSession.currentIndex + 1;
     const complete = nextIdx >= linguaSession.tasks.length;
     updateLinguaSession({ ...linguaSession, currentIndex: complete ? linguaSession.currentIndex : nextIdx, isComplete: complete });
+  };
+
+  // --- Audio Logic ---
+  const playListeningAudio = async () => {
+    if (!currentTask || isPlaying) return;
+    
+    let audioData = prefetchedAudio;
+    
+    // Fallback if not pre-fetched (e.g. user clicked too fast)
+    if (!audioData) {
+        setIsPlaying(true);
+        audioData = await generateSpeechFromText(currentTask.hiddenContent || currentTask.content);
+        if (!audioData) {
+            setIsPlaying(false);
+            return;
+        }
+    } else {
+        setIsPlaying(true);
+    }
+
+    if (audioData) {
+        if (!audioContextRef.current) {
+            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+        }
+        const ctx = audioContextRef.current;
+        const decoded = decodeBase64(audioData);
+        const buffer = await decodeAudioData(decoded, ctx, 24000, 1);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        source.onended = () => setIsPlaying(false);
+        source.start();
+    } else {
+        setIsPlaying(false);
+    }
   };
 
   return (
@@ -469,7 +602,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
               <Info size={14} /> Offline Mode (Connect AI to enable dynamic tasks)
            </div>
         ) : (
-           <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+           <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 text-emerald-700 dark:text-amber-400 text-xs font-bold">
               <Sparkles size={14} className="animate-pulse" /> AI Enhanced Experience
            </div>
         )}
@@ -565,13 +698,13 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
           </a>
         </div>
       </section>
-
+      
       {/* Daily Challenges */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Star className="text-amber-500 fill-amber-500" size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges (AI Evaluated)</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Mission (6 Pillars)</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && linguaSession && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
@@ -579,11 +712,11 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
             </span>
           )}
         </div>
-        <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[200px] flex flex-col justify-center transition-all overflow-hidden">
+        <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-100 dark:border-white/5 p-4 md:p-8 rounded-[2rem] md:rounded-3xl shadow-xl relative min-h-[300px] flex flex-col justify-center transition-all overflow-hidden">
           {isLoadingTasks ? (
             <div className="flex flex-col items-center justify-center h-full py-12 gap-3">
               <Loader2 className="animate-spin text-emerald-500" size={32} />
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating High-Quality IELTS Session...</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Generating Your Session...</p>
             </div>
           ) : (linguaSession?.isComplete || (linguaSession && linguaSession.tasks.length === 0)) ? (
             <div className="text-center py-8 animate-fade-in">
@@ -591,14 +724,20 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                  <CalendarCheck className="text-emerald-600 dark:text-emerald-400" size={32} />
                </div>
                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Daily Mission Complete</h3>
-               <p className="text-slate-500 text-sm">Session completed and saved to your browser.</p>
+               <p className="text-slate-500 text-sm">All 6 linguistic pillars evaluated.</p>
                <button onClick={loadEverything} className="mt-6 px-6 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">Regenerate AI Tasks</button>
             </div>
           ) : currentTask && (
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
                <div className="flex flex-row md:flex-col items-center gap-4 md:gap-3 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 md:pr-8 md:w-32">
-                  <div className="bg-amber-50 dark:bg-amber-500/10 p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0">
-                    <Hash className="text-amber-500 w-6 h-6 md:w-8 md:h-8" />
+                  <div className={`p-2.5 md:p-4 rounded-xl md:rounded-full shadow-inner flex-shrink-0 ${
+                    currentTask.category === 'Listening' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-500' :
+                    'bg-amber-50 dark:bg-amber-500/10 text-amber-500'
+                  }`}>
+                    {currentTask.category === 'Listening' ? <Headphones size={32} /> : 
+                     currentTask.category === 'Writing' ? <PenTool size={32} /> :
+                     currentTask.category === 'Reading' ? <BookOpen size={32} /> :
+                     <FileText size={32} />}
                   </div>
                   <div className="text-left md:text-center flex-1 md:flex-none">
                     <span className="hidden md:block text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">IELTS</span>
@@ -612,6 +751,23 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       {currentTask.content}
                     </h3>
                   </div>
+
+                  {/* Audio Controls for Listening */}
+                  <div className="flex flex-wrap gap-3">
+                    {currentTask.category === 'Listening' && (
+                        <button 
+                          onClick={playListeningAudio} 
+                          disabled={isPlaying}
+                          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 ${
+                             prefetchedAudio ? 'bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20' : 'bg-blue-600 hover:bg-blue-700'
+                          } text-white`}
+                        >
+                          {isPlaying ? <Loader2 className="animate-spin" size={16} /> : (prefetchedAudio ? <Volume2 size={16} className="animate-pulse" /> : <Play size={16} fill="currentColor" />)}
+                          {isPlaying ? "Playing..." : prefetchedAudio ? "Audio Ready: Play Now" : "Generating Audio..."}
+                          {prefetchedAudio && !isPlaying && <CheckCircle size={14} className="ml-1" />}
+                        </button>
+                    )}
+                  </div>
                   
                   <div className="pt-2 md:pt-5 border-t border-slate-100 dark:border-white/5">
                     {!feedback ? (
@@ -619,12 +775,12 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                         <textarea 
                           value={userAnswer} 
                           onChange={e => setUserAnswer(e.target.value)} 
-                          placeholder="Type your response or analysis..." 
+                          placeholder="Type your response or analysis here..." 
                           className="w-full h-24 md:h-32 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-4 text-sm md:text-base focus:ring-1 focus:ring-emerald-500/20 outline-none shadow-inner resize-none transition-all dark:text-white" 
                         />
                         <div className="flex justify-end">
                           <button type="submit" disabled={isChecking || !userAnswer.trim()} className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 shadow-md active:scale-95">
-                            {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Submit for Evaluation"}
+                            {isChecking ? <Loader2 className="animate-spin" size={16} /> : "Submit for AI Evaluation"}
                           </button>
                         </div>
                       </form>
@@ -632,7 +788,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
                         <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
                           <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Analysis</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Performance Analysis</span>
                             {lastScore !== null && lastScore > 0 && (
                               <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
                             )}
@@ -640,7 +796,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                           <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>
                         </div>
                         <button onClick={handleNextTask} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-                          Proceed to Next Task <ArrowRight size={16} />
+                          Next Pillar <ArrowRight size={16} />
                         </button>
                       </div>
                     )}

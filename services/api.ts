@@ -37,14 +37,15 @@ export const api = {
         const finalRoadmap = ROADMAP_DATA.map(defaultItem => {
           const userItem = userItemsMap.get(defaultItem.id);
           if (userItem) {
-            // Preserve user status/alignment while updating metadata from source
+            // Preserve user status while updating metadata and filters from source
             return {
               ...userItem,
               resource_name: defaultItem.resource_name || userItem.resource_name,
               resource_link: defaultItem.resource_link || userItem.resource_link,
               description: defaultItem.description || userItem.description,
               category: defaultItem.category || userItem.category,
-              priority: defaultItem.priority || userItem.priority
+              priority: defaultItem.priority || userItem.priority,
+              role_alignment: defaultItem.role_alignment || userItem.role_alignment // Ensure alignment updates from source
             };
           } else {
             return { ...defaultItem };

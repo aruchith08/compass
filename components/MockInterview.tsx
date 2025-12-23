@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Mic,
@@ -54,11 +55,10 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
     try {
       await runGenAI(async (ai) => {
         const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: [{ role: "user", parts: [{ text: aiPrompt }] }],
+          model: "gemini-3-pro-preview",
+          contents: aiPrompt,
         });
 
-        /* FIX: Directly use .text property to get generated content as per guidelines */
         const text = response.text?.trim() || "";
 
         setQuestion(
@@ -112,10 +112,9 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
       await runGenAI(async (ai) => {
         const response = await ai.models.generateContent({
           model: "gemini-3-pro-preview",
-          contents: [{ role: "user", parts: [{ text: aiPrompt }] }],
+          contents: aiPrompt,
         });
 
-        /* FIX: Directly use .text property to get generated content as per guidelines */
         const text = response.text || "";
 
         const scoreMatch = text.match(/Score:\s*(\d+)/i);
@@ -163,12 +162,11 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 AI Interview Coach
                 <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black">
-                  Pro
+                  Active
                 </span>
               </h2>
               <p className="text-xs text-slate-500 flex items-center gap-1 font-medium">
-                <Zap size={12} className="text-amber-500" /> Powered by Gemini 3
-                Pro
+                <Zap size={12} className="text-amber-500" /> Powered by Gemini
               </p>
             </div>
           </div>
@@ -281,7 +279,7 @@ const MockInterview: React.FC<MockInterviewProps> = ({ isOpen, onClose }) => {
               <div className="bg-white dark:bg-slate-800 border-2 border-indigo-100 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl">
                 <div className="bg-indigo-600 p-4 flex items-center justify-between">
                   <h3 className="font-bold text-white flex items-center gap-2">
-                    <Award size={20} /> Official Evaluation
+                    <Award size={20} /> AI Feedback
                   </h3>
                   {score !== null && (
                     <div className="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-white font-black text-sm border border-white/30">

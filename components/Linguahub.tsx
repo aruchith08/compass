@@ -27,7 +27,7 @@ import { runGenAI } from "../services/ai";
 import { useRoadmap } from "../RoadmapContext";
 
 // --- Robust JSON Parsing Helper ---
-const parseAIJSON = (text: string) => {
+const parseAIJSON = (text: string | undefined) => {
   try {
     if (!text) return null;
     let cleaned = text.trim();
@@ -111,7 +111,7 @@ export const SAMPLE_PAPERS: ResourceLink[] = [
 const sendMessageToGemini = async (message: string, history: ChatMessage[]): Promise<string> => {
   return runGenAI(async (ai) => {
     const chat = ai.chats.create({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3-pro-preview",
       config: {
         systemInstruction: "You are an expert IELTS Tutor named LinguaBot. Your goal is to help students achieve Band 7.0+. Keep answers concise, professional, and focused on IELTS marking criteria.",
       },
@@ -127,12 +127,12 @@ const evaluateChallenge = async (challenge: string, userAnswer: string, hiddenCo
     const prompt = `You are a certified IELTS Examiner. Task: Evaluate the candidate's response based on IELTS standards. 
     Question/Prompt: "${challenge}"${contextStr} 
     Candidate Answer: "${userAnswer}". 
-    Return Band Score (1.0-9.0) and detailed feedback including grammar, vocabulary, and task response. Format: Score: [X]/9 Feedback: [Your text]`;
+    Return Band Score (1.0-9.0) and detailed feedback including grammar, vocabulary, and task response. 
+    Format your response to include: Score: [X]/9 Feedback: [Your text]`;
     
-    // Using Pro for evaluation to ensure high-quality Band scoring
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: prompt,
     });
     const text = response.text || "";
     const scoreMatch = text.match(/Score:\s*(\d+(\.\d+)?)\/9/i);
@@ -154,9 +154,12 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
       required: ["word", "phonetic", "partOfSpeech", "definition", "example"],
     };
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ role: "user", parts: [{ text: "Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9." }] }],
-      config: { responseMimeType: "application/json", responseSchema: schema } as any,
+      model: "gemini-3-pro-preview",
+      contents: "Generate a random, sophisticated English vocabulary word suitable for IELTS Band 8/9.",
+      config: { 
+        responseMimeType: "application/json", 
+        responseSchema: schema 
+      },
     });
     return parseAIJSON(response.text);
   });
@@ -165,8 +168,8 @@ const generateVocabularyWord = async (): Promise<VocabularyWord | null> => {
 const checkVocabularyUsage = async (word: string, sentence: string): Promise<string> => {
   return runGenAI(async (ai) => {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ role: "user", parts: [{ text: `Evaluate the usage of the word "${word}" in this sentence: "${sentence}". Max 2 sentences feedback.` }] }],
+      model: "gemini-3-pro-preview",
+      contents: `Evaluate the usage of the word "${word}" in this sentence: "${sentence}". Max 2 sentences feedback.`,
     });
     return response.text || "No feedback generated.";
   });
@@ -199,9 +202,12 @@ const generateDailyChallenges = async (): Promise<DailyChallenge[]> => {
     Target Band: 7.5+. Provide the response in valid JSON.`;
     
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: { responseMimeType: "application/json", responseSchema: schema } as any,
+      model: "gemini-3-pro-preview",
+      contents: prompt,
+      config: { 
+        responseMimeType: "application/json", 
+        responseSchema: schema 
+      },
     });
     return parseAIJSON(response.text) || [];
   });
@@ -325,10 +331,14 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsVocabLoading(false);
       } else {
         setIsVocabLoading(true);
-        const word = await generateVocabularyWord();
-        if (word) {
-          localStorage.setItem(vocabKey, JSON.stringify(word));
-          setVocabWord(word);
+        try {
+          const word = await generateVocabularyWord();
+          if (word) {
+            localStorage.setItem(vocabKey, JSON.stringify(word));
+            setVocabWord(word);
+          }
+        } catch (e) {
+          console.error("Failed to load vocabulary word");
         }
         setIsVocabLoading(false);
       }
@@ -338,9 +348,13 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         setIsLoadingTasks(false);
       } else {
         setIsLoadingTasks(true);
-        const tasks = await generateDailyChallenges();
-        if (tasks.length > 0) {
-          updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+        try {
+          const tasks = await generateDailyChallenges();
+          if (tasks.length > 0) {
+            updateLinguaSession({ date: todayStr, tasks, currentIndex: 0, isComplete: false });
+          }
+        } catch (e) {
+          console.error("Failed to generate daily challenges");
         }
         setIsLoadingTasks(false);
       }
@@ -484,7 +498,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Star className="text-amber-500 fill-amber-500" size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges (Pro Evaluated)</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Daily Challenges (AI Evaluated)</h2>
           </div>
           {!isLoadingTasks && !linguaSession?.isComplete && (
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 md:px-4 py-1.5 rounded-full tracking-widest uppercase">
@@ -544,7 +558,7 @@ const Linguahub: React.FC<{ user: User | null }> = ({ user }) => {
                       <div className="animate-in slide-in-from-bottom-2 duration-300 space-y-3 md:space-y-4">
                         <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
                           <div className="flex justify-between items-center border-b border-emerald-100 dark:border-emerald-900/40 pb-2 mb-3 md:mb-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Band Analysis (Gemini Pro)</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500">IELTS Band Analysis</span>
                             <span className="bg-emerald-500 text-white px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-black shadow-md uppercase">BAND {lastScore}/9</span>
                           </div>
                           <p className="text-slate-700 dark:text-slate-300 text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-medium">{feedback}</p>

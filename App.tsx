@@ -11,7 +11,10 @@ import {
   Moon,
   Languages,
   Loader2,
-  HardDrive
+  HardDrive,
+  Cpu,
+  Zap,
+  ShieldCheck
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -23,6 +26,7 @@ import SplashScreen from './components/SplashScreen';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
+import { ensureKeySelected } from './services/ai';
 
 const FIXED_DAILY_TASKS = [
   "Note down the topics discussed in class today",
@@ -39,6 +43,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [aiConnected, setAiConnected] = useState(false);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
@@ -54,6 +59,26 @@ const App: React.FC = () => {
     }
     return 'light';
   });
+
+  // Check AI connection status
+  useEffect(() => {
+    const checkAi = async () => {
+      if (window.aistudio) {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        setAiConnected(hasKey);
+      } else {
+        setAiConnected(!!process.env.API_KEY);
+      }
+    };
+    checkAi();
+    const interval = setInterval(checkAi, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleConnectAI = async () => {
+    await ensureKeySelected();
+    setAiConnected(true);
+  };
 
   // Initial Session Check
   useEffect(() => {
@@ -252,11 +277,15 @@ const App: React.FC = () => {
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
                </div>
                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handleConnectAI} 
+                    className={`p-2 rounded-full transition-colors ${aiConnected ? 'text-emerald-500' : 'text-rose-500 animate-pulse'}`}
+                    title={aiConnected ? "AI Connected" : "Connect AI"}
+                  >
+                    <Cpu size={20} />
+                  </button>
                   <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-300">
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                  </button>
-                  <button onClick={handleLogout} className="p-2 rounded-full text-rose-500 hover:bg-rose-50/50 dark:hover:bg-red-900/20">
-                    <LogOut size={20} />
                   </button>
                </div>
             </header>
@@ -282,6 +311,26 @@ const App: React.FC = () => {
                  <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
+              </div>
+
+              {/* AI Status Panel */}
+              <div className="px-4 py-3 mx-4 mt-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-white/5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">AI Status</span>
+                  <div className={`w-2 h-2 rounded-full ${aiConnected ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 animate-pulse'}`}></div>
+                </div>
+                {aiConnected ? (
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                    <ShieldCheck size={14} /> Synchronized
+                  </div>
+                ) : (
+                  <button 
+                    onClick={handleConnectAI}
+                    className="w-full flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                  >
+                    <Zap size={12} fill="currentColor" /> Connect AI
+                  </button>
+                )}
               </div>
 
               <nav className="flex-1 p-4 space-y-2 overflow-y-auto">

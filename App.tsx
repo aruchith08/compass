@@ -18,7 +18,8 @@ import {
   Key,
   X,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Settings2
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -44,6 +45,21 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
   const [val, setVal] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [status, setStatus] = useState<'idle' | 'error' | 'success'>('idle');
+  const [currentKeyHint, setCurrentKeyHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      getApiKey().then(key => {
+        if (key && key.length > 8) {
+          setCurrentKeyHint(`••••${key.slice(-4)}`);
+        } else {
+          setCurrentKeyHint(null);
+        }
+      });
+      setVal("");
+      setStatus('idle');
+    }
+  }, [isOpen]);
 
   const handleVerify = async () => {
     if (!val.trim()) return;
@@ -70,12 +86,16 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500"><Key size={20} /></div>
-            <h3 className="text-lg font-bold">Connect Gemini AI</h3>
+            <h3 className="text-lg font-bold">AI Configuration</h3>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors"><X size={20} /></button>
         </div>
         
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Enter your Gemini API key to initialize AI tasks and evaluations.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+          {currentKeyHint 
+            ? `Update your Gemini API key (Current: ${currentKeyHint})` 
+            : "Enter your Gemini API key to initialize AI tasks and evaluations."}
+        </p>
         
         <div className="space-y-4">
           <div className="relative">
@@ -83,7 +103,7 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
               type="password" 
               value={val} 
               onChange={e => { setVal(e.target.value); setStatus('idle'); }}
-              placeholder="Paste API Key here..."
+              placeholder="Paste New API Key here..."
               className={`w-full bg-slate-100 dark:bg-slate-800 border-2 rounded-2xl px-5 py-4 text-sm outline-none transition-all ${
                 status === 'error' ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/10' : 
                 status === 'success' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : 'border-transparent focus:border-indigo-500'
@@ -107,7 +127,7 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
             disabled={isVerifying || !val.trim()}
             className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
           >
-            {isVerifying ? <Loader2 className="animate-spin" size={20} /> : status === 'success' ? 'Validated!' : 'Validate & Initialize'}
+            {isVerifying ? <Loader2 className="animate-spin" size={20} /> : status === 'success' ? 'Validated!' : 'Update & Connect'}
           </button>
           
           <a href="https://aistudio.google.com/app/apikey" target="_blank" className="block text-center text-[10px] text-slate-400 hover:text-indigo-500 underline uppercase tracking-widest font-black">Get API Key from Google</a>
@@ -162,11 +182,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleConnectAI = async () => {
-    if (window.aistudio) {
-      await ensureKeySelected();
-    } else {
-      setShowKeyModal(true);
-    }
+    setShowKeyModal(true);
   };
 
   const handleSaveKey = (key: string) => {
@@ -378,7 +394,7 @@ const App: React.FC = () => {
                   <button 
                     onClick={handleConnectAI} 
                     className={`p-2 rounded-full transition-colors ${aiConnected ? 'text-emerald-500' : 'text-rose-500 animate-pulse'}`}
-                    title={aiConnected ? "AI Connected" : "Connect AI"}
+                    title={aiConnected ? "Change API Key" : "Connect AI"}
                   >
                     <Cpu size={20} />
                   </button>
@@ -412,15 +428,21 @@ const App: React.FC = () => {
               </div>
 
               {/* AI Status Panel */}
-              <div className="px-4 py-3 mx-4 mt-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-white/5">
+              <div className="px-4 py-3 mx-4 mt-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-white/5 group/ai relative">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">AI Status</span>
                   <div className={`w-2 h-2 rounded-full ${aiConnected ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 animate-pulse'}`}></div>
                 </div>
                 {aiConnected ? (
-                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
-                    <ShieldCheck size={14} /> Synchronized
-                  </div>
+                  <button 
+                    onClick={handleConnectAI}
+                    className="w-full flex items-center justify-between text-emerald-600 dark:text-emerald-400 text-[11px] font-bold hover:bg-emerald-500/5 p-1 rounded transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={14} /> Synchronized
+                    </div>
+                    <Settings2 size={12} className="opacity-0 group-hover/ai:opacity-100 transition-opacity" />
+                  </button>
                 ) : (
                   <button 
                     onClick={handleConnectAI}

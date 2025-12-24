@@ -23,13 +23,46 @@ export const api = {
   }> {
     const userId = normalizeUsername(username);
     const storageKey = `compass_profile_${userId}`;
+    const today = new Date().toDateString();
     
     try {
       const savedData = localStorage.getItem(storageKey);
 
       if (savedData) {
         const data = JSON.parse(savedData) as UserProfile;
-        const userItems = data.roadmap || [];
+        let userItems = data.roadmap || [];
+        let dailyTasks = data.dailyTasks || [];
+        let homeworkTasks = data.homeworkTasks || [];
+        let linguaSession = data.linguaSession || null;
+
+        // NEW DAY RESET LOGIC
+        // If the last reset date is different from today, perform clean-up
+        if (data.lastResetDate !== today) {
+          console.log("New day detected. Resetting daily tasks and clearing homework.");
+          
+          // 1. Reset completion status of all daily routine items
+          dailyTasks = dailyTasks.map(task => ({
+            ...task,
+            completed: false
+          }));
+
+          // 2. Clear homework tasks for the new day
+          homeworkTasks = [];
+
+          // 3. Optional: Reset lingua session for the new day
+          linguaSession = null;
+
+          // Save the reset state immediately to prevent re-triggering
+          const resetProfile: UserProfile = {
+            ...data,
+            dailyTasks,
+            homeworkTasks,
+            linguaSession: undefined,
+            lastResetDate: today,
+            lastActive: new Date().toISOString()
+          };
+          localStorage.setItem(storageKey, JSON.stringify(resetProfile));
+        }
         
         // SYNC LOGIC with source data (data.ts)
         const userItemsMap = new Map(userItems.map(i => [i.id, i]));
@@ -45,7 +78,7 @@ export const api = {
               description: defaultItem.description || userItem.description,
               category: defaultItem.category || userItem.category,
               priority: defaultItem.priority || userItem.priority,
-              role_alignment: defaultItem.role_alignment || userItem.role_alignment // Ensure alignment updates from source
+              role_alignment: defaultItem.role_alignment || userItem.role_alignment
             };
           } else {
             return { ...defaultItem };
@@ -54,9 +87,9 @@ export const api = {
 
         return {
           roadmap: finalRoadmap,
-          dailyTasks: data.dailyTasks || [],
-          homeworkTasks: data.homeworkTasks || [],
-          linguaSession: data.linguaSession || null
+          dailyTasks,
+          homeworkTasks,
+          linguaSession
         };
       } else {
         // New local user: Initialize with defaults
@@ -66,7 +99,7 @@ export const api = {
           dailyTasks: [], 
           homeworkTasks: [],
           lastActive: new Date().toISOString(),
-          lastResetDate: new Date().toDateString()
+          lastResetDate: today
         };
         
         localStorage.setItem(storageKey, JSON.stringify(initialProfile));

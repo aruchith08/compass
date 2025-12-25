@@ -22,7 +22,8 @@ import {
   Settings2,
   ChevronRight as ChevronRightIcon,
   User as UserIcon,
-  HelpCircle
+  HelpCircle,
+  Timer
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -32,6 +33,7 @@ import Login from './components/Login';
 import Linguahub from './components/Linguahub';
 import SplashScreen from './components/SplashScreen';
 import GuideModal from './components/UserGuide';
+import PomodoroTimer from './components/PomodoroTimer';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
@@ -155,6 +157,7 @@ const App: React.FC = () => {
   const [aiConnected, setAiConnected] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showPomodoro, setShowPomodoro] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
@@ -399,6 +402,9 @@ const App: React.FC = () => {
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
                </div>
                <div className="flex items-center gap-1 sm:gap-2">
+                  <button onClick={() => setShowPomodoro(!showPomodoro)} className={`p-2 rounded-full transition-colors ${showPomodoro ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' : 'text-slate-400'}`}>
+                    <Timer size={20} />
+                  </button>
                   <button onClick={() => setShowGuide(true)} className="p-2 rounded-full text-slate-400 hover:text-emerald-500 transition-colors">
                     <HelpCircle size={20} />
                   </button>
@@ -412,7 +418,6 @@ const App: React.FC = () => {
                   <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-300">
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                   </button>
-                  {/* Mobile-only Extreme Right Logout */}
                   <button onClick={handleLogout} className="p-2 rounded-full hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-500 transition-colors" title="Logout">
                     <LogOut size={20} />
                   </button>
@@ -497,6 +502,10 @@ const App: React.FC = () => {
               </nav>
 
               <div className="p-4 border-t border-slate-100 dark:border-white/5 space-y-2">
+                 <button onClick={() => setShowPomodoro(!showPomodoro)} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${showPomodoro ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/30'}`}>
+                    <Timer size={20} />
+                    <span>Focus Engine</span>
+                 </button>
                  <button onClick={() => setShowGuide(true)} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-emerald-600 transition-all text-sm font-medium">
                     <HelpCircle size={20} />
                     <span>User Guide</span>
@@ -535,6 +544,7 @@ const App: React.FC = () => {
             </nav>
             <KeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} onSave={handleSaveKey} />
             <GuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
+            <PomodoroTimer isOpen={showPomodoro} onClose={() => setShowPomodoro(false)} />
           </div>
         </RoadmapContext.Provider>
       )}

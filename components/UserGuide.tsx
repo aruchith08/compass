@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle, ExternalLink, Timer } from 'lucide-react';
 
 interface GuideModalProps {
   isOpen: boolean;
@@ -105,6 +105,10 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                   <h3 className="text-lg font-bold flex items-center gap-2"><LayoutDashboard size={20} /> The Hub</h3>
                   <div className="grid gap-4">
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
+                      <h4 className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mb-1">Focus Engine (Pomodoro)</h4>
+                      <p className="text-xs text-slate-500 leading-relaxed">Click the <strong>Timer</strong> icon to launch the Pomodoro Focus Engine. Use the 25/5/15 rule to maintain peak cognitive performance during study sessions. The timer minimizes to a live badge so you can work without clutter.</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
                       <h4 className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mb-1">Utility Shortcuts</h4>
                       <p className="text-xs text-slate-500 leading-relaxed mb-2">The header contains instant links to elite learning resources:</p>
                       <ul className="space-y-2 text-[11px] text-slate-500">
@@ -121,10 +125,6 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
                       <h4 className="font-bold text-rose-600 dark:text-rose-400 text-sm mb-1">Homework Tasks</h4>
                       <p className="text-xs text-slate-500 leading-relaxed">Specifically for academic deadlines. These are <strong>cleared completely</strong> every 24 hours to keep your desk clean for the new day's workload.</p>
-                    </div>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
-                      <h4 className="font-bold text-indigo-600 dark:text-indigo-400 text-sm mb-1">Milestone Radar</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed">A live visualization of your career readiness. It calculates your percentage score for each job role based on the specific tasks you've completed in the <strong>Roadmap</strong> tab.</p>
                     </div>
                   </div>
                 </div>

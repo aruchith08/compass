@@ -7,6 +7,47 @@ import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
 import TimetableModal from './TimetableModal';
 
+// --- Custom Brand Icon for Roadmap.sh ---
+const RoadmapShIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 32 32" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path 
+      d="M9 23V13.5C9 11.567 10.567 10 12.5 10H15" 
+      stroke="currentColor" 
+      strokeWidth="4" 
+      strokeLinecap="round"
+    />
+    <circle cx="23" cy="21" r="3.5" fill="currentColor" />
+  </svg>
+);
+
+// --- Custom Plain Closed Book Icon for Goalkicker ---
+const GoalKickerIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    {/* Single minimalist line on the cover as requested */}
+    <path d="M11 7h3" opacity="0.4" strokeWidth="1.5" />
+  </svg>
+);
+
 // --- Confetti Component: "Fountain Burst" from Bottom ---
 const ConfettiEffect: React.FC<{ active: boolean }> = ({ active }) => {
   const [particles, setParticles] = useState<any[]>([]);
@@ -90,6 +131,8 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-wrap items-center gap-3">
            <div className="flex gap-2">
               <button onClick={scrollToSyllabus} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all shadow-sm" title="Academic Syllabus"><GraduationCap size={20} /></button>
+              <a href="https://roadmap.sh" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm" title="Roadmap.sh - Developer Roadmaps"><RoadmapShIcon size={20} /></a>
+              <a href="https://books.goalkicker.com" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all shadow-sm" title="GoalKicker - Professional Programming Books"><GoalKickerIcon size={20} /></a>
               <a href="https://gamma.app/create" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all shadow-sm" title="Presentation Builder"><Presentation size={20} /></a>
               <a href="https://www.perplexity.ai/" onClick={handlePerplexityClick} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all shadow-sm" title="Deep Search AI"><Search size={20} /></a>
               <button onClick={() => setShowTimetable(true)} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-all shadow-sm" title="Class Timetable"><CalendarClock size={20} /></button>

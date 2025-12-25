@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle, ExternalLink } from 'lucide-react';
 
 interface GuideModalProps {
   isOpen: boolean;
@@ -104,6 +104,16 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold flex items-center gap-2"><LayoutDashboard size={20} /> The Hub</h3>
                   <div className="grid gap-4">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
+                      <h4 className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mb-1">Utility Shortcuts</h4>
+                      <p className="text-xs text-slate-500 leading-relaxed mb-2">The header contains instant links to elite learning resources:</p>
+                      <ul className="space-y-2 text-[11px] text-slate-500">
+                        <li className="flex items-center gap-2"><div className="w-1 h-1 bg-indigo-400 rounded-full" /> <strong>Roadmap.sh:</strong> Visual career paths for developers.</li>
+                        <li className="flex items-center gap-2"><div className="w-1 h-1 bg-emerald-400 rounded-full" /> <strong>GoalKicker:</strong> Access 100+ free professional programming books.</li>
+                        <li className="flex items-center gap-2"><div className="w-1 h-1 bg-teal-400 rounded-full" /> <strong>Perplexity AI:</strong> Deep research for technical concepts.</li>
+                        <li className="flex items-center gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full" /> <strong>Gamma:</strong> Professional AI-driven presentation builder.</li>
+                      </ul>
+                    </div>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-white/5">
                       <h4 className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mb-1">Daily Routine</h4>
                       <p className="text-xs text-slate-500 leading-relaxed">Resets every night at 12:00 AM. Custom tasks stay in the list, but their "Completed" status is cleared to give you a fresh start every day.</p>

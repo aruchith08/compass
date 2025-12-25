@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle } from 'lucide-react';
 
 interface GuideModalProps {
   isOpen: boolean;
@@ -18,7 +18,11 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
     { id: 'roadmap', label: 'Roadmap', icon: CheckSquare },
     { id: 'ai-tools', label: 'AI Power', icon: BrainCircuit },
     { id: 'academic', label: 'Academic', icon: GraduationCap },
+    { id: 'support', label: 'Support', icon: MessageCircle },
   ];
+
+  const supportEmail = "ruchith.alok@gmail.com";
+  const mailtoLink = `mailto:${supportEmail}?subject=Compass%20Feedback%20%26%20Support`;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in" onClick={onClose}>
@@ -199,17 +203,62 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                 </div>
               </div>
             )}
+
+            {activeTab === 'support' && (
+              <div className="space-y-8 animate-slide-up">
+                <div className="relative p-6 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-3xl border border-emerald-500/20">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <MessageCircle className="text-emerald-500" size={24} /> Support & Feedback
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    Compass is built to empower your journey. If you encounter any issues or have suggestions to make it better, we're listening.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="flex gap-4 p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-white dark:border-white/5 shadow-sm">
+                       <AlertCircle className="text-rose-500 shrink-0" size={20} />
+                       <div>
+                         <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">Report Problems</h4>
+                         <p className="text-xs text-slate-500 dark:text-slate-400">Found a bug or something isn't loading? Let us know the details.</p>
+                       </div>
+                    </div>
+                    <div className="flex gap-4 p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-white dark:border-white/5 shadow-sm">
+                       <Sparkles className="text-amber-500 shrink-0" size={20} />
+                       <div>
+                         <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">Feature Suggestions</h4>
+                         <p className="text-xs text-slate-500 dark:text-slate-400">Have an idea for a new AI tool or academic feature? We'd love to hear it.</p>
+                       </div>
+                    </div>
+                    <div className="flex gap-4 p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-white dark:border-white/5 shadow-sm">
+                       <Mail className="text-indigo-500 shrink-0" size={20} />
+                       <div>
+                         <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">General Feedback</h4>
+                         <p className="text-xs text-slate-500 dark:text-slate-400">Just want to say hi or share how Compass is helping you? Drop a line!</p>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-slate-50 dark:bg-slate-950/40 rounded-3xl border border-slate-100 dark:border-white/5 text-center">
+                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Direct Response Channel:</p>
+                   <p className="font-mono text-emerald-600 dark:text-emerald-400 font-bold select-all">{supportEmail}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
         <div className="p-6 md:px-10 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-             <Info size={14} className="text-emerald-500" /> Mastery takes consistency
-           </div>
+           <a 
+             href={mailtoLink}
+             className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl transition-all text-[11px] font-black uppercase tracking-widest border border-emerald-500/20 shadow-sm active:scale-95"
+           >
+             <Mail size={16} /> Write to Us
+           </a>
            <button 
              onClick={onClose}
-             className="w-full md:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-sm active:scale-95 transition-all"
+             className="w-full md:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-sm active:scale-95 transition-all shadow-lg shadow-black/10"
            >
              Got it, Thanks!
            </button>

@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   Settings2,
   ChevronRight as ChevronRightIcon,
-  User as UserIcon
+  User as UserIcon,
+  HelpCircle
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -30,16 +31,13 @@ import Outputs from './components/Outputs';
 import Login from './components/Login';
 import Linguahub from './components/Linguahub';
 import SplashScreen from './components/SplashScreen';
+import GuideModal from './components/UserGuide';
 import { RoadmapItem, Role, Status, User, DailyTask, HomeworkTask, RoadmapContextType, LinguaSession } from './types';
 import { api } from './services/api';
 import { RoadmapContext } from './RoadmapContext';
 import { ensureKeySelected, getApiKey, saveManualKey, validateApiKey } from './services/ai';
 
 const FIXED_DAILY_TASKS = [
-  "Note down the topics discussed in class today",
-  "Bus ride: Use AI to read topics & prepare PPT",
-  "7:00 - 7:30 PM: Presentation",
-  "Check roadmap tracker & complete skills",
   "Complete given homeworks"
 ];
 
@@ -156,6 +154,7 @@ const App: React.FC = () => {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [aiConnected, setAiConnected] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
@@ -229,17 +228,11 @@ const App: React.FC = () => {
         isFixed: true
       }));
 
-      let finalDaily = profile.dailyTasks;
-      if (finalDaily.length === 0) {
-        finalDaily = fixedTasks;
-      } else {
-        const existingTexts = new Set(finalDaily.map(t => t.text));
-        FIXED_DAILY_TASKS.forEach((text, idx) => {
-          if (!existingTexts.has(text)) {
-            finalDaily.push({ id: `fixed_${idx}`, text, completed: false, isFixed: true });
-          }
-        });
-      }
+      // Sync Daily Tasks: 
+      // 1. Start with any existing custom tasks (isFixed: false)
+      const userCustomTasks = profile.dailyTasks.filter(t => !t.isFixed);
+      // 2. Prepend current fixed tasks
+      const finalDaily = [...fixedTasks, ...userCustomTasks];
 
       setItems(profile.roadmap);
       setDailyTasks(finalDaily);
@@ -406,6 +399,9 @@ const App: React.FC = () => {
                  <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">Compass</span>
                </div>
                <div className="flex items-center gap-1 sm:gap-2">
+                  <button onClick={() => setShowGuide(true)} className="p-2 rounded-full text-slate-400 hover:text-emerald-500 transition-colors">
+                    <HelpCircle size={20} />
+                  </button>
                   <button 
                     onClick={handleConnectAI} 
                     className={`p-2 rounded-full transition-colors ${aiConnected ? 'text-emerald-500' : 'text-rose-500 animate-pulse'}`}
@@ -500,7 +496,11 @@ const App: React.FC = () => {
                 ))}
               </nav>
 
-              <div className="p-4 border-t border-slate-100 dark:border-white/5">
+              <div className="p-4 border-t border-slate-100 dark:border-white/5 space-y-2">
+                 <button onClick={() => setShowGuide(true)} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-emerald-600 transition-all text-sm font-medium">
+                    <HelpCircle size={20} />
+                    <span>User Guide</span>
+                 </button>
                  <button onClick={handleLogout} className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl border border-rose-100 dark:border-red-900/30 text-rose-600 dark:text-red-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-sm font-medium">
                     <LogOut size={16} />
                     <span>Switch User</span>
@@ -534,6 +534,7 @@ const App: React.FC = () => {
                ))}
             </nav>
             <KeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} onSave={handleSaveKey} />
+            <GuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
           </div>
         </RoadmapContext.Provider>
       )}

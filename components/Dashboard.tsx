@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip, Cell } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot, Star } from 'lucide-react';
 import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
 import TimetableModal from './TimetableModal';
@@ -43,7 +43,6 @@ const GoalKickerIcon = ({ size = 20, className = "" }: { size?: number, classNam
   >
     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    {/* Single minimalist line on the cover as requested */}
     <path d="M11 7h3" opacity="0.4" strokeWidth="1.5" />
   </svg>
 );
@@ -80,7 +79,7 @@ const ConfettiEffect: React.FC<{ active: boolean }> = ({ active }) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { items, getCompletionPercentage, user, logout, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, } = useRoadmap();
+  const { items, getCompletionPercentage, user, starPoints, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, } = useRoadmap();
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
   const [showTimetable, setShowTimetable] = useState(false);
@@ -150,6 +149,12 @@ const Dashboard: React.FC = () => {
                 {allDailyDone ? <PartyPopper className="text-amber-600 dark:text-amber-400" size={18} /> : <ListTodo className="text-indigo-600 dark:text-indigo-400" size={18} />}
               </span>
               Daily Routine
+              <div className="flex items-center gap-1.5 ml-2 px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 group">
+                <Star size={14} className="text-amber-500 fill-amber-500 animate-pulse" />
+                <span className={`text-sm font-black ${starPoints >= 0 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500'}`}>
+                  {starPoints}
+                </span>
+              </div>
             </h3>
             {allDailyDone ? ( <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-3 py-1.5 rounded-full animate-bounce flex items-center gap-1"><Sparkles size={10} /> CLEAR <Sparkles size={10} /></span> ) : ( <span className="text-[9px] sm:text-[10px] text-slate-400 font-black uppercase tracking-widest px-2 sm:px-3 py-1 bg-slate-100 dark:bg-slate-800/40 rounded-full whitespace-nowrap">Auto-Reset</span> )}
           </div>
@@ -214,7 +219,6 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full animate-slide-up" style={{ animationDelay: '200ms' }}>
-        {/* Progress Radar/Milestone Visual */}
         <div className={`${glassCardClass} relative overflow-hidden flex flex-col`}>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="p-2 bg-emerald-100/50 dark:bg-emerald-500/10 rounded-xl"><Milestone className="text-emerald-600 dark:text-emerald-400" size={18} /></span>
@@ -234,7 +238,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Next Focus Card */}
         <div className={`${glassCardClass} flex flex-col`}>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="p-2 bg-rose-100/50 dark:bg-rose-500/10 rounded-xl"><Flame className="text-rose-600 dark:text-rose-400" size={18} /></span>
@@ -258,7 +261,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quote Section - Vibrant in both Light and Dark mode */}
       <div className="bg-gradient-to-br from-emerald-100/80 via-white/90 to-teal-50/80 dark:from-emerald-950/80 dark:via-slate-900/95 dark:to-teal-950/80 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden shadow-xl shadow-emerald-200/40 dark:shadow-2xl dark:shadow-emerald-900/40 animate-slide-up border border-emerald-200/60 dark:border-emerald-500/20" style={{ animationDelay: '300ms' }}>
         <div className="absolute top-0 right-0 p-32 bg-emerald-500/10 dark:bg-emerald-400/15 rounded-full blur-[100px] -mr-16 -mt-16 pointer-events-none animate-pulse-slow"></div>
         <div className="absolute bottom-0 left-0 p-32 bg-teal-500/5 dark:bg-teal-400/10 rounded-full blur-[100px] -ml-16 -mb-16 pointer-events-none animate-pulse-slow" style={{ animationDelay: '2s' }}></div>

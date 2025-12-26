@@ -163,6 +163,7 @@ const App: React.FC = () => {
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   const [linguaSession, setLinguaSession] = useState<LinguaSession | null>(null);
+  const [starPoints, setStarPoints] = useState<number>(0);
   
   const isInitialLoad = useRef(true);
   const hideTimeoutRef = useRef<number | null>(null);
@@ -231,16 +232,14 @@ const App: React.FC = () => {
         isFixed: true
       }));
 
-      // Sync Daily Tasks: 
-      // 1. Start with any existing custom tasks (isFixed: false)
       const userCustomTasks = profile.dailyTasks.filter(t => !t.isFixed);
-      // 2. Prepend current fixed tasks
       const finalDaily = [...fixedTasks, ...userCustomTasks];
 
       setItems(profile.roadmap);
       setDailyTasks(finalDaily);
       setHomeworkTasks(profile.homeworkTasks);
       setLinguaSession(profile.linguaSession || null);
+      setStarPoints(profile.starPoints || 0);
       setUser({ username });
       localStorage.setItem('roadmap_user_session', username);
       isInitialLoad.current = false;
@@ -258,6 +257,7 @@ const App: React.FC = () => {
     setDailyTasks([]);
     setHomeworkTasks([]);
     setLinguaSession(null);
+    setStarPoints(0);
     localStorage.removeItem('roadmap_user_session');
     setActiveTab('dashboard');
   };
@@ -269,12 +269,13 @@ const App: React.FC = () => {
           roadmap: items,
           dailyTasks: dailyTasks,
           homeworkTasks: homeworkTasks,
+          starPoints: starPoints,
           linguaSession: linguaSession || undefined
         });
       }, 1000);
       return () => clearTimeout(timeout);
     }
-  }, [items, dailyTasks, homeworkTasks, linguaSession, user]);
+  }, [items, dailyTasks, homeworkTasks, linguaSession, starPoints, user]);
 
   const toggleTheme = () => {
     setTheme(prev => {
@@ -348,12 +349,12 @@ const App: React.FC = () => {
   };
 
   const contextValue: RoadmapContextType = useMemo(() => ({
-    items, user, theme, isAiConnected: aiConnected, login: handleLogin, logout: handleLogout,
+    items, user, theme, isAiConnected: aiConnected, starPoints, login: handleLogin, logout: handleLogout,
     toggleTheme, toggleStatus, getCompletionPercentage,
     dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask,
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
     linguaSession, updateLinguaSession
-  }), [items, user, theme, aiConnected, dailyTasks, homeworkTasks, linguaSession]);
+  }), [items, user, theme, aiConnected, starPoints, dailyTasks, homeworkTasks, linguaSession]);
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },

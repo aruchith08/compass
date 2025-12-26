@@ -6,6 +6,7 @@ interface UserProfile {
   roadmap: RoadmapItem[];
   dailyTasks: DailyTask[];
   homeworkTasks: HomeworkTask[];
+  starPoints: number;
   linguaSession?: LinguaSession;
   lastActive: string;
   lastResetDate: string;
@@ -19,6 +20,7 @@ export const api = {
     roadmap: RoadmapItem[], 
     dailyTasks: DailyTask[], 
     homeworkTasks: HomeworkTask[],
+    starPoints: number,
     linguaSession: LinguaSession | null
   }> {
     const userId = normalizeUsername(username);
@@ -34,11 +36,21 @@ export const api = {
         let dailyTasks = data.dailyTasks || [];
         let homeworkTasks = data.homeworkTasks || [];
         let linguaSession = data.linguaSession || null;
+        let starPoints = data.starPoints || 0;
 
         // NEW DAY RESET LOGIC
-        // If the last reset date is different from today, perform clean-up
         if (data.lastResetDate !== today) {
-          console.log("New day detected. Resetting daily tasks and clearing homework.");
+          console.log("New day detected. Evaluating performance and resetting.");
+          
+          // Reward/Penalty Logic
+          if (dailyTasks.length > 0) {
+            const allCompleted = dailyTasks.every(task => task.completed);
+            if (allCompleted) {
+              starPoints += 10; // Award for consistency
+            } else {
+              starPoints -= 20; // Heavy penalty for missing tasks
+            }
+          }
           
           // 1. Reset completion status of all daily routine items
           dailyTasks = dailyTasks.map(task => ({
@@ -49,14 +61,15 @@ export const api = {
           // 2. Clear homework tasks for the new day
           homeworkTasks = [];
 
-          // 3. Optional: Reset lingua session for the new day
+          // 3. Reset lingua session
           linguaSession = null;
 
-          // Save the reset state immediately to prevent re-triggering
+          // Save the reset state
           const resetProfile: UserProfile = {
             ...data,
             dailyTasks,
             homeworkTasks,
+            starPoints,
             linguaSession: undefined,
             lastResetDate: today,
             lastActive: new Date().toISOString()
@@ -64,13 +77,11 @@ export const api = {
           localStorage.setItem(storageKey, JSON.stringify(resetProfile));
         }
         
-        // SYNC LOGIC with source data (data.ts)
+        // SYNC LOGIC with source data
         const userItemsMap = new Map(userItems.map(i => [i.id, i]));
-        
         const finalRoadmap = ROADMAP_DATA.map(defaultItem => {
           const userItem = userItemsMap.get(defaultItem.id);
           if (userItem) {
-            // Preserve user status while updating metadata and filters from source
             return {
               ...userItem,
               resource_name: defaultItem.resource_name || userItem.resource_name,
@@ -89,15 +100,17 @@ export const api = {
           roadmap: finalRoadmap,
           dailyTasks,
           homeworkTasks,
+          starPoints,
           linguaSession
         };
       } else {
-        // New local user: Initialize with defaults
+        // New local user
         const initialRoadmap = JSON.parse(JSON.stringify(ROADMAP_DATA));
         const initialProfile: UserProfile = {
           roadmap: initialRoadmap,
           dailyTasks: [], 
           homeworkTasks: [],
+          starPoints: 0,
           lastActive: new Date().toISOString(),
           lastResetDate: today
         };
@@ -107,6 +120,7 @@ export const api = {
           roadmap: initialRoadmap,
           dailyTasks: [],
           homeworkTasks: [],
+          starPoints: 0,
           linguaSession: null
         };
       }
@@ -133,7 +147,7 @@ export const api = {
 
       localStorage.setItem(storageKey, JSON.stringify(updatedProfile));
     } catch (err) {
-      console.error("Browser save failed (likely quota exceeded):", err);
+      console.error("Browser save failed:", err);
     }
   }
 };

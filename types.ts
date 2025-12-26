@@ -78,6 +78,7 @@ export interface RoadmapContextType {
   user: User | null;
   theme: 'dark' | 'light';
   isAiConnected: boolean;
+  starPoints: number;
   login: (username: string) => Promise<void>;
   logout: () => void;
   toggleTheme: () => void;

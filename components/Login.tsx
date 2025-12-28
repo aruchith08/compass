@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ChevronRight, Cloud, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2 } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (username: string) => void;
@@ -10,34 +10,23 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
   const [username, setUsername] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState('00:00:00');
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Clock
   useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      const timeStr = now.getHours().toString().padStart(2, '0') + ":" + 
-                      now.getMinutes().toString().padStart(2, '0') + ":" + 
-                      now.getSeconds().toString().padStart(2, '0');
-      setCurrentTime(timeStr);
-    };
-    const interval = setInterval(updateClock, 1000);
-    updateClock();
-    return () => clearInterval(interval);
+    setMounted(true);
   }, []);
 
-  // 3D Tilt Effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!cardRef.current) return;
-      const xAxis = (window.innerWidth / 2 - e.pageX) / 45;
-      const yAxis = (window.innerHeight / 2 - e.pageY) / 45;
-      cardRef.current.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => document.removeEventListener('mousemove', handleMouseMove);
+  // Generate unique snow particles once to avoid re-renders
+  const snowParticles = useMemo(() => {
+    return Array.from({ length: 60 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 15}s`,
+      duration: `${8 + Math.random() * 12}s`,
+      size: `${1 + Math.random() * 3}px`,
+      opacity: 0.2 + Math.random() * 0.5,
+      driftDelay: `${Math.random() * 5}s`
+    }));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,191 +37,172 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
         await onLogin(username);
       } catch (err: any) {
         if (err.message?.includes("PERMISSION_DENIED")) {
-          setErrorMsg("ACCESS DENIED: FIREBASE RULES RESTRICTED");
+          setErrorMsg("Access Denied: Please set your Firestore rules to 'Test Mode' in the Firebase Console.");
         } else {
-          setErrorMsg("CONNECTION FAILED: CHECK NETWORK");
+          setErrorMsg("Login failed. Please check your internet connection.");
         }
       }
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#030508] text-white font-sans overflow-hidden relative selection:bg-[#ff0080] selection:text-white">
-      <style>{`
-        :root {
-          --crystal-1: rgba(255, 0, 128, 0.4);
-          --crystal-2: rgba(0, 255, 255, 0.4);
-          --glass: rgba(255, 255, 255, 0.03);
-          --border: rgba(255, 255, 255, 0.15);
-        }
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#050b14] relative overflow-hidden transition-colors duration-700">
+      {/* Enhanced Dynamic Animated Background (Neural Mesh + Digital Snow) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/10 dark:bg-emerald-600/5 rounded-full blur-[120px] animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-500/10 dark:bg-indigo-600/5 rounded-full blur-[120px] animate-blob" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-teal-400/10 dark:bg-teal-500/5 rounded-full blur-[100px] animate-blob" style={{ animationDelay: '6s' }}></div>
+        
+        {/* Digital Snow Layer - Adjusted for Visibility in Light Mode */}
+        <div className="absolute inset-0 z-0">
+           {snowParticles.map((particle) => (
+             <div 
+               key={particle.id}
+               className="absolute rounded-full bg-emerald-500/40 dark:bg-emerald-400 shadow-[0_0_4px_rgba(16,185,129,0.2)] dark:shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-snowfall"
+               style={{
+                 left: particle.left,
+                 width: particle.size,
+                 height: particle.size,
+                 opacity: particle.opacity,
+                 animationDuration: particle.duration,
+                 animationDelay: particle.delay,
+                 top: '-20px'
+               }}
+             >
+                {/* Internal Drift Motion */}
+                <div className="w-full h-full animate-drift" style={{ animationDelay: particle.driftDelay }}></div>
+             </div>
+           ))}
+        </div>
 
-        /* Prismatic Backdrop Shards */
-        @keyframes drift {
-          from { transform: translate(-10%, -10%) rotate(0deg); }
-          to { transform: translate(10%, 10%) rotate(15deg); }
-        }
-
-        .shard {
-          position: absolute;
-          background: linear-gradient(135deg, var(--crystal-1), transparent, var(--crystal-2));
-          filter: blur(60px);
-          opacity: 0.3;
-          animation: drift 20s infinite alternate ease-in-out;
-        }
-
-        /* Chromatic Title Effect */
-        @keyframes shift {
-          0%, 100% { transform: translate(0); }
-          50% { transform: translate(-1px, 1px); }
-        }
-
-        .prism-title {
-          mix-blend-mode: screen;
-        }
-        .prism-title::before, .prism-title::after {
-          content: "ACCESS";
-          position: absolute;
-          top: 0; left: 0; width: 100%; height: 100%;
-          z-index: -1;
-        }
-        .prism-title::before {
-          color: #ff00ff;
-          left: -2px;
-          animation: shift 3s infinite;
-        }
-        .prism-title::after {
-          color: #00ffff;
-          left: 2px;
-          animation: shift 3s infinite reverse;
-        }
-
-        /* Light Sweep Animation */
-        @keyframes sweep {
-          from { background-position: 200% 0; }
-          to { background-position: -200% 0; }
-        }
-        .light-sweep {
-          background: linear-gradient(105deg, 
-            transparent 40%, 
-            rgba(255,255,255,0.05) 45%, 
-            rgba(255,255,255,0.15) 50%, 
-            rgba(255,255,255,0.05) 55%, 
-            transparent 60%
-          );
-          background-size: 200% 100%;
-          animation: sweep 8s infinite linear;
-        }
-
-        /* Input Focus Glow */
-        .prism-input:focus {
-          box-shadow: -4px 0 0 var(--crystal-1), 4px 0 0 var(--crystal-2);
-        }
-
-        /* Button Hover */
-        .prism-btn::after {
-          content: '';
-          position: absolute;
-          top: 0; left: -100%;
-          width: 100%; height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-          transition: 0.5s;
-        }
-        .prism-btn:hover::after {
-          left: 100%;
-        }
-
-        @keyframes reveal {
-           from { opacity: 0; transform: translateY(30px) scale(0.98); }
-           to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .animate-reveal {
-           animation: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
-
-      {/* Background Environment */}
-      <div className="fixed inset-0 z-0">
-        <div 
-          className="absolute inset-0 z-[-1]" 
-          style={{ background: 'radial-gradient(circle at 20% 30%, #1a1033 0%, transparent 40%), radial-gradient(circle at 80% 70%, #0a2222 0%, transparent 40%)' }}
-        ></div>
-        <div className="shard w-[40vw] h-[40vw] top-[-10%] left-[-10%]"></div>
-        <div className="shard w-[30vw] h-[30vw] bottom-[-5%] right-[-5%] delay-[-5s]"></div>
+        {/* Neural Network Pulse Overlay */}
+        <div className="absolute inset-0 opacity-20 dark:opacity-40">
+           {[...Array(15)].map((_, i) => (
+             <div 
+               key={i}
+               className="absolute w-1 h-1 bg-emerald-500/40 dark:bg-emerald-400 rounded-full animate-pulse"
+               style={{
+                 top: `${Math.random() * 100}%`,
+                 left: `${Math.random() * 100}%`,
+                 animationDelay: `${Math.random() * 5}s`,
+                 animationDuration: `${3 + Math.random() * 4}s`
+               }}
+             />
+           ))}
+        </div>
       </div>
 
-      {/* Login Container */}
-      <div className="relative w-[480px] p-[60px] perspective-[1000px] z-10">
-        <div 
-          ref={cardRef}
-          className="relative bg-[rgba(255,255,255,0.03)] backdrop-blur-[25px] border border-[rgba(255,255,255,0.15)] p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] animate-reveal"
-          style={{
-            clipPath: 'polygon(0% 0%, 90% 0%, 100% 10%, 100% 100%, 10% 100%, 0% 90%)',
-            backdropFilter: 'blur(25px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(25px) saturate(180%)',
-          }}
-        >
-          {/* Decorative Overlays */}
-          <div className="light-sweep absolute top-0 left-0 w-full h-full pointer-events-none"></div>
-          <div className="absolute -top-5 -right-5 w-20 h-20 bg-gradient-to-bl from-transparent via-transparent to-[rgba(255,255,255,0.1)] pointer-events-none"></div>
+      <div className={`relative z-10 w-full max-w-md p-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+        <div className="bg-white/70 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] dark:shadow-2xl p-10 relative overflow-hidden group">
+          
+          {/* Subtle Glow Effect on Hover */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
-          {/* Header */}
-          <h1 className="prism-title text-[2.5rem] font-extrabold text-white uppercase tracking-tighter mb-2 relative">
-            Access
-          </h1>
-          <span className="block font-mono text-xs text-white/50 uppercase tracking-[2px] mb-10">
-            Neural Link Established // ID: 882-X
-          </span>
+          <div className="text-center mb-10">
+            {/* Logo with Outer Ring Animation and BOUNCING effect */}
+            <div className="relative inline-flex items-center justify-center mb-6 animate-float">
+              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full animate-pulse"></div>
+              <div className="relative p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-xl shadow-emerald-500/30 transform transition-transform group-hover:scale-110 duration-500">
+                <Cpu className="text-white" size={32} />
+              </div>
+            </div>
+            
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight animate-slide-up" style={{ animationDelay: '100ms' }}>
+              Initialize <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300">Compass</span>
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm font-medium tracking-wide flex items-center justify-center gap-2 animate-slide-up" style={{ animationDelay: '200ms' }}>
+              <Zap size={14} className="text-amber-500" /> Professional AI Career OS
+            </p>
+          </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6 relative">
-              <label htmlFor="username" className="block font-mono text-[0.65rem] text-white/50 mb-2 uppercase">
-                CRYPTOGRAPHIC_IDENTITY
+          <form onSubmit={handleSubmit} className="space-y-8 relative">
+            <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
+              <label htmlFor="username" className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">
+                Enter your name
               </label>
-              <input 
-                id="username"
-                type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="USER_NAME"
-                autoComplete="off"
-                spellCheck={false}
-                className="prism-input w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.15)] p-4 text-white font-sans text-base transition-all duration-300 outline-none focus:border-white focus:bg-[rgba(255,255,255,0.07)] placeholder:text-white/20"
-              />
+              <div className="relative group/input">
+                <input
+                  id="username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="e.g. Ruchith Alokam"
+                  className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white px-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-300 placeholder-slate-400 dark:placeholder-slate-600 shadow-inner"
+                />
+              </div>
+
+              {errorMsg && (
+                <div className="flex items-start gap-3 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-2xl mt-4 animate-scale-in">
+                  <AlertCircle size={18} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-rose-700 dark:text-rose-300 font-bold leading-relaxed">
+                    {errorMsg}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Error Message */}
-            {errorMsg && (
-              <div className="mb-6 p-3 bg-red-900/20 border border-red-500/30 flex items-center gap-2 text-red-400 font-mono text-[0.65rem] tracking-wider animate-pulse">
-                <AlertCircle size={14} />
-                {errorMsg}
-              </div>
-            )}
+            <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
+              <button
+                type="submit"
+                disabled={isLoading || !username.trim()}
+                className={`group relative w-full flex items-center justify-center py-4 px-6 rounded-2xl text-white font-bold transition-all duration-500 overflow-hidden
+                  ${isLoading || !username.trim() 
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed' 
+                    : 'bg-slate-900 dark:bg-white dark:text-slate-950 shadow-2xl hover:scale-[1.02] active:scale-[0.98]'
+                  }
+                `}
+              >
+                {/* Button Shimmer Effect */}
+                {!isLoading && username.trim() && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
+                )}
 
-            <button 
-              type="submit"
-              disabled={isLoading || !username.trim()}
-              className="prism-btn w-full mt-2 p-4 bg-white text-black border-none font-extrabold font-sans uppercase tracking-[1px] relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin" size={16} />
-                  Initializing...
-                </>
-              ) : (
-                "Initialize Connection"
-              )}
-            </button>
+                {isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="animate-pulse">Syncing...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="tracking-wide">Establish Session</span>
+                    <ChevronRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+              
+              <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">
+                <Cloud size={12} className="text-emerald-500" />
+                <span>browser save Architecture</span>
+              </div>
+            </div>
           </form>
 
-          {/* Metadata Footer */}
-          <div className="mt-8 pt-5 border-t border-[rgba(255,255,255,0.15)] flex justify-between font-mono text-[0.6rem] text-white/50 uppercase">
-            <span>LVL: ALPHA-9</span>
-            <span>SECURE REFRACTION ACTIVE</span>
-            <span>UTC: {currentTime}</span>
+          <div className="mt-12 pt-8 border-t border-slate-100 dark:border-white/5 animate-slide-up" style={{ animationDelay: '500ms' }}>
+             <div className="flex items-center justify-center space-x-10 opacity-60">
+                <div className="flex flex-col items-center group/icon cursor-default">
+                   <div className="p-2 rounded-lg bg-slate-50 dark:bg-white/5 group-hover/icon:bg-emerald-50 dark:group-hover/icon:bg-emerald-500/10 transition-colors">
+                     <ShieldCheck size={18} className="group-hover/icon:text-emerald-500 transition-colors" />
+                   </div>
+                   <span className="text-[9px] font-bold mt-2">SECURE</span>
+                </div>
+                <div className="flex flex-col items-center group/icon cursor-default">
+                   <div className="p-2 rounded-lg bg-slate-50 dark:bg-white/5 group-hover/icon:bg-emerald-50 dark:group-hover/icon:bg-emerald-500/10 transition-colors">
+                     <Sparkles size={18} className="group-hover/icon:text-emerald-500 transition-colors" />
+                   </div>
+                   <span className="text-[9px] font-bold mt-2">ADAPTIVE</span>
+                </div>
+             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </div>
   );
 };

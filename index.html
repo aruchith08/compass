@@ -13,6 +13,11 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="application-name" content="Roadmap">
     
+    <!-- Fonts for Prism Design -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <title>Compass</title>
     
     <!-- Theme Initialization Script to prevent flash -->
@@ -36,6 +41,10 @@
         darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif', 'ui-sans-serif', 'system-ui'],
+              mono: ['Space Mono', 'monospace', 'ui-monospace', 'SFMono-Regular'],
+            },
             colors: {
               slate: {
                 850: '#151f32',

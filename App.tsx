@@ -225,12 +225,17 @@ const App: React.FC = () => {
     try {
       const profile = await api.login(username);
       
-      const fixedTasks: DailyTask[] = FIXED_DAILY_TASKS.map((text, idx) => ({
-        id: `fixed_${idx}`,
-        text,
-        completed: false,
-        isFixed: true
-      }));
+      // Correctly merge fixed tasks with saved state
+      const fixedTasks: DailyTask[] = FIXED_DAILY_TASKS.map((text, idx) => {
+        const id = `fixed_${idx}`;
+        const existing = profile.dailyTasks.find(t => t.id === id);
+        return {
+          id,
+          text,
+          completed: existing ? existing.completed : false, // Preserve completed status if it exists
+          isFixed: true
+        };
+      });
 
       const userCustomTasks = profile.dailyTasks.filter(t => !t.isFixed);
       const finalDaily = [...fixedTasks, ...userCustomTasks];
@@ -264,6 +269,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (user && !isInitialLoad.current) {
+      // Reduced debounce time to 500ms for quicker saves
       const timeout = setTimeout(() => {
         api.saveProfile(user.username, {
           roadmap: items,
@@ -272,7 +278,7 @@ const App: React.FC = () => {
           starPoints: starPoints,
           linguaSession: linguaSession || undefined
         });
-      }, 1000);
+      }, 500);
       return () => clearTimeout(timeout);
     }
   }, [items, dailyTasks, homeworkTasks, linguaSession, starPoints, user]);

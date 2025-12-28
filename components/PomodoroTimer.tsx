@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, Pause, RotateCcw, Coffee, Target, Zap, X, Minimize2, PictureInPicture2, BellRing } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Target, Zap, X, Minimize2, PictureInPicture2, BellRing, AlertCircle } from 'lucide-react';
 
 type TimerMode = 'focus' | 'short' | 'long';
 
@@ -17,6 +17,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const [isActive, setIsActive] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [pipWindow, setPipWindow] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   const timerRef = useRef<number | null>(null);
 
@@ -64,16 +65,25 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     setIsActive(false);
     setMode(targetMode);
     setTimeLeft(MODES[targetMode].minutes * 60);
+    setErrorMsg(null);
   };
 
   const togglePip = async () => {
+    setErrorMsg(null);
     if (pipWindow) {
       pipWindow.close();
       return;
     }
 
+    // Security check: Document PiP is strictly restricted to top-level frames
+    // This prevents the "Opening a PiP window is only allowed from a top-level browsing context" error
+    if (window.self !== window.top) {
+      setErrorMsg("Must be in new tab/window.");
+      return;
+    }
+
     if (!('documentPictureInPicture' in window)) {
-      alert("Interactive Picture-in-Picture is currently only supported in Chromium-based browsers (Chrome, Edge).");
+      setErrorMsg("Not supported in this browser.");
       return;
     }
 
@@ -100,14 +110,12 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         }
       });
 
-      // Inject Tailwind CDN if not found in rules
       if (!pipW.document.head.querySelector('style')) {
         const script = document.createElement('script');
         script.src = "https://cdn.tailwindcss.com";
         pipW.document.head.appendChild(script);
       }
 
-      // Sync theme and basic body styles
       pipW.document.documentElement.className = document.documentElement.className;
       pipW.document.body.className = "bg-white dark:bg-[#050b14] overflow-hidden p-0 m-0 h-full flex items-center justify-center";
 
@@ -117,8 +125,14 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       pipW.addEventListener("pagehide", () => {
         setPipWindow(null);
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("PiP activation failed:", err);
+      // Fallback user notification within UI
+      if (err.name === 'NotAllowedError' || (err.message && err.message.includes('top-level'))) {
+         setErrorMsg("Must be in new tab/window.");
+      } else {
+         setErrorMsg("Failed to launch PiP.");
+      }
     }
   };
 
@@ -132,7 +146,6 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const progress = (timeLeft / totalSeconds) * 100;
   const CurrentIcon = MODES[mode].icon;
 
-  // SVG Constants
   const size = 200;
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
@@ -142,7 +155,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   if (!isOpen) return null;
 
   const timerContent = (
-    <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 p-8'} ${pipWindow ? 'scale-90' : ''}`}>
+    <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'} ${pipWindow ? 'scale-90' : ''}`}>
       {isMinimized ? (
         <button 
           onClick={() => setIsMinimized(false)}
@@ -151,7 +164,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           <span className="text-[10px] font-black">{formatTime(timeLeft)}</span>
         </button>
       ) : (
-        <>
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
@@ -173,8 +186,16 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
             </div>
           </div>
 
+          {/* Error Message */}
+          {errorMsg && (
+            <div className="mb-6 p-3 bg-rose-50 dark:bg-rose-900/30 border border-rose-100 dark:border-rose-800 rounded-xl flex items-center justify-center gap-2 animate-fade-in shrink-0">
+               <AlertCircle size={14} className="text-rose-500" />
+               <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wide">{errorMsg}</span>
+            </div>
+          )}
+
           {/* Timer Visual */}
-          <div className="relative flex flex-col items-center justify-center mb-10">
+          <div className="relative flex flex-col items-center justify-center mb-10 shrink-0">
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90 drop-shadow-[0_0_15px_rgba(16,185,129,0.1)]">
               <circle 
                 cx={size / 2} 
@@ -208,7 +229,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="flex items-center justify-center gap-4 mb-8 shrink-0">
             <button 
               onClick={() => resetTimer()} 
               className="p-5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-[1.5rem] hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 border border-slate-200 dark:border-white/5"
@@ -232,7 +253,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           </div>
 
           {/* Modes */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 shrink-0">
             {(Object.keys(MODES) as TimerMode[]).map((m) => (
               <button
                 key={m}
@@ -247,7 +268,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               </button>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

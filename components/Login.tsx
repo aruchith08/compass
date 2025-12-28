@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ChevronRight, Cloud, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2 } from 'lucide-react';
 
 interface LoginProps {
@@ -11,6 +11,10 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
   const [username, setUsername] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  
+  // Tilt State
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +47,29 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
         }
       }
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Calculate rotation based on mouse position
+    // Max rotation is 10 degrees
+    const rotateX = ((y - centerY) / centerY) * -10; 
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    setRotate({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setRotate({ x: 0, y: 0 });
   };
 
   return (
@@ -92,8 +119,20 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
         </div>
       </div>
 
-      <div className={`relative z-10 w-full max-w-md p-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-        <div className="bg-white/70 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] dark:shadow-2xl p-10 relative overflow-hidden group">
+      <div 
+        className={`relative z-10 w-full max-w-md p-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+        style={{ perspective: '1000px' }}
+      >
+        <div 
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            transform: `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale3d(1, 1, 1)`,
+            transition: 'transform 0.1s ease-out'
+          }}
+          className="bg-white/70 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] dark:shadow-2xl p-10 relative overflow-hidden group will-change-transform"
+        >
           
           {/* Subtle Glow Effect on Hover */}
           <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>

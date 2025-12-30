@@ -160,14 +160,14 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     // Clear
     ctx.clearRect(0, 0, size, size);
 
-    // Background - Theme Aware
-    ctx.fillStyle = isDark ? '#0f172a' : '#ffffff'; 
+    // Background - Theme Aware (Soft Gray for Light Mode instead of White)
+    ctx.fillStyle = isDark ? '#0f172a' : '#e2e8f0'; 
     ctx.fillRect(0, 0, size, size);
 
     // Track Ring - Theme Aware
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, 2 * Math.PI);
-    ctx.strokeStyle = isDark ? '#1e293b' : '#f1f5f9';
+    ctx.strokeStyle = isDark ? '#1e293b' : '#cbd5e1';
     ctx.lineWidth = lineWidth;
     ctx.stroke();
 
@@ -185,7 +185,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     ctx.stroke();
 
     // Time Text - Theme Aware
-    ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+    ctx.fillStyle = isDark ? '#ffffff' : '#1e293b';
     ctx.font = 'bold 120px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

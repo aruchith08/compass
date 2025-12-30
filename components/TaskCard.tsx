@@ -48,7 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
     // If trying to complete a High Priority task with AI connected, force modal open
     if (nextStatus === 'Completed' && item.priority === 'High' && isAiConnected) {
       if (onClick) {
-        onClick(); // Open Modal
+        onClick(); // Open Modal to trigger validation
       }
       return;
     }
@@ -56,7 +56,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
     toggleStatus(item.id, nextStatus);
   };
 
-  // Check if Socratic Validation would be triggered next
+  // Check if Socratic Validation would be triggered next (High Priority + In Progress + AI Connected)
   const isProtected = item.status === 'In Progress' && item.priority === 'High' && isAiConnected;
 
   return (
@@ -108,8 +108,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
           >
             {statusIcon[item.status]}
             {isProtected && (
-              <div className="absolute -top-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm">
-                <ShieldAlert size={12} className="text-indigo-500 fill-indigo-100 dark:fill-indigo-900/50" />
+              <div className="absolute -top-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm ring-1 ring-white dark:ring-slate-900">
+                <ShieldAlert size={10} className="text-indigo-500 fill-indigo-100 dark:fill-indigo-900/50" />
               </div>
             )}
           </button>

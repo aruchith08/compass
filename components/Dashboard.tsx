@@ -2,10 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip, Cell } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot, Star, Coffee, Sunrise, Zap } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot, Star, Coffee, Sunrise, Zap, BrainCircuit, FileText, ShoppingBag, TrendingUp, RefreshCw } from 'lucide-react';
 import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
 import TimetableModal from './TimetableModal';
+import ResumeArchitectModal from './ResumeArchitect';
+import StarShopModal from './StarShop';
 import { runGenAI } from '../services/ai';
 
 // --- Custom Brand Icon for Roadmap.sh ---
@@ -170,11 +172,118 @@ const MorningBriefing: React.FC = () => {
   );
 };
 
+// --- Memory Anchor (Flashcards) ---
+const MemoryAnchor: React.FC = () => {
+    const { items, isAiConnected } = useRoadmap();
+    const [question, setQuestion] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [showAnswer, setShowAnswer] = useState(false);
+    
+    // Pick a completed task
+    const completedTasks = items.filter(i => i.status === 'Completed');
+    
+    const generateFlashcard = async () => {
+        if (!isAiConnected || completedTasks.length === 0) return;
+        setLoading(true);
+        setShowAnswer(false);
+        const randomTask = completedTasks[Math.floor(Math.random() * completedTasks.length)];
+        
+        try {
+            await runGenAI(async (ai) => {
+                const prompt = `Generate a single conceptual flashcard question for the topic: "${randomTask.name}". Do NOT provide the answer yet. Just the question. Keep it challenging.`;
+                const result = await ai.models.generateContent({
+                    model: "gemini-3-flash-preview",
+                    contents: prompt
+                });
+                setQuestion(result.text || "Explain this concept.");
+            });
+        } catch(e) { console.error(e); } 
+        finally { setLoading(false); }
+    };
+
+    if (completedTasks.length === 0) return null;
+
+    return (
+        <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm relative group overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-slate-700 dark:text-slate-200"><BrainCircuit size={16} className="text-indigo-500" /> Memory Anchor</h3>
+                <button onClick={generateFlashcard} className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"><RefreshCw size={14} className={loading ? 'animate-spin' : ''} /></button>
+            </div>
+            <div className="min-h-[100px] flex items-center justify-center text-center">
+                {!question && !loading && (
+                    <button onClick={generateFlashcard} className="text-xs font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl">Start Recall Session</button>
+                )}
+                {loading && <Zap className="animate-pulse text-indigo-400" />}
+                {question && !loading && (
+                    <div>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-3">{question}</p>
+                        <button onClick={() => setShowAnswer(true)} className={`text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-indigo-500 transition-colors ${showAnswer ? 'hidden' : 'block'}`}>Reveal Answer (Mental Check)</button>
+                         {showAnswer && <p className="text-xs text-emerald-500 font-bold animate-fade-in">Did you recall correctly?</p>}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- Market Pulse (Trending) ---
+const MarketPulse: React.FC<{ className?: string }> = ({ className }) => {
+    const { isAiConnected } = useRoadmap();
+    const [trends, setTrends] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchTrends = async () => {
+            if(!isAiConnected) return;
+            const cached = localStorage.getItem('market_pulse_trends');
+            if(cached) { setTrends(JSON.parse(cached)); return; }
+
+            setLoading(true);
+            try {
+                await runGenAI(async (ai) => {
+                    const prompt = "List 3 top trending technical skills for AI Engineers right now. Just the names, comma separated.";
+                    const result = await ai.models.generateContent({
+                        model: "gemini-3-flash-preview",
+                        contents: prompt,
+                        config: { tools: [{ googleSearch: {} }] }
+                    });
+                    const text = result.text || "RAG, LLMOps, Agents";
+                    const list = text.split(',').map(s => s.trim()).slice(0, 3);
+                    setTrends(list);
+                    localStorage.setItem('market_pulse_trends', JSON.stringify(list));
+                });
+            } catch(e) { 
+                 // Fallback if search fails
+                 setTrends(["Generative AI", "MLOps", "Edge AI"]);
+            } finally { setLoading(false); }
+        };
+        fetchTrends();
+    }, [isAiConnected]);
+
+    if (!isAiConnected) return null;
+
+    return (
+        <div className={`bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-lg relative overflow-hidden border border-slate-700/50 ${className}`}>
+            <div className="absolute top-0 right-0 p-16 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+            <h3 className="text-xs font-bold flex items-center gap-2 mb-3 relative z-10 uppercase tracking-wider text-blue-300"><TrendingUp size={14} className="text-blue-400" /> Market Pulse</h3>
+            {loading ? <div className="h-8 animate-pulse bg-white/10 rounded-xl" /> : (
+                <div className="flex flex-wrap gap-2 relative z-10">
+                    {trends.map((t, i) => (
+                        <span key={i} className="text-[10px] font-bold bg-white/10 px-2 py-1 rounded-lg border border-white/5 whitespace-nowrap">{t}</span>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const Dashboard: React.FC = () => {
   const { items, getCompletionPercentage, user, starPoints, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, isAiConnected } = useRoadmap();
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
   const [showTimetable, setShowTimetable] = useState(false);
+  const [showResume, setShowResume] = useState(false);
+  const [showShop, setShowShop] = useState(false);
   const [celebrateDaily, setCelebrateDaily] = useState(false);
   const [celebrateHomework, setCelebrateHomework] = useState(false);
   const allDailyDone = dailyTasks.length > 0 && dailyTasks.every(t => t.completed);
@@ -208,7 +317,9 @@ const Dashboard: React.FC = () => {
     fill: '#10b981' 
   }));
   const totalProgress = getCompletionPercentage("All Roles");
-  const nextFocusItems = items.filter(i => (i.status === 'To Do' || i.status === 'In Progress') && i.priority === 'High').slice(0, 3);
+  
+  // High Priority Queue: Take top 2 items, then allow space for Market Pulse
+  const nextFocusItems = items.filter(i => (i.status === 'To Do' || i.status === 'In Progress') && i.priority === 'High').slice(0, 2);
   const completedCount = items.filter(i => i.status === 'Completed').length;
   const glassCardClass = "bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-white/5 shadow-lg dark:shadow-2xl dark:shadow-emerald-500/5 rounded-3xl p-5 sm:p-6 transition-all duration-300 min-w-0";
 
@@ -218,19 +329,29 @@ const Dashboard: React.FC = () => {
       {/* Morning Briefing Insertion */}
       {isAiConnected && <MorningBriefing />}
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">System <span className="text-emerald-600 dark:text-emerald-400">Initialized</span></h2>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Strategic overview for your professional development.</p>
+      {/* COMPACT RESPONSIVE HEADER */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 animate-slide-up mb-2" style={{ animationDelay: '50ms' }}>
+        <div className="shrink-0">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">System <span className="text-emerald-600 dark:text-emerald-400">Initialized</span></h2>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Strategic overview for your professional development.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-           <div className="flex gap-2">
-              <button onClick={scrollToSyllabus} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all shadow-sm" title="Academic Syllabus"><GraduationCap size={20} /></button>
-              <a href="https://roadmap.sh" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm" title="Roadmap.sh - Developer Roadmaps"><RoadmapShIcon size={20} /></a>
-              <a href="https://books.goalkicker.com" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all shadow-sm" title="GoalKicker - Professional Programming Books"><GoalKickerIcon size={20} /></a>
-              <a href="https://gamma.app/create" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all shadow-sm" title="Presentation Builder"><Presentation size={20} /></a>
-              <a href="https://www.perplexity.ai/" onClick={handlePerplexityClick} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all shadow-sm" title="Deep Search AI"><Search size={20} /></a>
-              <button onClick={() => setShowTimetable(true)} className="p-2.5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/5 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-all shadow-sm" title="Class Timetable"><CalendarClock size={20} /></button>
+        
+        {/* ACTION BAR - Horizontally scrollable on mobile to prevent vertical stacking issues */}
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
+           {/* Internal App Tools */}
+           <div className="flex shrink-0 gap-1 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-1 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+              <button onClick={scrollToSyllabus} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" title="Academic Syllabus"><GraduationCap size={20} /></button>
+              <button onClick={() => setShowResume(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Resume Architect"><FileText size={20} /></button>
+              <button onClick={() => setShowShop(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" title="Star Shop"><ShoppingBag size={20} /></button>
+              <button onClick={() => setShowTimetable(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" title="Class Timetable"><CalendarClock size={20} /></button>
+           </div>
+
+           {/* External Resources */}
+           <div className="flex shrink-0 gap-1 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-1 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+              <a href="https://roadmap.sh" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-rose-500 transition-colors" title="Roadmap.sh"><RoadmapShIcon size={20} /></a>
+              <a href="https://goalkicker.com" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors" title="GoalKicker Books"><GoalKickerIcon size={20} /></a>
+              <a href="https://gamma.app" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-purple-500 transition-colors" title="Gamma Presentations"><Presentation size={20} /></a>
+              <a href="https://www.perplexity.ai" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-600 dark:text-slate-300 hover:text-teal-500 transition-colors" title="Perplexity AI"><Search size={20} /></a>
            </div>
         </div>
       </div>
@@ -245,7 +366,7 @@ const Dashboard: React.FC = () => {
                 {allDailyDone ? <PartyPopper className="text-amber-600 dark:text-amber-400" size={18} /> : <ListTodo className="text-indigo-600 dark:text-indigo-400" size={18} />}
               </span>
               Daily Routine
-              <div className="flex items-center gap-1.5 ml-2 px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 group">
+              <div className="flex items-center gap-1.5 ml-2 px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 group cursor-pointer" onClick={() => setShowShop(true)}>
                 <Star size={14} className="text-amber-500 fill-amber-500 animate-pulse" />
                 <span className={`text-sm font-black ${starPoints >= 0 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500'}`}>
                   {starPoints}
@@ -313,6 +434,11 @@ const Dashboard: React.FC = () => {
           {allHomeworkDone && ( <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none animate-sparkle"><Sparkles size={120} className="text-emerald-500" /></div> )}
         </div>
       </div>
+      
+      {/* Memory Anchor Row (Now Full Width) */}
+      <div className="w-full animate-slide-up" style={{ animationDelay: '150ms' }}>
+         <MemoryAnchor />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full animate-slide-up" style={{ animationDelay: '200ms' }}>
         <div className={`${glassCardClass} relative overflow-hidden flex flex-col`}>
@@ -340,15 +466,20 @@ const Dashboard: React.FC = () => {
             High Priority Queue
           </h3>
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[300px] custom-scrollbar pr-1">
-            {nextFocusItems.length > 0 ? nextFocusItems.map((item, idx) => (
-              <div key={item.id} className="p-4 bg-slate-50/80 dark:bg-slate-800/20 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-emerald-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
-                <div className="flex justify-between items-start mb-1.5">
-                  <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">Level {item.year}</span>
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{item.category}</span>
-                </div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug line-clamp-2">{item.name}</h4>
-              </div>
-            )) : <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center py-10 font-medium"><p className="text-sm">Queue empty. Synchronization optimal.</p></div>}
+            {nextFocusItems.length > 0 || isAiConnected ? (
+              <>
+                {nextFocusItems.map((item, idx) => (
+                  <div key={item.id} className="p-4 bg-slate-50/80 dark:bg-slate-800/20 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-emerald-500/30 transition-all hover:translate-x-1 animate-slide-up" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
+                    <div className="flex justify-between items-start mb-1.5">
+                      <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">Level {item.year}</span>
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{item.category}</span>
+                    </div>
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug line-clamp-2">{item.name}</h4>
+                  </div>
+                ))}
+                <MarketPulse className="animate-slide-up" />
+              </>
+            ) : <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center py-10 font-medium"><p className="text-sm">Queue empty. Synchronization optimal.</p></div>}
           </div>
           <div className="mt-auto pt-4 border-t border-slate-100 dark:border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
             <span className="text-slate-500">Nodes Completed</span>
@@ -384,6 +515,8 @@ const Dashboard: React.FC = () => {
 
       <SyllabusViewer />
       {showTimetable && <TimetableModal user={user} onClose={() => setShowTimetable(false)} />}
+      {showResume && <ResumeArchitectModal onClose={() => setShowResume(false)} />}
+      {showShop && <StarShopModal onClose={() => setShowShop(false)} />}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { RoadmapItem, Status } from '../types';
-import { X, ExternalLink, Calendar, CheckCircle2, Circle, Clock, AlertTriangle, Tag, Timer, Brain, Send, GraduationCap, Loader2, ThumbsUp, ThumbsDown, ArrowRight, ShieldAlert } from 'lucide-react';
+import { X, ExternalLink, Calendar, CheckCircle2, Circle, Clock, AlertTriangle, Tag, Timer, Brain, Send, GraduationCap, Loader2, ThumbsUp, ThumbsDown, ArrowRight, ShieldAlert, FileCode, FileText } from 'lucide-react';
 import { useRoadmap } from '../RoadmapContext';
 import { runGenAI } from '../services/ai';
 import { Type } from '@google/genai';
@@ -20,6 +20,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
   const [question, setQuestion] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
   const [evaluation, setEvaluation] = useState<{ pass: boolean; feedback: string } | null>(null);
+
+  // Readme Gen State
+  const [isGeneratingReadme, setIsGeneratingReadme] = useState(false);
+  const [readmeContent, setReadmeContent] = useState<string | null>(null);
 
   if (!item) return null;
 
@@ -115,6 +119,37 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
       console.error("Evaluation Error", e);
       setEvaluation({ pass: true, feedback: "AI unavailable. Passing on trust." });
       setChallengeStep('result');
+    }
+  };
+
+  const generateReadme = async () => {
+    setIsGeneratingReadme(true);
+    try {
+       await runGenAI(async (ai) => {
+          const prompt = `
+            Generate a professional GitHub README.md for the project: "${item.name}".
+            Description: ${item.description}.
+            Tech Stack (infer from context): Python, React, etc.
+            
+            Structure:
+            1. Title & Badges
+            2. Features
+            3. Tech Stack
+            4. Installation
+            
+            Return ONLY raw Markdown.
+          `;
+          const result = await ai.models.generateContent({
+             model: "gemini-3-flash-preview",
+             contents: prompt
+          });
+          setReadmeContent(result.text || "Failed to generate.");
+       });
+    } catch (e) {
+       console.error(e);
+       setReadmeContent("Error generating README. Check API connection.");
+    } finally {
+       setIsGeneratingReadme(false);
     }
   };
 
@@ -303,6 +338,41 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ item, onClose }) => {
               ))}
             </div>
           </div>
+
+          {/* GitFolio (README Generator) */}
+          {item.is_project && isAiConnected && (
+             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <FileCode size={16} className="text-purple-500" /> GitFolio: README Architect
+                    </h3>
+                </div>
+                {!readmeContent ? (
+                    <button 
+                        onClick={generateReadme} 
+                        disabled={isGeneratingReadme}
+                        className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-500/20"
+                    >
+                        {isGeneratingReadme ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+                        {isGeneratingReadme ? "Drafting Documentation..." : "Generate Professional README.md"}
+                    </button>
+                ) : (
+                    <div className="space-y-3">
+                        <textarea 
+                            readOnly 
+                            value={readmeContent} 
+                            className="w-full h-48 bg-slate-900 text-slate-300 font-mono text-xs p-3 rounded-lg border border-slate-700 focus:outline-none"
+                        />
+                        <button 
+                            onClick={() => {navigator.clipboard.writeText(readmeContent); setReadmeContent(null)}} 
+                            className="w-full py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
+                        >
+                            Copy & Close
+                        </button>
+                    </div>
+                )}
+             </div>
+          )}
 
           {/* Resource Link */}
           {item.resource_name && (

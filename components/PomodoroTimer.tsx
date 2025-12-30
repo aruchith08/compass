@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, Pause, RotateCcw, Coffee, Target, Zap, X, Minimize2, PictureInPicture2, BellRing, AlertCircle } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Target, Zap, X, Minimize2, PictureInPicture2, BellRing, AlertCircle, Volume2, VolumeX } from 'lucide-react';
 
 type TimerMode = 'focus' | 'short' | 'long';
 
@@ -11,6 +11,52 @@ const MODES: Record<TimerMode, { label: string; minutes: number; color: string; 
   long: { label: 'Long Break', minutes: 15, color: 'purple', icon: Zap },
 };
 
+class WhiteNoise {
+  ctx: AudioContext | null = null;
+  node: ScriptProcessorNode | null = null;
+  gain: GainNode | null = null;
+
+  start() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    const bufferSize = 4096;
+    this.node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
+    this.node.onaudioprocess = (e) => {
+      const output = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        // Brownian noise approximation
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5; 
+      }
+    };
+    let lastOut = 0;
+    
+    this.gain = this.ctx.createGain();
+    this.gain.gain.value = 0.05; // Low volume
+    
+    this.node.connect(this.gain);
+    this.gain.connect(this.ctx.destination);
+  }
+
+  stop() {
+    if (this.node) {
+      this.node.disconnect();
+      this.node = null;
+    }
+    if (this.gain) {
+      this.gain.disconnect();
+      this.gain = null;
+    }
+    if (this.ctx) {
+       this.ctx.close();
+       this.ctx = null;
+    }
+  }
+}
+
 const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<TimerMode>('focus');
   const [timeLeft, setTimeLeft] = useState(MODES.focus.minutes * 60);
@@ -18,8 +64,10 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const [isMinimized, setIsMinimized] = useState(false);
   const [pipWindow, setPipWindow] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [zenMode, setZenMode] = useState(false);
   
   const timerRef = useRef<number | null>(null);
+  const noiseRef = useRef<WhiteNoise | null>(null);
 
   useEffect(() => {
     if (isActive && timeLeft > 0) {
@@ -33,6 +81,27 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [isActive, timeLeft]);
+
+  // Handle Zen Mode Audio
+  useEffect(() => {
+    if (zenMode && isActive) {
+      if (!noiseRef.current) {
+        noiseRef.current = new WhiteNoise();
+        noiseRef.current.start();
+      }
+    } else {
+      if (noiseRef.current) {
+        noiseRef.current.stop();
+        noiseRef.current = null;
+      }
+    }
+    return () => {
+      if (noiseRef.current) {
+        noiseRef.current.stop();
+        noiseRef.current = null;
+      }
+    };
+  }, [zenMode, isActive]);
 
   const handleTimerComplete = () => {
     setIsActive(false);
@@ -75,8 +144,6 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       return;
     }
 
-    // Security check: Document PiP is strictly restricted to top-level frames
-    // This prevents the "Opening a PiP window is only allowed from a top-level browsing context" error
     if (window.self !== window.top) {
       setErrorMsg("Must be in new tab/window.");
       return;
@@ -93,7 +160,6 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         height: 480,
       });
 
-      // Copy all styles to the new window
       [...document.styleSheets].forEach((styleSheet) => {
         try {
           const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
@@ -127,7 +193,6 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       });
     } catch (err: any) {
       console.error("PiP activation failed:", err);
-      // Fallback user notification within UI
       if (err.name === 'NotAllowedError' || (err.message && err.message.includes('top-level'))) {
          setErrorMsg("Must be in new tab/window.");
       } else {
@@ -253,7 +318,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           </div>
 
           {/* Modes */}
-          <div className="grid grid-cols-3 gap-3 shrink-0">
+          <div className="grid grid-cols-3 gap-3 shrink-0 mb-4">
             {(Object.keys(MODES) as TimerMode[]).map((m) => (
               <button
                 key={m}
@@ -268,17 +333,17 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               </button>
             ))}
           </div>
+
+          {/* Zen Mode Toggle */}
+          <button 
+            onClick={() => setZenMode(!zenMode)} 
+            className={`w-full py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest transition-all ${zenMode ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400'}`}
+          >
+             {zenMode ? <Volume2 size={16} /> : <VolumeX size={16} />}
+             Zen Mode (White Noise)
+          </button>
         </div>
       )}
-    </div>
-  );
-
-  return (
-    <div className={`fixed bottom-24 lg:bottom-10 left-6 z-[150] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isMinimized ? 'w-16 h-16' : 'w-80'}`}>
-      {pipWindow 
-        ? createPortal(timerContent, pipWindow.document.body)
-        : timerContent
-      }
     </div>
   );
 };

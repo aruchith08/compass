@@ -73,12 +73,22 @@ export interface LinguaSession {
   isComplete: boolean;
 }
 
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  icon: string; // Icon name
+  type: 'theme' | 'utility' | 'buff';
+}
+
 export interface RoadmapContextType {
   items: RoadmapItem[];
   user: User | null;
   theme: 'dark' | 'light';
   isAiConnected: boolean;
   starPoints: number;
+  inventory: string[]; // List of purchased ShopItem IDs
   login: (username: string) => Promise<void>;
   logout: () => void;
   toggleTheme: () => void;
@@ -98,6 +108,9 @@ export interface RoadmapContextType {
   // Lingua (AI Daily Sync)
   linguaSession: LinguaSession | null;
   updateLinguaSession: (session: LinguaSession) => void;
+
+  // Shop
+  purchaseItem: (itemId: string, cost: number) => boolean;
 }
 
 // Syllabus Types

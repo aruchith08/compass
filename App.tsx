@@ -135,14 +135,6 @@ const KeyModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () =>
           <a href="https://aistudio.google.com/app/apikey" target="_blank" className="block text-center text-[10px] text-slate-400 hover:text-indigo-500 underline uppercase tracking-widest font-black">Get API Key from Google</a>
         </div>
       </div>
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-4px); }
-          75% { transform: translateX(4px); }
-        }
-        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-      `}</style>
     </div>
   );
 };
@@ -164,6 +156,7 @@ const App: React.FC = () => {
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   const [linguaSession, setLinguaSession] = useState<LinguaSession | null>(null);
   const [starPoints, setStarPoints] = useState<number>(0);
+  const [inventory, setInventory] = useState<string[]>([]);
   
   const isInitialLoad = useRef(true);
   const hideTimeoutRef = useRef<number | null>(null);
@@ -225,14 +218,13 @@ const App: React.FC = () => {
     try {
       const profile = await api.login(username);
       
-      // Correctly merge fixed tasks with saved state
       const fixedTasks: DailyTask[] = FIXED_DAILY_TASKS.map((text, idx) => {
         const id = `fixed_${idx}`;
         const existing = profile.dailyTasks.find(t => t.id === id);
         return {
           id,
           text,
-          completed: existing ? existing.completed : false, // Preserve completed status if it exists
+          completed: existing ? existing.completed : false, 
           isFixed: true
         };
       });
@@ -245,6 +237,11 @@ const App: React.FC = () => {
       setHomeworkTasks(profile.homeworkTasks);
       setLinguaSession(profile.linguaSession || null);
       setStarPoints(profile.starPoints || 0);
+      
+      // Load inventory from local storage if available, else empty
+      const savedInv = localStorage.getItem(`compass_inventory_${username}`);
+      setInventory(savedInv ? JSON.parse(savedInv) : []);
+
       setUser({ username });
       localStorage.setItem('roadmap_user_session', username);
       isInitialLoad.current = false;
@@ -263,13 +260,13 @@ const App: React.FC = () => {
     setHomeworkTasks([]);
     setLinguaSession(null);
     setStarPoints(0);
+    setInventory([]);
     localStorage.removeItem('roadmap_user_session');
     setActiveTab('dashboard');
   };
 
   useEffect(() => {
     if (user && !isInitialLoad.current) {
-      // Reduced debounce time to 500ms for quicker saves
       const timeout = setTimeout(() => {
         api.saveProfile(user.username, {
           roadmap: items,
@@ -278,10 +275,11 @@ const App: React.FC = () => {
           starPoints: starPoints,
           linguaSession: linguaSession || undefined
         });
+        localStorage.setItem(`compass_inventory_${user.username}`, JSON.stringify(inventory));
       }, 500);
       return () => clearTimeout(timeout);
     }
-  }, [items, dailyTasks, homeworkTasks, linguaSession, starPoints, user]);
+  }, [items, dailyTasks, homeworkTasks, linguaSession, starPoints, user, inventory]);
 
   const toggleTheme = () => {
     setTheme(prev => {
@@ -338,6 +336,15 @@ const App: React.FC = () => {
     setLinguaSession(session);
   };
 
+  const purchaseItem = (itemId: string, cost: number) => {
+    if (starPoints >= cost && !inventory.includes(itemId)) {
+      setStarPoints(prev => prev - cost);
+      setInventory(prev => [...prev, itemId]);
+      return true;
+    }
+    return false;
+  };
+
   const showSidebar = () => {
     if (hideTimeoutRef.current) {
       window.clearTimeout(hideTimeoutRef.current);
@@ -355,12 +362,12 @@ const App: React.FC = () => {
   };
 
   const contextValue: RoadmapContextType = useMemo(() => ({
-    items, user, theme, isAiConnected: aiConnected, starPoints, login: handleLogin, logout: handleLogout,
+    items, user, theme, isAiConnected: aiConnected, starPoints, inventory, login: handleLogin, logout: handleLogout,
     toggleTheme, toggleStatus, getCompletionPercentage,
     dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask,
     toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask,
-    linguaSession, updateLinguaSession
-  }), [items, user, theme, aiConnected, starPoints, dailyTasks, homeworkTasks, linguaSession]);
+    linguaSession, updateLinguaSession, purchaseItem
+  }), [items, user, theme, aiConnected, starPoints, dailyTasks, homeworkTasks, linguaSession, inventory]);
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },

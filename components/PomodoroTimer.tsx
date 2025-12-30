@@ -16,28 +16,31 @@ class WhiteNoise {
   gain: GainNode | null = null;
 
   start() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    const bufferSize = 4096;
-    this.node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-    this.node.onaudioprocess = (e) => {
-      const output = e.outputBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        // Brownian noise approximation
-        const white = Math.random() * 2 - 1;
-        output[i] = (lastOut + (0.02 * white)) / 1.02;
-        lastOut = output[i];
-        output[i] *= 3.5; 
+    try {
+      if (!this.ctx) {
+        this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
-    };
-    let lastOut = 0;
-    
-    this.gain = this.ctx.createGain();
-    this.gain.gain.value = 0.05; // Low volume
-    
-    this.node.connect(this.gain);
-    this.gain.connect(this.ctx.destination);
+      const bufferSize = 4096;
+      this.node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
+      this.node.onaudioprocess = (e) => {
+        const output = e.outputBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = output[i];
+          output[i] *= 3.5; 
+        }
+      };
+      let lastOut = 0;
+      
+      this.gain = this.ctx.createGain();
+      this.gain.gain.value = 0.05; 
+      
+      this.node.connect(this.gain);
+      this.gain.connect(this.ctx.destination);
+    } catch (e) {
+      console.error("Audio Context Error", e);
+    }
   }
 
   stop() {
@@ -135,21 +138,24 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   }, [zenMode, isActive]);
 
   // --- Canvas Rendering for PiP ---
-  useEffect(() => {
+  const drawCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // High resolution canvas for crisp text
     const size = 512;
-    canvas.width = size;
-    canvas.height = size;
+    // Ensure dimensions match
+    if (canvas.width !== size) canvas.width = size;
+    if (canvas.height !== size) canvas.height = size;
     
     const center = size / 2;
     const radius = 200;
     const lineWidth = 40;
+
+    // Clear
+    ctx.clearRect(0, 0, size, size);
 
     // Background
     ctx.fillStyle = '#0f172a'; // slate-900
@@ -186,7 +192,10 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     ctx.fillStyle = '#94a3b8'; // slate-400
     ctx.font = 'bold 40px sans-serif';
     ctx.fillText(isActive ? MODES[mode].label.toUpperCase() : "PAUSED", center, center + 80);
+  };
 
+  useEffect(() => {
+    drawCanvas();
   }, [timeLeft, mode, isActive]);
 
   const handleTimerComplete = () => {
@@ -197,7 +206,10 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
   const playBell = () => {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      
+      const ctx = new AudioContextClass();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
@@ -236,7 +248,9 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         await document.exitPictureInPicture();
         setIsPiPActive(false);
       } else {
-        // Capture stream if not already active
+        // Force a draw to ensure content exists before capture
+        drawCanvas();
+
         if (video.srcObject === null) {
             const stream = canvas.captureStream(30); // 30 FPS
             video.srcObject = stream;
@@ -246,9 +260,12 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
         await video.requestPictureInPicture();
         setIsPiPActive(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("PiP failed", err);
-      setErrorMsg("Browser blocked PiP.");
+      let msg = "PiP failed.";
+      if (err.name === 'NotAllowedError') msg = "PiP blocked by browser.";
+      if (err.name === 'InvalidStateError') msg = "Video not ready.";
+      setErrorMsg(msg);
       setTimeout(() => setErrorMsg(null), 3000);
     }
   };
@@ -287,9 +304,20 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   return (
     <div className={`fixed bottom-6 left-6 z-[120] transition-all duration-300 ease-out ${isMinimized ? 'w-16 h-16' : 'w-80'}`}>
       
-      {/* Hidden Elements for PiP */}
-      <canvas ref={canvasRef} className="hidden" />
-      <video ref={videoRef} className="hidden" muted playsInline />
+      {/* Hidden Elements for PiP - NOT display:none, but opacity-0 to allow rendering */}
+      <canvas 
+        ref={canvasRef} 
+        width={512} 
+        height={512} 
+        className="absolute bottom-0 left-0 opacity-0 pointer-events-none z-[-1]" 
+      />
+      <video 
+        ref={videoRef} 
+        muted 
+        autoPlay 
+        playsInline 
+        className="absolute bottom-0 left-0 opacity-0 pointer-events-none z-[-1] w-1 h-1" 
+      />
 
       <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'}`}>
       

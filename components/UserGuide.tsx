@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle, ExternalLink, Timer, FileText, Activity, Star, Network, PenTool, ShoppingBag, BookOpen } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Library, Briefcase, Languages, GraduationCap, CalendarClock, ShieldCheck, Zap, Info, ChevronRight, HelpCircle, Target, Sparkles, BrainCircuit, Mail, MessageCircle, AlertCircle, ExternalLink, Timer, FileText, Activity, Star, Network, PenTool, ShoppingBag, BookOpen, Store } from 'lucide-react';
 
 interface GuideModalProps {
   isOpen: boolean;
@@ -18,6 +18,7 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
     { id: 'roadmap', label: 'Roadmap', icon: CheckSquare },
     { id: 'ai-tools', label: 'AI Suite', icon: BrainCircuit },
     { id: 'academic', label: 'Academic', icon: GraduationCap },
+    { id: 'academia-market', label: 'AcademiaMarket', icon: Store },
     { id: 'support', label: 'Support', icon: MessageCircle },
   ];
 
@@ -313,6 +314,44 @@ const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'academia-market' && (
+              <div className="space-y-8 animate-slide-up">
+                 <div className="flex items-center gap-3">
+                     <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl"><Store size={24} /></div>
+                     <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Partner Ecosystem</h3>
+                        <p className="text-xs text-slate-500">Explore other tools in our network.</p>
+                     </div>
+                 </div>
+
+                 <div className="p-8 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="bg-white/20 p-2 rounded-lg backdrop-blur-md"><Store size={24} /></span>
+                            <h2 className="text-2xl font-black tracking-tight">AcademiaMarket</h2>
+                        </div>
+
+                        <p className="text-indigo-100 leading-relaxed mb-6 max-w-2xl">
+                            AcademiaMarket is a hyper-local, peer-to-peer marketplace built with React and Firebase that connects university students for manual academic tasks like handwriting and formatting. It utilises a trust-based matching system and a structured "task handshake" workflow to ensure secure, community-driven collaboration.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <a
+                                href="https://academia-market.vercel.app/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-all shadow-lg active:scale-95"
+                            >
+                                Try Academia Market <ExternalLink size={16} />
+                            </a>
+                        </div>
+                    </div>
+                 </div>
               </div>
             )}
 

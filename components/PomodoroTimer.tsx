@@ -1,14 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Play, Pause, RotateCcw, Coffee, Target, Zap, X, Minimize2, PictureInPicture2, BellRing, AlertCircle, Volume2, VolumeX } from 'lucide-react';
 
 type TimerMode = 'focus' | 'short' | 'long';
 
-const MODES: Record<TimerMode, { label: string; minutes: number; color: string; icon: any }> = {
-  focus: { label: 'Focus', minutes: 25, color: 'emerald', icon: Target },
-  short: { label: 'Short Break', minutes: 5, color: 'indigo', icon: Coffee },
-  long: { label: 'Long Break', minutes: 15, color: 'purple', icon: Zap },
+const MODES: Record<TimerMode, { label: string; minutes: number; color: string; hex: string; icon: any }> = {
+  focus: { label: 'Focus', minutes: 25, color: 'emerald', hex: '#10b981', icon: Target },
+  short: { label: 'Short Break', minutes: 5, color: 'indigo', hex: '#6366f1', icon: Coffee },
+  long: { label: 'Long Break', minutes: 15, color: 'purple', hex: '#a855f7', icon: Zap },
 };
 
 class WhiteNoise {
@@ -62,41 +61,40 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const [timeLeft, setTimeLeft] = useState(MODES.focus.minutes * 60);
   const [isActive, setIsActive] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [pipWindow, setPipWindow] = useState<any>(null);
+  const [isPiPActive, setIsPiPActive] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [zenMode, setZenMode] = useState(false);
   
   const timerRef = useRef<number | null>(null);
   const endTimeRef = useRef<number | null>(null);
   const noiseRef = useRef<WhiteNoise | null>(null);
+  
+  // Canvas & Video Refs for Native PiP
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Robust Timer Logic using Date delta to prevent drift
+  // --- Timer Logic ---
   useEffect(() => {
     if (isActive && timeLeft > 0) {
-      // If resuming or starting, calculate expected end time based on current timeLeft
       if (!endTimeRef.current) {
         endTimeRef.current = Date.now() + timeLeft * 1000;
       }
 
       timerRef.current = window.setInterval(() => {
         if (!endTimeRef.current) return;
-        
         const now = Date.now();
         const diff = endTimeRef.current - now;
         
         if (diff <= 0) {
-          // Time is up
           setTimeLeft(0);
           endTimeRef.current = null;
           if (timerRef.current) clearInterval(timerRef.current);
         } else {
-          // Update second count
           const secondsRemaining = Math.ceil(diff / 1000);
           setTimeLeft(prev => prev !== secondsRemaining ? secondsRemaining : prev);
         }
-      }, 200); // Check frequently for UI smoothness
+      }, 200);
     } else {
-      // Paused
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -105,21 +103,17 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     }
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isActive]); // Removed timeLeft dependency to prevent re-creation of interval
+  }, [isActive]);
 
-  // Handle Completion
   useEffect(() => {
     if (timeLeft === 0 && isActive) {
       handleTimerComplete();
     }
   }, [timeLeft, isActive]);
 
-  // Handle Zen Mode Audio
+  // --- Zen Mode Audio ---
   useEffect(() => {
     if (zenMode && isActive) {
       if (!noiseRef.current) {
@@ -139,6 +133,61 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       }
     };
   }, [zenMode, isActive]);
+
+  // --- Canvas Rendering for PiP ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // High resolution canvas for crisp text
+    const size = 512;
+    canvas.width = size;
+    canvas.height = size;
+    
+    const center = size / 2;
+    const radius = 200;
+    const lineWidth = 40;
+
+    // Background
+    ctx.fillStyle = '#0f172a'; // slate-900
+    ctx.fillRect(0, 0, size, size);
+
+    // Track Ring
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#1e293b'; // slate-800
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+
+    // Progress Ring
+    const totalSeconds = MODES[mode].minutes * 60;
+    const progress = 1 - (timeLeft / totalSeconds);
+    const startAngle = -Math.PI / 2;
+    const endAngle = startAngle + (progress * 2 * Math.PI);
+
+    ctx.beginPath();
+    ctx.arc(center, center, radius, startAngle, endAngle);
+    ctx.strokeStyle = MODES[mode].hex;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Time Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 120px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(formatTime(timeLeft), center, center - 20);
+
+    // Status Text
+    ctx.fillStyle = '#94a3b8'; // slate-400
+    ctx.font = 'bold 40px sans-serif';
+    ctx.fillText(isActive ? MODES[mode].label.toUpperCase() : "PAUSED", center, center + 80);
+
+  }, [timeLeft, mode, isActive]);
 
   const handleTimerComplete = () => {
     setIsActive(false);
@@ -176,69 +225,46 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     setErrorMsg(null);
   };
 
-  const togglePip = async () => {
-    setErrorMsg(null);
-    if (pipWindow) {
-      pipWindow.close();
-      return;
-    }
-
-    if (window.self !== window.top) {
-      setErrorMsg("Must be in new tab/window.");
-      return;
-    }
-
-    if (!('documentPictureInPicture' in window)) {
-      setErrorMsg("Not supported in this browser.");
-      return;
-    }
+  const toggleNativePip = async () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (!video || !canvas) return;
 
     try {
-      const pipW = await (window as any).documentPictureInPicture.requestWindow({
-        width: 320,
-        height: 480,
-      });
-
-      [...document.styleSheets].forEach((styleSheet) => {
-        try {
-          const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
-          const style = document.createElement('style');
-          style.textContent = cssRules;
-          pipW.document.head.appendChild(style);
-        } catch (e) {
-          const link = document.createElement('link');
-          if (styleSheet.href) {
-            link.rel = 'stylesheet';
-            link.href = styleSheet.href;
-            pipW.document.head.appendChild(link);
-          }
-        }
-      });
-
-      if (!pipW.document.head.querySelector('style')) {
-        const script = document.createElement('script');
-        script.src = "https://cdn.tailwindcss.com";
-        pipW.document.head.appendChild(script);
-      }
-
-      pipW.document.documentElement.className = document.documentElement.className;
-      pipW.document.body.className = "bg-white dark:bg-[#050b14] overflow-hidden p-0 m-0 h-full flex items-center justify-center";
-
-      setPipWindow(pipW);
-      setIsMinimized(false);
-
-      pipW.addEventListener("pagehide", () => {
-        setPipWindow(null);
-      });
-    } catch (err: any) {
-      console.error("PiP activation failed:", err);
-      if (err.name === 'NotAllowedError' || (err.message && err.message.includes('top-level'))) {
-         setErrorMsg("Must be in new tab/window.");
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPiPActive(false);
       } else {
-         setErrorMsg("Failed to launch PiP.");
+        // Capture stream if not already active
+        if (video.srcObject === null) {
+            const stream = canvas.captureStream(30); // 30 FPS
+            video.srcObject = stream;
+        }
+        
+        await video.play();
+        await video.requestPictureInPicture();
+        setIsPiPActive(true);
       }
+    } catch (err) {
+      console.error("PiP failed", err);
+      setErrorMsg("Browser blocked PiP.");
+      setTimeout(() => setErrorMsg(null), 3000);
     }
   };
+
+  // Listen for PiP close
+  useEffect(() => {
+      const video = videoRef.current;
+      const onLeave = () => setIsPiPActive(false);
+      
+      if (video) {
+          video.addEventListener('leavepictureinpicture', onLeave);
+      }
+      return () => {
+          if (video) video.removeEventListener('leavepictureinpicture', onLeave);
+      };
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -260,7 +286,13 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
   return (
     <div className={`fixed bottom-6 left-6 z-[120] transition-all duration-300 ease-out ${isMinimized ? 'w-16 h-16' : 'w-80'}`}>
-      <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'} ${pipWindow ? 'scale-90' : ''}`}>
+      
+      {/* Hidden Elements for PiP */}
+      <canvas ref={canvasRef} className="hidden" />
+      <video ref={videoRef} className="hidden" muted playsInline />
+
+      <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'}`}>
+      
       {isMinimized ? (
         <button 
           onClick={() => setIsMinimized(false)}
@@ -280,9 +312,9 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
               <button 
-                onClick={togglePip} 
-                className={`p-2 transition-colors ${pipWindow ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500 hover:text-indigo-500'}`}
-                title="Picture in Picture"
+                onClick={toggleNativePip} 
+                className={`p-2 transition-colors ${isPiPActive ? 'text-emerald-500 bg-emerald-500/10 rounded-lg' : 'text-slate-400 dark:text-slate-500 hover:text-indigo-500'}`}
+                title="Pop out floating timer"
               >
                 <PictureInPicture2 size={16} />
               </button>
@@ -321,7 +353,9 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
                 strokeDasharray={circumference} 
                 strokeDashoffset={offset}
                 strokeLinecap="round"
-                className={`transition-all duration-1000 ease-linear text-emerald-500`}
+                className={`transition-all duration-1000 ease-linear ${
+                    mode === 'focus' ? 'text-emerald-500' : mode === 'short' ? 'text-indigo-500' : 'text-purple-500'
+                }`}
               />
             </svg>
             

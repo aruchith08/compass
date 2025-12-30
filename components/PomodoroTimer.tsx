@@ -67,20 +67,57 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const [zenMode, setZenMode] = useState(false);
   
   const timerRef = useRef<number | null>(null);
+  const endTimeRef = useRef<number | null>(null);
   const noiseRef = useRef<WhiteNoise | null>(null);
 
+  // Robust Timer Logic using Date delta to prevent drift
   useEffect(() => {
     if (isActive && timeLeft > 0) {
+      // If resuming or starting, calculate expected end time based on current timeLeft
+      if (!endTimeRef.current) {
+        endTimeRef.current = Date.now() + timeLeft * 1000;
+      }
+
       timerRef.current = window.setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      handleTimerComplete();
+        if (!endTimeRef.current) return;
+        
+        const now = Date.now();
+        const diff = endTimeRef.current - now;
+        
+        if (diff <= 0) {
+          // Time is up
+          setTimeLeft(0);
+          endTimeRef.current = null;
+          if (timerRef.current) clearInterval(timerRef.current);
+        } else {
+          // Update second count
+          const secondsRemaining = Math.ceil(diff / 1000);
+          setTimeLeft(prev => prev !== secondsRemaining ? secondsRemaining : prev);
+        }
+      }, 200); // Check frequently for UI smoothness
     } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+      // Paused
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      endTimeRef.current = null;
     }
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [isActive, timeLeft]);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isActive]); // Removed timeLeft dependency to prevent re-creation of interval
+
+  // Handle Completion
+  useEffect(() => {
+    if (timeLeft === 0 && isActive) {
+      handleTimerComplete();
+    }
+  }, [timeLeft, isActive]);
 
   // Handle Zen Mode Audio
   useEffect(() => {
@@ -105,6 +142,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
   const handleTimerComplete = () => {
     setIsActive(false);
+    endTimeRef.current = null;
     playBell();
   };
 
@@ -132,6 +170,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const resetTimer = (newMode?: TimerMode) => {
     const targetMode = newMode || mode;
     setIsActive(false);
+    endTimeRef.current = null;
     setMode(targetMode);
     setTimeLeft(MODES[targetMode].minutes * 60);
     setErrorMsg(null);
@@ -219,8 +258,9 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
   if (!isOpen) return null;
 
-  const timerContent = (
-    <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'} ${pipWindow ? 'scale-90' : ''}`}>
+  return (
+    <div className={`fixed bottom-6 left-6 z-[120] transition-all duration-300 ease-out ${isMinimized ? 'w-16 h-16' : 'w-80'}`}>
+      <div className={`relative bg-white dark:bg-[#050b14] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-2xl flex flex-col ${isMinimized ? 'w-16 h-16 p-0' : 'w-80 max-h-[calc(100vh-8rem)]'} ${pipWindow ? 'scale-90' : ''}`}>
       {isMinimized ? (
         <button 
           onClick={() => setIsMinimized(false)}
@@ -344,6 +384,7 @@ const PomodoroTimer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 };

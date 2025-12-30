@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRoadmap } from '../RoadmapContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip, Cell } from 'recharts';
-import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot, Star } from 'lucide-react';
+import { Target, Trophy, Flame, ListTodo, BookOpen, Plus, Trash2, CheckCircle, Presentation, Search, ExternalLink, Quote, GraduationCap, CalendarClock, PartyPopper, Sparkles, Milestone, LogOut, CircleDot, Star, Coffee, Sunrise, Zap } from 'lucide-react';
 import { Role } from '../types';
 import SyllabusViewer from './SyllabusViewer';
 import TimetableModal from './TimetableModal';
+import { runGenAI } from '../services/ai';
 
 // --- Custom Brand Icon for Roadmap.sh ---
 const RoadmapShIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -78,8 +79,99 @@ const ConfettiEffect: React.FC<{ active: boolean }> = ({ active }) => {
   );
 };
 
+// --- Morning Briefing AI Component ---
+const MorningBriefing: React.FC = () => {
+  const { user, starPoints, dailyTasks, items, isAiConnected } = useRoadmap();
+  const [briefing, setBriefing] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    const checkBriefing = async () => {
+      if (!user || !isAiConnected) return;
+
+      const today = new Date().toDateString();
+      const storageKey = `compass_briefing_${user.username}_${today}`;
+      const savedBriefing = localStorage.getItem(storageKey);
+
+      if (savedBriefing) {
+        setBriefing(savedBriefing);
+        return;
+      }
+
+      // Generate new briefing
+      setLoading(true);
+      try {
+        const pendingCount = dailyTasks.filter(t => !t.completed).length;
+        const inProgressRoadmap = items.filter(i => i.status === 'In Progress').map(i => i.name).slice(0, 2).join(", ");
+        
+        const prompt = `
+          You are a tactical military-style AI career OS named "Compass".
+          User: ${user.username}
+          XP: ${starPoints}
+          Pending Routine Tasks: ${pendingCount}
+          Current Focus: ${inProgressRoadmap || "General Foundations"}
+          
+          Generate a short, high-energy, stoic morning briefing (max 40 words).
+          Focus on discipline, momentum, and executing the mission today.
+          Do not say "Good morning". Start directly with the tactical advice.
+        `;
+
+        await runGenAI(async (ai) => {
+          const result = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: prompt,
+          });
+          const text = result.text?.trim() || "Systems online. Execute your objectives.";
+          setBriefing(text);
+          localStorage.setItem(storageKey, text);
+        });
+      } catch (e) {
+        console.error("Briefing Gen Error", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkBriefing();
+  }, [user, isAiConnected, dailyTasks, items, starPoints]);
+
+  if (dismissed || (!briefing && !loading)) return null;
+
+  return (
+    <div className="w-full mb-6 animate-slide-down">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 dark:from-indigo-950 dark:to-slate-900 text-white shadow-xl shadow-indigo-500/10 border border-indigo-500/20">
+        <div className="absolute top-0 right-0 p-24 bg-indigo-500/10 rounded-full blur-3xl -mr-12 -mt-12 pointer-events-none"></div>
+        <div className="relative z-10 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+          <div className="p-3 bg-white/10 rounded-xl backdrop-blur-md shrink-0">
+             {loading ? <Zap className="animate-pulse text-yellow-400" size={24} /> : <Sunrise className="text-amber-400" size={24} />}
+          </div>
+          <div className="flex-1">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-1">
+              Daily Tactical Briefing
+            </h4>
+            {loading ? (
+              <div className="h-4 w-3/4 bg-white/10 rounded animate-pulse"></div>
+            ) : (
+              <p className="text-sm md:text-base font-medium leading-relaxed font-mono opacity-90">
+                "{briefing}"
+              </p>
+            )}
+          </div>
+          <button 
+            onClick={() => setDismissed(true)}
+            className="self-start md:self-center px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors whitespace-nowrap"
+          >
+            Acknowledge
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard: React.FC = () => {
-  const { items, getCompletionPercentage, user, starPoints, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, } = useRoadmap();
+  const { items, getCompletionPercentage, user, starPoints, dailyTasks, homeworkTasks, toggleDailyTask, addDailyTask, deleteDailyTask, toggleHomeworkTask, addHomeworkTask, deleteHomeworkTask, isAiConnected } = useRoadmap();
   const [newDaily, setNewDaily] = useState('');
   const [newHomework, setNewHomework] = useState('');
   const [showTimetable, setShowTimetable] = useState(false);
@@ -122,6 +214,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-12 w-full max-w-full overflow-hidden">
+      
+      {/* Morning Briefing Insertion */}
+      {isAiConnected && <MorningBriefing />}
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">System <span className="text-emerald-600 dark:text-emerald-400">Initialized</span></h2>

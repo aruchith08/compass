@@ -1,26 +1,39 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { SyllabusCourse, SyllabusUnit } from '../types';
-import { X, CheckCircle2, Circle, BookOpen, Trophy, FileText, PieChart, Copy, Check } from 'lucide-react';
+import { X, CheckCircle2, Circle, Trophy, FileText, Copy, Check, Sparkles, Brain, Loader2, BookOpen } from 'lucide-react';
+import { runGenAI } from '../services/ai';
+import { useRoadmap } from '../RoadmapContext';
+import { Type } from "@google/genai";
 
 interface SyllabusModalProps {
   course: SyllabusCourse;
   onClose: () => void;
 }
 
+interface UnitAnalysis {
+  summary: string;
+  examQuestions: string[];
+  mnemonic: string;
+}
+
 const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
+  const { isAiConnected } = useRoadmap();
+  
   // State for checked topics
   const [checkedTopics, setCheckedTopics] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   
+  // AI States
+  const [analyzingUnitIdx, setAnalyzingUnitIdx] = useState<number | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<Record<number, UnitAnalysis>>({});
+
   // Helper to parse topics string into array
   const parseTopics = (topicsStr: string): string[] => {
-    // Split by comma or bullet points if present, then trim
     return topicsStr.split(/,|•|–/).map(t => t.trim()).filter(t => t.length > 2);
   };
 
   // Generate a robust unique ID for topics using indices
-  // Previous version caused collisions with similar unit titles
   const getTopicId = (unitIdx: number, topicIdx: number) => {
     return `${course.code}_u${unitIdx}_t${topicIdx}`;
   };
@@ -51,17 +64,72 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
   };
 
   const handleCopy = (topic: string, unitTitle: string, id: string) => {
-    // Construct a context-rich string for better search results (Course + Unit + Topic)
     const richText = `${course.title} - ${unitTitle}: ${topic}`;
     navigator.clipboard.writeText(richText).then(() => {
       setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopiedId(null), 2000); 
     });
   };
 
-  // Accurate Stats Calculation
-  // We calculate completedCount by iterating through the ACTUAL renderable topics
-  // This avoids "ghost" progress from old/invalid IDs in local storage
+  // AI Generation Logic
+  const handleSynthesizeUnit = async (unit: SyllabusUnit, idx: number) => {
+    if (!isAiConnected || analyzingUnitIdx !== null) return;
+    
+    // Check if we already have it to save tokens/time
+    if (analysisResults[idx]) {
+        // Toggle view logic could go here if we wanted to hide/show, but currently we just show if exists
+        return; 
+    }
+
+    setAnalyzingUnitIdx(idx);
+
+    try {
+      const prompt = `
+        Act as an expert Engineering Professor.
+        Analyze this syllabus unit:
+        Course: ${course.title}
+        Unit: ${unit.title}
+        Topics: ${unit.topics}
+
+        Output a JSON object with:
+        1. "summary": A concise 2-sentence summary of what this unit covers.
+        2. "examQuestions": An array of 3 likely short-answer exam questions based on these topics.
+        3. "mnemonic": A creative mnemonic to remember key concepts.
+      `;
+
+      await runGenAI(async (ai) => {
+        const schema = {
+           type: Type.OBJECT,
+           properties: {
+             summary: { type: Type.STRING },
+             examQuestions: { type: Type.ARRAY, items: { type: Type.STRING } },
+             mnemonic: { type: Type.STRING },
+           },
+           required: ["summary", "examQuestions", "mnemonic"]
+        };
+
+        const result = await ai.models.generateContent({
+           model: "gemini-3-flash-preview",
+           contents: prompt,
+           config: {
+             responseMimeType: "application/json",
+             responseSchema: schema
+           }
+        });
+
+        if (result.text) {
+           const parsed = JSON.parse(result.text) as UnitAnalysis;
+           setAnalysisResults(prev => ({ ...prev, [idx]: parsed }));
+        }
+      });
+    } catch (e) {
+      console.error("Syllabus Synthesis Error", e);
+    } finally {
+      setAnalyzingUnitIdx(null);
+    }
+  };
+
+  // Stats Calculation
   const { totalTopics, completedCount, progress } = useMemo(() => {
     const allUnits = course.units || [];
     let total = 0;
@@ -141,18 +209,71 @@ const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
           {allUnits.length > 0 ? (
             allUnits.map((unit, unitIdx) => {
               const topics = parseTopics(unit.topics);
+              const analysis = analysisResults[unitIdx];
+              const isAnalyzing = analyzingUnitIdx === unitIdx;
               
               return (
                 <div key={unitIdx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
                   {/* Unit Header */}
-                  <div className="bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-bold text-sm shrink-0">
-                      {['I', 'II', 'III', 'IV', 'V'][unitIdx]}
+                  <div className="bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-bold text-sm shrink-0">
+                        {['I', 'II', 'III', 'IV', 'V'][unitIdx]}
+                      </div>
+                      <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm md:text-base">
+                        {unit.title}
+                      </h3>
                     </div>
-                    <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm md:text-base">
-                      {unit.title}
-                    </h3>
+                    
+                    {/* AI Button */}
+                    {isAiConnected && (
+                      <button 
+                        onClick={() => handleSynthesizeUnit(unit, unitIdx)}
+                        disabled={isAnalyzing || !!analysis}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                           analysis ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 cursor-default' : 
+                           isAnalyzing ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' :
+                           'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95'
+                        }`}
+                      >
+                         {isAnalyzing ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                         {isAnalyzing ? "Synthesizing..." : analysis ? "Unit Synthesized" : "Neural Synthesis"}
+                      </button>
+                    )}
                   </div>
+
+                  {/* AI Analysis Result */}
+                  {analysis && (
+                    <div className="bg-indigo-50/50 dark:bg-indigo-950/20 border-b border-indigo-100 dark:border-indigo-900/30 p-4 animate-slide-down">
+                        <div className="grid gap-4">
+                            <div className="flex gap-3">
+                                <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/40 rounded-lg h-fit text-indigo-600 dark:text-indigo-400"><BookOpen size={16} /></div>
+                                <div>
+                                    <h4 className="text-xs font-bold uppercase text-indigo-700 dark:text-indigo-400 mb-1">Brief Summary</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{analysis.summary}</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className="p-1.5 bg-amber-100 dark:bg-amber-900/40 rounded-lg h-fit text-amber-600 dark:text-amber-400"><Brain size={16} /></div>
+                                <div>
+                                    <h4 className="text-xs font-bold uppercase text-amber-700 dark:text-amber-400 mb-1">Mnemonic</h4>
+                                    <p className="text-sm font-mono text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-black/20 p-2 rounded border border-amber-200 dark:border-amber-900/30">{analysis.mnemonic}</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg h-fit text-emerald-600 dark:text-emerald-400"><FileText size={16} /></div>
+                                <div className="w-full">
+                                    <h4 className="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400 mb-1">Exam Prediction</h4>
+                                    <ul className="list-disc pl-4 space-y-1">
+                                        {analysis.examQuestions.map((q, i) => (
+                                            <li key={i} className="text-xs text-slate-600 dark:text-slate-300">{q}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  )}
 
                   {/* Checklist */}
                   <div className="divide-y divide-slate-100 dark:divide-slate-800/50">

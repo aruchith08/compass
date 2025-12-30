@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RoadmapItem, Status } from '../types';
-import { CheckCircle2, Circle, Clock, AlertTriangle, ExternalLink, Timer } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, AlertTriangle, ExternalLink, Timer, ShieldAlert } from 'lucide-react';
 import { useRoadmap } from '../RoadmapContext';
 
 interface TaskCardProps {
@@ -10,13 +10,13 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
-  const { toggleStatus } = useRoadmap();
+  const { toggleStatus, isAiConnected } = useRoadmap();
 
   const statusColors = {
     "To Do": "text-slate-500",
     "In Progress": "text-amber-500",
     "Completed": "text-emerald-500",
-    "Revisit": "text-rose-500"
+    "Revisit": "text-rose-400"
   };
 
   const statusBg = {
@@ -35,14 +35,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
 
   const handleStatusClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const nextStatus: Record<Status, Status> = {
+    const nextStatusMap: Record<Status, Status> = {
       "To Do": "In Progress",
       "In Progress": "Completed",
       "Completed": "Revisit",
       "Revisit": "To Do"
     };
-    toggleStatus(item.id, nextStatus[item.status]);
+    
+    const nextStatus = nextStatusMap[item.status];
+
+    // Socratic Validator Interception
+    // If trying to complete a High Priority task with AI connected, force modal open
+    if (nextStatus === 'Completed' && item.priority === 'High' && isAiConnected) {
+      if (onClick) {
+        onClick(); // Open Modal
+      }
+      return;
+    }
+
+    toggleStatus(item.id, nextStatus);
   };
+
+  // Check if Socratic Validation would be triggered next
+  const isProtected = item.status === 'In Progress' && item.priority === 'High' && isAiConnected;
 
   return (
     <div 
@@ -88,10 +103,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, onClick }) => {
 
           <button 
             onClick={statusIcon[item.status] ? handleStatusClick : undefined}
-            className={`flex-shrink-0 p-2 rounded-lg transition-colors ${statusBg[item.status]} ${statusColors[item.status]}`}
-            title={`Current status: ${item.status}. Click to cycle.`}
+            className={`relative flex-shrink-0 p-2 rounded-lg transition-colors ${statusBg[item.status]} ${statusColors[item.status]}`}
+            title={isProtected ? "Verification Required: Click to open validator" : `Current status: ${item.status}. Click to cycle.`}
           >
             {statusIcon[item.status]}
+            {isProtected && (
+              <div className="absolute -top-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm">
+                <ShieldAlert size={12} className="text-indigo-500 fill-indigo-100 dark:fill-indigo-900/50" />
+              </div>
+            )}
           </button>
         </div>
 

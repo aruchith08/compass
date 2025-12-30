@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { ChevronRight, Cloud, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2 } from 'lucide-react';
+import { ChevronRight, HardDrive, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2 } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (username: string) => void;
@@ -211,7 +211,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
               </button>
               
               <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">
-                <Cloud size={12} className="text-emerald-500" />
+                <HardDrive size={12} className="text-emerald-500" />
                 <span>browser save Architecture</span>
               </div>
             </div>

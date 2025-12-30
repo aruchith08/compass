@@ -23,7 +23,10 @@ import {
   ChevronRight as ChevronRightIcon,
   User as UserIcon,
   HelpCircle,
-  Timer
+  Timer,
+  Sparkles,
+  BookOpen,
+  ArrowRight
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tracker from './components/Tracker';
@@ -152,6 +155,9 @@ const App: React.FC = () => {
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   
+  // Onboarding State
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2>(0);
+  
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [homeworkTasks, setHomeworkTasks] = useState<HomeworkTask[]>([]);
   const [linguaSession, setLinguaSession] = useState<LinguaSession | null>(null);
@@ -245,6 +251,14 @@ const App: React.FC = () => {
       setUser({ username });
       localStorage.setItem('roadmap_user_session', username);
       isInitialLoad.current = false;
+
+      // Check for Onboarding Flag
+      const onboardingCompleted = localStorage.getItem(`compass_intro_completed_${username}`);
+      if (!onboardingCompleted) {
+        // Delay slightly to allow dashboard to render behind
+        setTimeout(() => setOnboardingStep(1), 800);
+      }
+
     } catch (error) {
       console.error("Login failed", error);
       throw error;
@@ -263,6 +277,24 @@ const App: React.FC = () => {
     setInventory([]);
     localStorage.removeItem('roadmap_user_session');
     setActiveTab('dashboard');
+  };
+
+  // Onboarding Flow Handlers
+  const handleOnboardingStep1 = (showGuideAction: boolean) => {
+    setOnboardingStep(2);
+    if (showGuideAction) {
+      setShowGuide(true);
+    }
+  };
+
+  const handleOnboardingStep2 = (connectAiAction: boolean) => {
+    setOnboardingStep(0);
+    if (user) {
+      localStorage.setItem(`compass_intro_completed_${user.username}`, 'true');
+    }
+    if (connectAiAction) {
+      setShowKeyModal(true);
+    }
   };
 
   useEffect(() => {
@@ -556,6 +588,67 @@ const App: React.FC = () => {
                  </button>
                ))}
             </nav>
+            
+            {/* Onboarding Overlay 1: Welcome / Guide */}
+            {onboardingStep === 1 && (
+              <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+                <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2rem] p-8 border-2 border-emerald-500/20 shadow-2xl animate-scale-in text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                  <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Compass className="text-emerald-600 dark:text-emerald-400" size={32} />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Welcome Aboard</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-8 leading-relaxed">
+                    Compass is a deep operating system for your career. To understand how to use the trackers, AI tools, and gamification, check out the manual.
+                  </p>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => handleOnboardingStep1(true)}
+                      className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                    >
+                      <BookOpen size={18} /> Open System Manual
+                    </button>
+                    <button 
+                      onClick={() => handleOnboardingStep1(false)}
+                      className="w-full py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold uppercase tracking-widest transition-colors"
+                    >
+                      Skip For Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Onboarding Overlay 2: AI Key */}
+            {onboardingStep === 2 && (
+              <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+                <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2rem] p-8 border-2 border-indigo-500/20 shadow-2xl animate-scale-in text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-indigo-400 to-purple-500"></div>
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Sparkles className="text-indigo-600 dark:text-indigo-400" size={32} />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Unlock Full Potential</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-8 leading-relaxed">
+                    To use the <strong>Interview Coach, Resume Architect, and Neural Synthesis</strong>, you need to connect a free Google Gemini API Key.
+                  </p>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => handleOnboardingStep2(true)}
+                      className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+                    >
+                      <Key size={18} /> Add API Key
+                    </button>
+                    <button 
+                      onClick={() => handleOnboardingStep2(false)}
+                      className="w-full py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold uppercase tracking-widest transition-colors"
+                    >
+                      Use Offline Mode
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <KeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} onSave={handleSaveKey} />
             <GuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
             <PomodoroTimer isOpen={showPomodoro} onClose={() => setShowPomodoro(false)} />

@@ -7,6 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 > **Navigate your future with Compass. 🧭**
+<img width="1123" height="839" alt="image" src="https://github.com/user-attachments/assets/25e3b6dc-1278-4525-a99c-4ea8cbcf59c9" />
 
 ---
 
@@ -320,4 +321,3 @@ GitHub: [https://github.com/aruchith08](https://github.com/aruchith08)
 
 **Compass is not a planner.
 It is a system that builds careers. 🧭**
-<img width="1123" height="839" alt="image" src="https://github.com/user-attachments/assets/3c02e731-9106-4911-9022-e087d9e633b0" />

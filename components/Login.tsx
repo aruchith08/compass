@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { ChevronRight, HardDrive, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2 } from 'lucide-react';
+import { ChevronRight, HardDrive, ShieldCheck, Cpu, AlertCircle, Sparkles, Zap, Loader2, User } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (username: string) => void;
@@ -46,6 +46,15 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
           setErrorMsg("Login failed. Please check your internet connection.");
         }
       }
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setErrorMsg(null);
+    try {
+      await onLogin("Guest_User");
+    } catch (err: any) {
+      setErrorMsg("Demo login failed. Please try again.");
     }
   };
 
@@ -137,7 +146,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
           {/* Subtle Glow Effect on Hover */}
           <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             {/* Logo with Outer Ring Animation and BOUNCING effect */}
             <div className="relative inline-flex items-center justify-center mb-6 animate-float">
               <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full animate-pulse"></div>
@@ -154,7 +163,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8 relative">
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
             <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
               <label htmlFor="username" className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">
                 Enter your name
@@ -209,6 +218,27 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
                   </>
                 )}
               </button>
+
+              {/* DEMO MODE DIVIDER */}
+              <div className="relative my-5 animate-slide-up" style={{ animationDelay: '450ms' }}>
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200 dark:border-white/10"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-3 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-full">Or</span>
+                  </div>
+              </div>
+
+              {/* GUEST BUTTON */}
+              <button
+                type="button"
+                onClick={handleGuestLogin}
+                disabled={isLoading}
+                className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all flex items-center justify-center gap-2 animate-slide-up shadow-sm group/demo"
+                style={{ animationDelay: '500ms' }}
+              >
+                <User size={16} className="group-hover/demo:scale-110 transition-transform" /> Enter Demo Mode
+              </button>
               
               <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">
                 <HardDrive size={12} className="text-emerald-500" />
@@ -217,7 +247,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
             </div>
           </form>
 
-          <div className="mt-12 pt-8 border-t border-slate-100 dark:border-white/5 animate-slide-up" style={{ animationDelay: '500ms' }}>
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/5 animate-slide-up" style={{ animationDelay: '500ms' }}>
              <div className="flex items-center justify-center space-x-10 opacity-60">
                 <div className="flex flex-col items-center group/icon cursor-default">
                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-white/5 group-hover/icon:bg-emerald-50 dark:group-hover/icon:bg-emerald-500/10 transition-colors">
